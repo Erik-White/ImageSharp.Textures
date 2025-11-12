@@ -157,6 +157,48 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                     return AllocateMipMaps<Bc7>(memoryStream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
                     return AllocateMipMaps<Etc1>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc4x4>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_5x4_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_5x4_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc5x4>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc5x5>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_6x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_6x5_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc6x5>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc6x6>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_8x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_8x5_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc8x5>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_8x6_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_8x6_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc8x6>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc8x8>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x5_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc10x5>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x6_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x6_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc10x6>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x8_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x8_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc10x8>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc10x10>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_12x10_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_12x10_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc12x10>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
+                    return AllocateMipMaps<RgbaAstc12x12>(memoryStream, width, height, levelIndices);
             }
 
             throw new NotSupportedException("The pixel format is not supported");
@@ -286,6 +328,48 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                     return AllocateCubeMap<Bc7>(stream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK:
                     return AllocateCubeMap<Etc1>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_4x4_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_4x4_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc4x4>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_5x4_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_5x4_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc5x4>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_5x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_5x5_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc5x5>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_6x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_6x5_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc6x5>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_6x6_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_6x6_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc6x6>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_8x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_8x5_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc8x5>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_8x6_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_8x6_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc8x6>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_8x8_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_8x8_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc8x8>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x5_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x5_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc10x5>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x6_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x6_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc10x6>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x8_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x8_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc10x8>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_10x10_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_10x10_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc10x10>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_12x10_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_12x10_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc12x10>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_ASTC_12x12_UNORM_BLOCK:
+                case VkFormat.VK_FORMAT_ASTC_12x12_SRGB_BLOCK:
+                    return AllocateCubeMap<RgbaAstc12x12>(stream, width, height, levelIndices);
             }
 
             throw new NotSupportedException("The pixel format is not supported");

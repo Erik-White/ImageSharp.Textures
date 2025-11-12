@@ -41,7 +41,7 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
         /// <returns>The decoded mipmaps.</returns>
         public MipMap[] DecodeMipMaps(Stream stream, int width, int height, uint count)
         {
-            if (this.KtxHeader.GlTypeSize == 1)
+            if (this.KtxHeader.GlTypeSize is 0 or 1)
             {
                 switch (this.KtxHeader.GlFormat)
                 {
@@ -86,13 +86,41 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                                 return this.AllocateMipMaps<Etc1>(stream, width, height, count);
                             case GlInternalPixelFormat.CompressedRgb8Etc2:
                                 return this.AllocateMipMaps<Etc2>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc4x4Khr:
+                                return this.AllocateMipMaps<RgbaAstc4x4>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc5x4Khr:
+                                return this.AllocateMipMaps<RgbaAstc5x4>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc5x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc5x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc6x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc6x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc6x6Khr:
+                                return this.AllocateMipMaps<RgbaAstc6x6>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc8x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc8x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc8x6Khr:
+                                return this.AllocateMipMaps<RgbaAstc8x6>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc8x8Khr:
+                                return this.AllocateMipMaps<RgbaAstc8x8>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc10x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc10x6Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x6>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc10x8Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x8>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc10x10Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x10>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc12x10Khr:
+                                return this.AllocateMipMaps<RgbaAstc12x10>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedRgbaAstc12x12Khr:
+                                return this.AllocateMipMaps<RgbaAstc12x12>(stream, width, height, count);
                         }
 
                         break;
                 }
             }
 
-            if (this.KtxHeader.GlTypeSize == 2 || this.KtxHeader.GlTypeSize == 4)
+            if (this.KtxHeader.GlTypeSize is 2 or 4)
             {
                 // TODO: endianess is not respected here. Use stream reader which respects endianess.
                 switch (this.KtxHeader.GlInternalFormat)
@@ -166,12 +194,40 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                             return this.AllocateCubeMap<Etc1>(stream, width, height);
                         case GlInternalPixelFormat.CompressedRgb8Etc2:
                             return this.AllocateCubeMap<Etc2>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc4x4Khr:
+                            return this.AllocateCubeMap<RgbaAstc4x4>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc5x4Khr:
+                            return this.AllocateCubeMap<RgbaAstc5x4>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc5x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc5x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc6x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc6x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc6x6Khr:
+                            return this.AllocateCubeMap<RgbaAstc6x6>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc8x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc8x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc8x6Khr:
+                            return this.AllocateCubeMap<RgbaAstc8x6>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc8x8Khr:
+                            return this.AllocateCubeMap<RgbaAstc8x8>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc10x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc10x6Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x6>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc10x8Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x8>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc10x10Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x10>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc12x10Khr:
+                            return this.AllocateCubeMap<RgbaAstc12x10>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedRgbaAstc12x12Khr:
+                            return this.AllocateCubeMap<RgbaAstc12x12>(stream, width, height);
                     }
 
                     break;
             }
 
-            if (this.KtxHeader.GlTypeSize == 2 || this.KtxHeader.GlTypeSize == 4)
+            if (this.KtxHeader.GlTypeSize is 2 or 4)
             {
                 // TODO: endianess is not respected here. Use stream reader which respects endianess.
                 switch (this.KtxHeader.GlInternalFormat)

@@ -52,7 +52,7 @@ jobs:
               id: lfs-cache
               with:
                 path: .git/lfs
-                key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v1
+                key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v2
 
             - name: Git LFS Pull
               run: git lfs pull

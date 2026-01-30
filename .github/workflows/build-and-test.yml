@@ -42,31 +42,10 @@ jobs:
               with:
                 fetch-depth: 0
                 submodules: recursive
-
-            # See https://github.com/actions/checkout/issues/165#issuecomment-657673315
-            - name: Create LFS file list
-              run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-
-            - name: Restore LFS cache
-              uses: actions/cache@v4
-              id: lfs-cache
-              with:
-                path: .git/lfs
-                key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v2
-
-            - name: Git LFS Pull
-              run: git lfs pull
+                lfs: true
 
             - name: Install NuGet
               uses: NuGet/setup-nuget@v2
-
-            - name: Setup NuGet Cache
-              uses: actions/cache@v4
-              id: nuget-cache
-              with:
-                  path: ~/.nuget
-                  key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets') }}
-                  restore-keys: ${{ runner.os }}-nuget-
 
             - name: DotNet Setup
               uses: actions/setup-dotnet@v4

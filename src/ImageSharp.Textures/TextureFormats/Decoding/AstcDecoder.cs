@@ -1,6 +1,8 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using AstcSharp.Core;
+
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 
 /// <summary>
@@ -8,8 +10,6 @@ namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 /// Based on the Google ASTC codec implementation.
 /// </summary>
 /// <remarks>
-/// <see href="https://github.com/google/astc-codec/tree/master/src/decoder"/>
-/// </remarks>
 internal static class AstcDecoder
 {
     /// <summary>
@@ -20,13 +20,31 @@ internal static class AstcDecoder
     /// <param name="blockHeight">The height of the block footprint (4-12).</param>
     /// <param name="decodedPixels">The output span for decoded RGBA pixels.</param>
     /// <param name="isSrgb">Optional flag to indicate if the output should be in sRGB color space.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if the block dimensions are invalid.</exception>
     public static void DecodeBlock(ReadOnlySpan<byte> blockData, int blockWidth, int blockHeight, Span<byte> decodedPixels, bool isSrgb = false)
     {
-        AstcSharp.Footprint? footprint = AstcSharp.Footprint.FromDimensions(blockWidth, blockHeight);
-        if (footprint is null)
-        {
-            throw new ArgumentOutOfRangeException(nameof(blockWidth), "Block dimensions must be between 4 and 12.");
-        }
-        AstcSharp.Codec.DecompressBlock(blockData, footprint.Value, decodedPixels);
+        Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
+
+        AstcSharp.AstcDecoder.DecompressBlock(blockData, footprint, decodedPixels);
     }
+
+    private static FootprintType FootprintFromDimensions(int width, int height)
+        => (width, height) switch
+        {
+            (4, 4) => FootprintType.Footprint4x4,
+            (5, 4) => FootprintType.Footprint5x4,
+            (5, 5) => FootprintType.Footprint5x5,
+            (6, 5) => FootprintType.Footprint6x5,
+            (6, 6) => FootprintType.Footprint6x6,
+            (8, 5) => FootprintType.Footprint8x5,
+            (8, 6) => FootprintType.Footprint8x6,
+            (8, 8) => FootprintType.Footprint8x8,
+            (10, 5) => FootprintType.Footprint10x5,
+            (10, 6) => FootprintType.Footprint10x6,
+            (10, 8) => FootprintType.Footprint10x8,
+            (10, 10) => FootprintType.Footprint10x10,
+            (12, 10) => FootprintType.Footprint12x10,
+            (12, 12) => FootprintType.Footprint12x12,
+            _ => throw new ArgumentOutOfRangeException(nameof(width), "Invalid footprint type."),
+        };
 }

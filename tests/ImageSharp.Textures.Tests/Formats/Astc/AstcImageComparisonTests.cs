@@ -2,6 +2,7 @@
 // Licensed under the Six Labors Split License.
 
 using AstcSharp;
+using AstcSharp.IO;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison;
 using PixelRgba = SixLabors.ImageSharp.PixelFormats.Rgba32;
@@ -33,22 +34,18 @@ public class AstcImageComparisonTests
         }
     }
 
-#nullable enable
     [Theory]
     [MemberData(nameof(AstcTestFiles))]
     public void DecodeAstcFiles_ProducesExpectedImages(string inputPath, string expectedPath)
     {
-        using var expected = Image.Load<PixelRgba>(expectedPath);
+        using Image<PixelRgba> expected = Image.Load<PixelRgba>(expectedPath);
         byte[] inputData = File.ReadAllBytes(inputPath);
-        var inputFile = AstcFile.LoadFromMemory(inputData, out string? errorMessage);
-        int stride = expected.Width * 4;
-        byte[] decodedBuffer = new byte[stride * expected.Height];
+        AstcFile inputFile = AstcFile.FromMemory(inputData);
 
         Assert.NotNull(inputFile);
-        Assert.Null(errorMessage);
 
-        Codec.DecompressToImage(inputFile, decodedBuffer, decodedBuffer.Length, stride);
-        using var actual = Image.LoadPixelData<PixelRgba>(decodedBuffer, expected.Width, expected.Height);
+        Span<byte> decodedBuffer = AstcDecoder.DecompressToImage(inputFile);
+        using Image<PixelRgba> actual = Image.LoadPixelData<PixelRgba>(decodedBuffer, expected.Width, expected.Height);
         // Reading the buffer manually will result in x,y order instead of row,column
         actual.Mutate(x => x.RotateFlip(RotateMode.Rotate180, FlipMode.Horizontal));
 

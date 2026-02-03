@@ -6,10 +6,8 @@ using AstcSharp.Core;
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 
 /// <summary>
-/// An ASTC decoder for various block footprints.
-/// Based on the Google ASTC codec implementation.
+/// ASTC (Adaptive scalable texture compression) decoder for all valid block footprints.
 /// </summary>
-/// <remarks>
 internal static class AstcDecoder
 {
     /// <summary>

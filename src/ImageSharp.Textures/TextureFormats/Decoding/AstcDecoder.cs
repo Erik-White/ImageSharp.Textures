@@ -26,6 +26,68 @@ internal static class AstcDecoder
         AstcSharp.AstcDecoder.DecompressBlock(blockData, footprint, decodedPixels);
     }
 
+    /// <summary>
+    /// Decompresses ASTC-compressed image data to RGBA pixels.
+    /// </summary>
+    /// <param name="blockData">The compressed block data.</param>
+    /// <param name="width">The width of the texture.</param>
+    /// <param name="height">The height of the texture.</param>
+    /// <param name="blockWidth">The width of the block footprint.</param>
+    /// <param name="blockHeight">The height of the block footprint.</param>
+    /// <param name="compressedBytesPerBlock">The number of compressed bytes per block.</param>
+    /// <returns>The decompressed RGBA pixel data.</returns>
+    public static byte[] DecompressImage(
+        byte[] blockData,
+        int width,
+        int height,
+        int blockWidth,
+        int blockHeight,
+        byte compressedBytesPerBlock)
+    {
+        int blocksWide = (width + blockWidth - 1) / blockWidth;
+        int blocksHigh = (height + blockHeight - 1) / blockHeight;
+        byte[] decompressedData = new byte[width * height * 4];
+        byte[] decodedBlock = new byte[blockWidth * blockHeight * 4];
+
+        int blockIndex = 0;
+
+        for (int by = 0; by < blocksHigh; by++)
+        {
+            for (int bx = 0; bx < blocksWide; bx++)
+            {
+                int blockDataOffset = blockIndex * compressedBytesPerBlock;
+                if (blockDataOffset + compressedBytesPerBlock <= blockData.Length)
+                {
+                    DecodeBlock(
+                        blockData.AsSpan(blockDataOffset, compressedBytesPerBlock),
+                        blockWidth,
+                        blockHeight,
+                        decodedBlock);
+
+                    for (int py = 0; py < blockHeight && ((by * blockHeight) + py) < height; py++)
+                    {
+                        for (int px = 0; px < blockWidth && ((bx * blockWidth) + px) < width; px++)
+                        {
+                            int srcIndex = ((py * blockWidth) + px) * 4;
+                            int dstX = (bx * blockWidth) + px;
+                            int dstY = (by * blockHeight) + py;
+                            int dstIndex = ((dstY * width) + dstX) * 4;
+
+                            decompressedData[dstIndex] = decodedBlock[srcIndex];
+                            decompressedData[dstIndex + 1] = decodedBlock[srcIndex + 1];
+                            decompressedData[dstIndex + 2] = decodedBlock[srcIndex + 2];
+                            decompressedData[dstIndex + 3] = decodedBlock[srcIndex + 3];
+                        }
+                    }
+                }
+
+                blockIndex++;
+            }
+        }
+
+        return decompressedData;
+    }
+
     private static FootprintType FootprintFromDimensions(int width, int height)
         => (width, height) switch
         {

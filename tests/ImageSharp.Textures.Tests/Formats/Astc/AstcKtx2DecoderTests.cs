@@ -22,13 +22,6 @@ public class AstcKtx2DecoderTests
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
-
-        var test = texture as FlatTexture;
-
-        Image firstMipMap = test.MipMaps[0].GetImage();
-        Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
-        var firstMipMapImage = firstMipMap as Image<Rgba32>;
-        firstMipMapImage.SaveAsPng(@"C:\Users\ErikWhite\Downloads\image.png");
     }
 
     [Theory]

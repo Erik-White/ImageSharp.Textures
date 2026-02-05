@@ -32,6 +32,48 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
         public KtxHeader KtxHeader { get; }
 
         /// <summary>
+        /// Determines if endianness byte-swapping is needed.
+        /// </summary>
+        /// <returns>True if byte-swapping is required, false otherwise.</returns>
+        private bool NeedsEndianSwap()
+        {
+            bool isSystemLittleEndian = BitConverter.IsLittleEndian;
+            bool isFileLittleEndian = this.KtxHeader.Endianness == KtxEndianness.LittleEndian;
+            return isSystemLittleEndian != isFileLittleEndian;
+        }
+
+        /// <summary>
+        /// Swaps endianness for 16-bit values in-place.
+        /// </summary>
+        /// <param name="data">The data to swap.</param>
+        private static void SwapEndian16(Span<byte> data)
+        {
+            for (int i = 0; i < data.Length; i += 2)
+            {
+                byte temp = data[i];
+                data[i] = data[i + 1];
+                data[i + 1] = temp;
+            }
+        }
+
+        /// <summary>
+        /// Swaps endianness for 32-bit values in-place.
+        /// </summary>
+        /// <param name="data">The data to swap.</param>
+        private static void SwapEndian32(Span<byte> data)
+        {
+            for (int i = 0; i < data.Length; i += 4)
+            {
+                byte temp0 = data[i];
+                byte temp1 = data[i + 1];
+                data[i] = data[i + 3];
+                data[i + 1] = data[i + 2];
+                data[i + 2] = temp1;
+                data[i + 3] = temp0;
+            }
+        }
+
+        /// <summary>
         /// Decodes the mipmaps of a KTX textures.
         /// </summary>
         /// <param name="stream">The stream to read the texture data from.</param>
@@ -152,7 +194,6 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
 
             if (this.KtxHeader.GlTypeSize is 2 or 4)
             {
-                // TODO: endianess is not respected here. Use stream reader which respects endianess.
                 switch (this.KtxHeader.GlInternalFormat)
                 {
                     case GlInternalPixelFormat.Rgb5A1:
@@ -307,7 +348,6 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
 
             if (this.KtxHeader.GlTypeSize is 2 or 4)
             {
-                // TODO: endianess is not respected here. Use stream reader which respects endianess.
                 switch (this.KtxHeader.GlInternalFormat)
                 {
                     case GlInternalPixelFormat.Rgb5A1:
@@ -359,15 +399,17 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
 
             var cubeMapTexture = new CubemapTexture();
             var blockFormat = default(TBlock);
+            bool needsSwap = this.NeedsEndianSwap();
+
             for (int i = 0; i < numberOfMipMaps; i++)
             {
                 var dataForEachFace = this.ReadTextureDataSize(stream);
-                cubeMapTexture.PositiveX.MipMaps.Add(ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace));
-                cubeMapTexture.NegativeX.MipMaps.Add(ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace));
-                cubeMapTexture.PositiveY.MipMaps.Add(ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace));
-                cubeMapTexture.NegativeY.MipMaps.Add(ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace));
-                cubeMapTexture.PositiveZ.MipMaps.Add(ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace));
-                cubeMapTexture.NegativeZ.MipMaps.Add(ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace));
+                cubeMapTexture.PositiveX.MipMaps.Add(this.ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace, needsSwap));
+                cubeMapTexture.NegativeX.MipMaps.Add(this.ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace, needsSwap));
+                cubeMapTexture.PositiveY.MipMaps.Add(this.ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace, needsSwap));
+                cubeMapTexture.NegativeY.MipMaps.Add(this.ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace, needsSwap));
+                cubeMapTexture.PositiveZ.MipMaps.Add(this.ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace, needsSwap));
+                cubeMapTexture.NegativeZ.MipMaps.Add(this.ReadFaceTexture(stream, width, height, blockFormat, dataForEachFace, needsSwap));
 
                 width >>= 1;
                 height >>= 1;
@@ -376,11 +418,25 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
             return cubeMapTexture;
         }
 
-        private static MipMap<TBlock> ReadFaceTexture<TBlock>(Stream stream, int width, int height, TBlock blockFormat, uint dataForEachFace)
+        private MipMap<TBlock> ReadFaceTexture<TBlock>(Stream stream, int width, int height, TBlock blockFormat, uint dataForEachFace, bool needsSwap)
             where TBlock : struct, IBlock<TBlock>
         {
             byte[] faceData = new byte[dataForEachFace];
             ReadTextureData(stream, faceData);
+
+            // Apply endianness conversion if needed
+            if (needsSwap)
+            {
+                if (this.KtxHeader.GlTypeSize == 2)
+                {
+                    SwapEndian16(faceData);
+                }
+                else if (this.KtxHeader.GlTypeSize == 4)
+                {
+                    SwapEndian32(faceData);
+                }
+            }
+
             return new MipMap<TBlock>(blockFormat, faceData, width, height);
         }
 
@@ -412,11 +468,26 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
 
             var blockFormat = default(TBlock);
             var mipMaps = new MipMap<TBlock>[count];
+            bool needsSwap = this.NeedsEndianSwap();
+
             for (int i = 0; i < count; i++)
             {
                 var pixelDataSize = this.ReadTextureDataSize(stream);
                 byte[] mipMapData = new byte[pixelDataSize];
                 ReadTextureData(stream, mipMapData);
+
+                // Apply endianness conversion if needed
+                if (needsSwap)
+                {
+                    if (this.KtxHeader.GlTypeSize == 2)
+                    {
+                        SwapEndian16(mipMapData);
+                    }
+                    else if (this.KtxHeader.GlTypeSize == 4)
+                    {
+                        SwapEndian32(mipMapData);
+                    }
+                }
 
                 mipMaps[i] = new MipMap<TBlock>(blockFormat, mipMapData, width, height);
 
@@ -444,7 +515,9 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                 throw new TextureFormatException("could not read texture data length from the stream");
             }
 
-            var pixelDataSize = BinaryPrimitives.ReadUInt32LittleEndian(this.buffer);
+            uint pixelDataSize = this.KtxHeader.Endianness == KtxEndianness.LittleEndian
+                ? BinaryPrimitives.ReadUInt32LittleEndian(this.buffer)
+                : BinaryPrimitives.ReadUInt32BigEndian(this.buffer);
 
             return pixelDataSize;
         }

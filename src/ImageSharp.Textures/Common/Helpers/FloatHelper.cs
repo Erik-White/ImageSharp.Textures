@@ -1,6 +1,7 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using System;
 using System.Runtime.CompilerServices;
 
 namespace SixLabors.ImageSharp.Textures.Common.Helpers
@@ -14,24 +15,10 @@ namespace SixLabors.ImageSharp.Textures.Common.Helpers
         public static uint PackFloatToFloat32(float value) => Unsafe.As<float, uint>(ref value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float UnpackFloat16ToFloat(uint value)
-        {
-            uint result =
-                ((value >> 15) << 31) |
-                ((((value >> 10) & 0x1f) - 15 + 127) << 23) |
-                ((value & 0x3ff) << 13);
-            return Unsafe.As<uint, float>(ref result);
-        }
+        public static float UnpackFloat16ToFloat(uint value) => (float)BitConverter.UInt16BitsToHalf((ushort)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint PackFloatToFloat16(float value)
-        {
-            uint temp = Unsafe.As<float, uint>(ref value);
-            return
-                ((temp >> 31) << 15) |
-                ((((temp >> 23) & 0xff) - 127 + 15) << 10) |
-                ((temp & 0x7fffff) >> 13);
-        }
+        public static uint PackFloatToFloat16(float value) => BitConverter.HalfToUInt16Bits((Half)value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float UnpackFloat10ToFloat(uint value)

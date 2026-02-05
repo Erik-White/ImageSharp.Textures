@@ -114,6 +114,36 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                                 return this.AllocateMipMaps<RgbaAstc12x10>(stream, width, height, count);
                             case GlInternalPixelFormat.CompressedRgbaAstc12x12Khr:
                                 return this.AllocateMipMaps<RgbaAstc12x12>(stream, width, height, count);
+
+                            // ASTC sRGB variants (use same decoder as RGBA variants)
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc4x4Khr:
+                                return this.AllocateMipMaps<RgbaAstc4x4>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x4Khr:
+                                return this.AllocateMipMaps<RgbaAstc5x4>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc5x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc6x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x6Khr:
+                                return this.AllocateMipMaps<RgbaAstc6x6>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc8x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x6Khr:
+                                return this.AllocateMipMaps<RgbaAstc8x6>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x8Khr:
+                                return this.AllocateMipMaps<RgbaAstc8x8>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x5Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x5>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x6Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x6>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x8Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x8>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x10Khr:
+                                return this.AllocateMipMaps<RgbaAstc10x10>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x10Khr:
+                                return this.AllocateMipMaps<RgbaAstc12x10>(stream, width, height, count);
+                            case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x12Khr:
+                                return this.AllocateMipMaps<RgbaAstc12x12>(stream, width, height, count);
                         }
 
                         break;
@@ -135,6 +165,24 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                         return this.AllocateMipMaps<Rgba64>(stream, width, height, count);
                     case GlInternalPixelFormat.Rgba32UnsignedInt:
                         return this.AllocateMipMaps<Rgba128>(stream, width, height, count);
+
+                    // HDR floating-point formats
+                    case GlInternalPixelFormat.R16F:
+                        return this.AllocateMipMaps<R16Float>(stream, width, height, count);
+                    case GlInternalPixelFormat.Rg16F:
+                        return this.AllocateMipMaps<Rg32Float>(stream, width, height, count);
+                    case GlInternalPixelFormat.Rgb16F:
+                        return this.AllocateMipMaps<Rgb48Float>(stream, width, height, count);
+                    case GlInternalPixelFormat.Rgba16F:
+                        return this.AllocateMipMaps<Rgba64Float>(stream, width, height, count);
+                    case GlInternalPixelFormat.R32F:
+                        return this.AllocateMipMaps<Fp32>(stream, width, height, count);
+                    case GlInternalPixelFormat.Rg32F:
+                        return this.AllocateMipMaps<Rg64Float>(stream, width, height, count);
+                    case GlInternalPixelFormat.Rgb32F:
+                        return this.AllocateMipMaps<Rgb96Float>(stream, width, height, count);
+                    case GlInternalPixelFormat.Rgba32F:
+                        return this.AllocateMipMaps<Rgba128Float>(stream, width, height, count);
                 }
             }
 
@@ -222,6 +270,36 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                             return this.AllocateCubeMap<RgbaAstc12x10>(stream, width, height);
                         case GlInternalPixelFormat.CompressedRgbaAstc12x12Khr:
                             return this.AllocateCubeMap<RgbaAstc12x12>(stream, width, height);
+
+                        // ASTC sRGB variants (use same decoder as RGBA variants)
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc4x4Khr:
+                            return this.AllocateCubeMap<RgbaAstc4x4>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x4Khr:
+                            return this.AllocateCubeMap<RgbaAstc5x4>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc5x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc6x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x6Khr:
+                            return this.AllocateCubeMap<RgbaAstc6x6>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc8x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x6Khr:
+                            return this.AllocateCubeMap<RgbaAstc8x6>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x8Khr:
+                            return this.AllocateCubeMap<RgbaAstc8x8>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x5Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x5>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x6Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x6>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x8Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x8>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x10Khr:
+                            return this.AllocateCubeMap<RgbaAstc10x10>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x10Khr:
+                            return this.AllocateCubeMap<RgbaAstc12x10>(stream, width, height);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x12Khr:
+                            return this.AllocateCubeMap<RgbaAstc12x12>(stream, width, height);
                     }
 
                     break;
@@ -242,6 +320,24 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx
                         return this.AllocateCubeMap<Rgba64>(stream, width, height);
                     case GlInternalPixelFormat.Rgba32UnsignedInt:
                         return this.AllocateCubeMap<Rgba128>(stream, width, height);
+
+                    // HDR floating-point formats
+                    case GlInternalPixelFormat.R16F:
+                        return this.AllocateCubeMap<R16Float>(stream, width, height);
+                    case GlInternalPixelFormat.Rg16F:
+                        return this.AllocateCubeMap<Rg32Float>(stream, width, height);
+                    case GlInternalPixelFormat.Rgb16F:
+                        return this.AllocateCubeMap<Rgb48Float>(stream, width, height);
+                    case GlInternalPixelFormat.Rgba16F:
+                        return this.AllocateCubeMap<Rgba64Float>(stream, width, height);
+                    case GlInternalPixelFormat.R32F:
+                        return this.AllocateCubeMap<Fp32>(stream, width, height);
+                    case GlInternalPixelFormat.Rg32F:
+                        return this.AllocateCubeMap<Rg64Float>(stream, width, height);
+                    case GlInternalPixelFormat.Rgb32F:
+                        return this.AllocateCubeMap<Rgb96Float>(stream, width, height);
+                    case GlInternalPixelFormat.Rgba32F:
+                        return this.AllocateCubeMap<Rgba128Float>(stream, width, height);
                 }
             }
 

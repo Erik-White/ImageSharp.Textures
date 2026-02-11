@@ -67,5 +67,19 @@ public static class TestImages
             public const string Mipmap_Ldr_12x12_Posx = "astc_mipmap_ldr_12x12_posx.ktx2";
             public const string Mipmap_Ldr_Cubemap_6x6 = "astc_mipmap_ldr_cubemap_6x6.ktx2";
         }
+
+        public static class Hdr
+        {
+            public const string R16 = "hdr-rgb16-r16.ktx2";
+            public const string Rg16 = "hdr-rgb16-rg16.ktx2";
+            public const string Rgb16 = "hdr-rgb16-rgb16.ktx2";
+            public const string Rgba16 = "hdr-rgb16-rgba16.ktx2";
+            public const string R32 = "hdr-rgb32-r32.ktx2";
+            public const string Rg32 = "hdr-rgb32-rg32.ktx2";
+            public const string Rgb32 = "hdr-rgb32-rgb32.ktx2";
+            public const string Rgba32 = "hdr-rgb32-rgba32.ktx2";
+            public const string Rgb9e5 = "hdr-rgb32-rgb9e5.ktx2";
+            public const string B10g11r11 = "hdr-rgb32-b10g11r11.ktx2";
+        }
     }
 }

@@ -11,6 +11,11 @@ public static class TestImages
     public static class Ktx
     {
         public const string Rgba = "rgba8888.ktx";
+
+        public static class Astc
+        {
+            public const string Rgb32_8x8 = "astc-rgba32-8x8.ktx";
+        }
     }
 
     public static class Ktx2

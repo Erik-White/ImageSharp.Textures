@@ -1,75 +1,73 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Tests
+namespace SixLabors.ImageSharp.Textures.Tests;
+
+/// <summary>
+/// Class that contains all the relative test image paths in the Images/Input/Formats directory.
+/// </summary>
+public static class TestImages
 {
-    /// <summary>
-    /// Class that contains all the relative test image paths in the Images/Input/Formats directory.
-    /// </summary>
-    public static class TestImages
+    public static class Ktx
     {
-        public static class Ktx
+        public const string Rgba = "rgba8888.ktx";
+    }
+
+    public static class Ktx2
+    {
+        public static class Astc
         {
-            public const string Rgba = "rgba8888.ktx";
-        }
+            // Flat textures with various block sizes
+            public const string Ldr_4x4_FlightHelmet = "astc_ldr_4x4_FlightHelmet_baseColor.ktx2";
+            public const string Ldr_5x4_IronBars = "astc_ldr_5x4_Iron_Bars_001_normal.ktx2";
+            public const string Ldr_6x5_FlightHelmet = "astc_ldr_6x5_FlightHelmet_baseColor.ktx2";
+            public const string Ldr_6x6_IronBars = "astc_ldr_6x6_Iron_Bars_001_normal.ktx2";
+            public const string Ldr_6x6_Posx = "astc_ldr_6x6_posx.ktx2";
+            public const string Ldr_8x6_FlightHelmet = "astc_ldr_8x6_FlightHelmet_baseColor.ktx2";
+            public const string Ldr_8x8_FlightHelmet = "astc_ldr_8x8_FlightHelmet_baseColor.ktx2";
+            public const string Ldr_10x5_FlightHelmet = "astc_ldr_10x5_FlightHelmet_baseColor.ktx2";
+            public const string Ldr_12x10_FlightHelmet = "astc_ldr_12x10_FlightHelmet_baseColor.ktx2";
+            public const string Ldr_12x12_FlightHelmet = "astc_ldr_12x12_FlightHelmet_baseColor.ktx2";
+            public const string Rgb32_4x4 = "astc-rgb32-4x4.ktx2";
+            public const string Rgb32_5x4 = "astc-rgb32-5x4.ktx2";
+            public const string Rgb32_5x5 = "astc-rgb32-5x5.ktx2";
+            public const string Rgb32_6x5 = "astc-rgb32-6x5.ktx2";
+            public const string Rgb32_6x6 = "astc-rgb32-6x6.ktx2";
+            public const string Rgb32_8x5 = "astc-rgb32-8x5.ktx2";
+            public const string Rgb32_8x6 = "astc-rgb32-8x6.ktx2";
+            public const string Rgb32_8x8 = "astc-rgb32-8x8.ktx2";
+            public const string Rgb32_10x5 = "astc-rgb32-10x5.ktx2";
+            public const string Rgb32_10x6 = "astc-rgb32-10x6.ktx2";
+            public const string Rgb32_10x8 = "astc-rgb32-10x8.ktx2";
+            public const string Rgb32_10x10 = "astc-rgb32-10x10.ktx2";
+            public const string Rgb32_12x10 = "astc-rgb32-12x10.ktx2";
+            public const string Rgb32_12x12 = "astc-rgb32-12x12.ktx2";
 
-        public static class Ktx2
-        {
-            public static class Astc
-            {
-                // Flat textures with various block sizes
-                public const string Ldr_4x4_FlightHelmet = "astc_ldr_4x4_FlightHelmet_baseColor.ktx2";
-                public const string Ldr_5x4_IronBars = "astc_ldr_5x4_Iron_Bars_001_normal.ktx2";
-                public const string Ldr_6x5_FlightHelmet = "astc_ldr_6x5_FlightHelmet_baseColor.ktx2";
-                public const string Ldr_6x6_IronBars = "astc_ldr_6x6_Iron_Bars_001_normal.ktx2";
-                public const string Ldr_6x6_Posx = "astc_ldr_6x6_posx.ktx2";
-                public const string Ldr_8x6_FlightHelmet = "astc_ldr_8x6_FlightHelmet_baseColor.ktx2";
-                public const string Ldr_8x8_FlightHelmet = "astc_ldr_8x8_FlightHelmet_baseColor.ktx2";
-                public const string Ldr_10x5_FlightHelmet = "astc_ldr_10x5_FlightHelmet_baseColor.ktx2";
-                public const string Ldr_12x10_FlightHelmet = "astc_ldr_12x10_FlightHelmet_baseColor.ktx2";
-                public const string Ldr_12x12_FlightHelmet = "astc_ldr_12x12_FlightHelmet_baseColor.ktx2";
-                public const string Rgb32Unorm_4x4 = "ldr-rgb32-astc_4x4_unorm.ktx2";
-                public const string Rgb32Unorm_5x4 = "ldr-rgb32-astc_5x4_unorm.ktx2";
-                public const string Rgb32Unorm_5x5 = "ldr-rgb32-astc_5x5_unorm.ktx2";
-                public const string Rgb32Unorm_6x5 = "ldr-rgb32-astc_6x5_unorm.ktx2";
-                public const string Rgb32Unorm_6x6 = "ldr-rgb32-astc_6x6_unorm.ktx2";
-                public const string Rgb32Unorm_8x5 = "ldr-rgb32-astc_8x5_unorm.ktx2";
-                public const string Rgb32Unorm_8x6 = "ldr-rgb32-astc_8x6_unorm.ktx2";
-                public const string Rgb32Unorm_8x8 = "ldr-rgb32-astc_8x8_unorm.ktx2";
-                public const string Rgb32Unorm_10x5 = "ldr-rgb32-astc_10x5_unorm.ktx2";
-                public const string Rgb32Unorm_10x6 = "ldr-rgb32-astc_10x6_unorm.ktx2";
-                public const string Rgb32Unorm_10x8 = "ldr-rgb32-astc_10x8_unorm.ktx2";
-                public const string Rgb32Unorm_10x10 = "ldr-rgb32-astc_10x10_unorm.ktx2";
-                public const string Rgb32Unorm_12x10 = "ldr-rgb32-astc_12x10_unorm.ktx2";
-                public const string Rgb32Unorm_12x12 = "ldr-rgb32-astc_12x12_unorm.ktx2";
+            // Volume textures
+            public const string Ldr_6x6_3dTex = "astc_ldr_6x6_3dtex_7.ktx2";
 
+            // Array textures
+            public const string Ldr_6x6_ArrayTex = "astc_ldr_6x6_arraytex_7.ktx2";
+            public const string Ldr_6x6_ArrayTex_Mipmap = "astc_ldr_6x6_arraytex_7_mipmap.ktx2";
 
-                // Volume textures
-                public const string Ldr_6x6_3dTex = "astc_ldr_6x6_3dtex_7.ktx2";
+            // Cubemap textures
+            public const string Ldr_Cubemap_6x6 = "astc_ldr_cubemap_6x6.ktx2";
 
-                // Array textures
-                public const string Ldr_6x6_ArrayTex = "astc_ldr_6x6_arraytex_7.ktx2";
-                public const string Ldr_6x6_ArrayTex_Mipmap = "astc_ldr_6x6_arraytex_7_mipmap.ktx2";
-
-                // Cubemap textures
-                public const string Ldr_Cubemap_6x6 = "astc_ldr_cubemap_6x6.ktx2";
-
-                // Mipmap tests with different quality settings
-                public const string Mipmap_Ldr_4x4_Posx = "astc_mipmap_ldr_4x4_posx.ktx2";
-                public const string Mipmap_Ldr_6x5_Posx = "astc_mipmap_ldr_6x5_posx.ktx2";
-                public const string Mipmap_Ldr_6x6_Fast = "astc_mipmap_ldr_6x6_kodim17_fast.ktx2";
-                public const string Mipmap_Ldr_6x6_Medium = "astc_mipmap_ldr_6x6_kodim17_medium.ktx2";
-                public const string Mipmap_Ldr_6x6_Fastest = "astc_mipmap_ldr_6x6_kodim17_fastest.ktx2";
-                public const string Mipmap_Ldr_6x6_Posx = "astc_mipmap_ldr_6x6_posx.ktx2";
-                public const string Mipmap_Ldr_6x6_Posy = "astc_mipmap_ldr_6x6_posy.ktx2";
-                public const string Mipmap_Ldr_6x6_Posz = "astc_mipmap_ldr_6x6_posz.ktx2";
-                public const string Mipmap_Ldr_8x6_Posx = "astc_mipmap_ldr_8x6_posx.ktx2";
-                public const string Mipmap_Ldr_8x8_Posx = "astc_mipmap_ldr_8x8_posx.ktx2";
-                public const string Mipmap_Ldr_10x5_Posx = "astc_mipmap_ldr_10x5_posx.ktx2";
-                public const string Mipmap_Ldr_12x10_Posx = "astc_mipmap_ldr_12x10_posx.ktx2";
-                public const string Mipmap_Ldr_12x12_Posx = "astc_mipmap_ldr_12x12_posx.ktx2";
-                public const string Mipmap_Ldr_Cubemap_6x6 = "astc_mipmap_ldr_cubemap_6x6.ktx2";
-            }
+            // Mipmap tests with different quality settings
+            public const string Mipmap_Ldr_4x4_Posx = "astc_mipmap_ldr_4x4_posx.ktx2";
+            public const string Mipmap_Ldr_6x5_Posx = "astc_mipmap_ldr_6x5_posx.ktx2";
+            public const string Mipmap_Ldr_6x6_Fast = "astc_mipmap_ldr_6x6_kodim17_fast.ktx2";
+            public const string Mipmap_Ldr_6x6_Medium = "astc_mipmap_ldr_6x6_kodim17_medium.ktx2";
+            public const string Mipmap_Ldr_6x6_Fastest = "astc_mipmap_ldr_6x6_kodim17_fastest.ktx2";
+            public const string Mipmap_Ldr_6x6_Posx = "astc_mipmap_ldr_6x6_posx.ktx2";
+            public const string Mipmap_Ldr_6x6_Posy = "astc_mipmap_ldr_6x6_posy.ktx2";
+            public const string Mipmap_Ldr_6x6_Posz = "astc_mipmap_ldr_6x6_posz.ktx2";
+            public const string Mipmap_Ldr_8x6_Posx = "astc_mipmap_ldr_8x6_posx.ktx2";
+            public const string Mipmap_Ldr_8x8_Posx = "astc_mipmap_ldr_8x8_posx.ktx2";
+            public const string Mipmap_Ldr_10x5_Posx = "astc_mipmap_ldr_10x5_posx.ktx2";
+            public const string Mipmap_Ldr_12x10_Posx = "astc_mipmap_ldr_12x10_posx.ktx2";
+            public const string Mipmap_Ldr_12x12_Posx = "astc_mipmap_ldr_12x12_posx.ktx2";
+            public const string Mipmap_Ldr_Cubemap_6x6 = "astc_mipmap_ldr_cubemap_6x6.ktx2";
         }
     }
 }

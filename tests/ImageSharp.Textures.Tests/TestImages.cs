@@ -28,6 +28,21 @@ namespace SixLabors.ImageSharp.Textures.Tests
                 public const string Ldr_10x5_FlightHelmet = "astc_ldr_10x5_FlightHelmet_baseColor.ktx2";
                 public const string Ldr_12x10_FlightHelmet = "astc_ldr_12x10_FlightHelmet_baseColor.ktx2";
                 public const string Ldr_12x12_FlightHelmet = "astc_ldr_12x12_FlightHelmet_baseColor.ktx2";
+                public const string Rgb32Unorm_4x4 = "ldr-rgb32-astc_4x4_unorm.ktx2";
+                public const string Rgb32Unorm_5x4 = "ldr-rgb32-astc_5x4_unorm.ktx2";
+                public const string Rgb32Unorm_5x5 = "ldr-rgb32-astc_5x5_unorm.ktx2";
+                public const string Rgb32Unorm_6x5 = "ldr-rgb32-astc_6x5_unorm.ktx2";
+                public const string Rgb32Unorm_6x6 = "ldr-rgb32-astc_6x6_unorm.ktx2";
+                public const string Rgb32Unorm_8x5 = "ldr-rgb32-astc_8x5_unorm.ktx2";
+                public const string Rgb32Unorm_8x6 = "ldr-rgb32-astc_8x6_unorm.ktx2";
+                public const string Rgb32Unorm_8x8 = "ldr-rgb32-astc_8x8_unorm.ktx2";
+                public const string Rgb32Unorm_10x5 = "ldr-rgb32-astc_10x5_unorm.ktx2";
+                public const string Rgb32Unorm_10x6 = "ldr-rgb32-astc_10x6_unorm.ktx2";
+                public const string Rgb32Unorm_10x8 = "ldr-rgb32-astc_10x8_unorm.ktx2";
+                public const string Rgb32Unorm_10x10 = "ldr-rgb32-astc_10x10_unorm.ktx2";
+                public const string Rgb32Unorm_12x10 = "ldr-rgb32-astc_12x10_unorm.ktx2";
+                public const string Rgb32Unorm_12x12 = "ldr-rgb32-astc_12x12_unorm.ktx2";
+
 
                 // Volume textures
                 public const string Ldr_6x6_3dTex = "astc_ldr_6x6_3dtex_7.ktx2";

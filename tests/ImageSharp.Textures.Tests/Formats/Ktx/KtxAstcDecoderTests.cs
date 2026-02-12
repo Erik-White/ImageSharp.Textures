@@ -6,7 +6,6 @@ using SixLabors.ImageSharp.Textures.Formats.Ktx;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes;
-using SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders;
 using SixLabors.ImageSharp.Textures.TextureFormats;
 
@@ -36,8 +35,6 @@ public class KtxAstcDecoderTests
 
         Image<Rgba32> firstMipMapImage = firstMipMap as Image<Rgba32>;
 
-        // Note that the comparer is given a high threshold to allow for the lossy compression of ASTC,
-        // especially at larger block sizes, but the output is still expected to be very similar to the reference image.
-        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(2.0f), provider, appendPixelTypeToFileName: false);
+        firstMipMapImage.CompareToReferenceOutput(provider, appendPixelTypeToFileName: false);
     }
 }

@@ -1,6 +1,8 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Formats.Ktx2;
@@ -119,6 +121,31 @@ public partial class Ktx2AstcDecoderTests
         Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
 
         (firstMipMap as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.05f), provider, testOutputDetails: $"{blockSize}");
+    }
+
+    [Theory(Skip = "Supercompression support not yet implemented")]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zlib1)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zlib9)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zstd1)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zstd9)]
+    public void Ktx2AstcDecoder_CanDecode_Rgba32_Supercompressed(TestTextureProvider provider)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(provider.InputFile);
+        string compressionDetails = fileName.Contains("ZLIB", StringComparison.Ordinal) ? fileName.Substring(fileName.IndexOf("ZLIB", StringComparison.Ordinal)) : fileName.Substring(fileName.IndexOf("ZSTD", StringComparison.Ordinal));
+
+        using Texture texture = provider.GetTexture(KtxDecoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        Assert.NotNull(flatTexture?.MipMaps);
+        Assert.Single(flatTexture.MipMaps);
+
+        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+        Assert.Equal(16, firstMipMap.Width);
+        Assert.Equal(16, firstMipMap.Height);
+        Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
+
+        (firstMipMap as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.05f), provider, testOutputDetails: $"{compressionDetails}");
     }
 
     private static string GetBlockSizeFromFileName(string fileName)

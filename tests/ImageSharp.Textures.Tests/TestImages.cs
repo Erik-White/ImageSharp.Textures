@@ -78,6 +78,14 @@ public static class TestImages
             public const string Rgb32_Unorm_12x10 = "valid_ASTC_12x10_UNORM_BLOCK_2D.ktx2";
             public const string Rgb32_Unorm_12x12 = "valid_ASTC_12x12_UNORM_BLOCK_2D.ktx2";
 
+            // Supercompressed textures (ZLIB)
+            public const string Rgb32_Unorm_4x4_Zlib1 = "valid_ASTC_4x4_UNORM_BLOCK_2D_ZLIB_1.ktx2";
+            public const string Rgb32_Unorm_4x4_Zlib9 = "valid_ASTC_4x4_UNORM_BLOCK_2D_ZLIB_9.ktx2";
+
+            // Supercompressed textures (ZSTD)
+            public const string Rgb32_Unorm_4x4_Zstd1 = "valid_ASTC_4x4_UNORM_BLOCK_2D_ZSTD_1.ktx2";
+            public const string Rgb32_Unorm_4x4_Zstd9 = "valid_ASTC_4x4_UNORM_BLOCK_2D_ZSTD_9.ktx2";
+
             // Volume textures
             public const string Ldr_6x6_3dTex = "astc_ldr_6x6_3dtex_7.ktx2";
 

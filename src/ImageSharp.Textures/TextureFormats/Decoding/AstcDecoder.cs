@@ -61,8 +61,8 @@ internal static class AstcDecoder
         byte compressedBytesPerBlock)
     {
         ArgumentNullException.ThrowIfNull(blockData);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(0, width);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(0, height);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(width, 0);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(height, 0);
 
         if (compressedBytesPerBlock != AstcBlockSize)
         {

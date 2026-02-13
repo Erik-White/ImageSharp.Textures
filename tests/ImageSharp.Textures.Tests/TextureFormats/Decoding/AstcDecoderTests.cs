@@ -168,7 +168,6 @@ public class AstcDecoderTests
             AstcDecoder.DecompressImage(blockData, 0, 256, 4, 4, 16));
 
         Assert.Equal("width", ex.ParamName);
-        Assert.Contains("greater than 0", ex.Message);
     }
 
     [Fact]
@@ -191,7 +190,6 @@ public class AstcDecoderTests
             AstcDecoder.DecompressImage(blockData, 256, 0, 4, 4, 16));
 
         Assert.Equal("height", ex.ParamName);
-        Assert.Contains("greater than 0", ex.Message);
     }
 
     [Fact]

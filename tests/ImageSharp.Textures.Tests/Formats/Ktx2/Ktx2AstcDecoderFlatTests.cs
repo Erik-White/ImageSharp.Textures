@@ -15,7 +15,7 @@ namespace SixLabors.ImageSharp.Textures.Tests.Formats.Ktx2;
 
 [Trait("Format", "Ktx2")]
 [Trait("Format", "Astc")]
-public partial class Ktx2AstcDecoderTests
+public partial class Ktx2AstcDecoderFlatTests
 {
     private static readonly Ktx2Decoder KtxDecoder = new();
 

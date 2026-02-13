@@ -1,8 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using System;
-using System.IO;
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Formats.Ktx2;
@@ -45,15 +43,16 @@ public partial class Ktx2AstcDecoderTests
         Assert.NotNull(flatTexture?.MipMaps);
         Assert.Single(flatTexture.MipMaps);
 
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+        using Image firstMipMap = flatTexture.MipMaps[0].GetImage();
         Assert.Equal(256, firstMipMap.Width);
         Assert.Equal(256, firstMipMap.Height);
         Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
 
         Image<Rgba32> firstMipMapImage = firstMipMap as Image<Rgba32>;
 
-        // Note that the comparer is given a high threshold to allow for the lossy compression of ASTC,
+        // Note that the comparer is given a higher threshold to allow for the lossy compression of ASTC,
         // especially at larger block sizes, but the output is still expected to be very similar to the reference image.
+        // A single reference image is used to save on the amount of test data otherwise required for each block size.
         firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(4.0f), provider, appendPixelTypeToFileName: false);
     }
 
@@ -82,7 +81,7 @@ public partial class Ktx2AstcDecoderTests
         Assert.NotNull(flatTexture?.MipMaps);
         Assert.Single(flatTexture.MipMaps);
 
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+        using Image firstMipMap = flatTexture.MipMaps[0].GetImage();
         Assert.Equal(16, firstMipMap.Width);
         Assert.Equal(16, firstMipMap.Height);
         Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
@@ -115,12 +114,29 @@ public partial class Ktx2AstcDecoderTests
         Assert.NotNull(flatTexture?.MipMaps);
         Assert.Single(flatTexture.MipMaps);
 
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+        using Image firstMipMap = flatTexture.MipMaps[0].GetImage();
         Assert.Equal(16, firstMipMap.Width);
         Assert.Equal(16, firstMipMap.Height);
         Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
 
         (firstMipMap as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.05f), provider, testOutputDetails: $"{blockSize}");
+    }
+
+    [Theory]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Ldr_6x6_ArrayTex_Mipmap)]
+    public void Ktx2AstcDecoder_CanDecode_MipMaps(TestTextureProvider provider)
+    {
+        int mimMapLevel = 0;
+
+        using Texture texture = provider.GetTexture(KtxDecoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        foreach (MipMap mipMap in flatTexture.MipMaps)
+        {
+            using Image image = mipMap.GetImage();
+            (image as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.Exact, provider, testOutputDetails: $"{mimMapLevel++}");
+        }
     }
 
     [Theory(Skip = "Supercompression support not yet implemented")]
@@ -131,7 +147,9 @@ public partial class Ktx2AstcDecoderTests
     public void Ktx2AstcDecoder_CanDecode_Rgba32_Supercompressed(TestTextureProvider provider)
     {
         string fileName = Path.GetFileNameWithoutExtension(provider.InputFile);
-        string compressionDetails = fileName.Contains("ZLIB", StringComparison.Ordinal) ? fileName.Substring(fileName.IndexOf("ZLIB", StringComparison.Ordinal)) : fileName.Substring(fileName.IndexOf("ZSTD", StringComparison.Ordinal));
+        string compressionDetails = fileName.Contains("ZLIB", StringComparison.Ordinal)
+            ? fileName[fileName.IndexOf("ZLIB", StringComparison.Ordinal)..]
+            : fileName[fileName.IndexOf("ZSTD", StringComparison.Ordinal)..];
 
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);
@@ -140,7 +158,7 @@ public partial class Ktx2AstcDecoderTests
         Assert.NotNull(flatTexture?.MipMaps);
         Assert.Single(flatTexture.MipMaps);
 
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+        using Image firstMipMap = flatTexture.MipMaps[0].GetImage();
         Assert.Equal(16, firstMipMap.Width);
         Assert.Equal(16, firstMipMap.Height);
         Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);

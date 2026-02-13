@@ -123,6 +123,22 @@ public partial class Ktx2AstcDecoderFlatTests
     }
 
     [Theory]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Srgb_Large)]
+    public void Ktx2AstcDecoder_CanDecode_Rgba32_Srgb_Large(TestTextureProvider provider)
+    {
+        using Texture texture = provider.GetTexture(KtxDecoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        using Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+        Assert.Equal(2048, firstMipMap.Width);
+        Assert.Equal(2048, firstMipMap.Height);
+        Assert.Equal(32, firstMipMap.PixelType.BitsPerPixel);
+
+        (firstMipMap as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.Exact, provider);
+    }
+
+    [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Ldr_6x6_ArrayTex_Mipmap)]
     public void Ktx2AstcDecoder_CanDecode_MipMaps(TestTextureProvider provider)
     {

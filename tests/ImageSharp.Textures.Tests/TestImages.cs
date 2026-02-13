@@ -72,7 +72,6 @@ public static class TestImages
 
             // Textures with several levels of MipMaps
             public const string Rgb32_Srgb_6x6_MipMap = "astc_ldr_6x6_arraytex_7_mipmap.ktx2";
-            public const string Mipmap_Ldr_Cubemap_6x6 = "astc_mipmap_ldr_cubemap_6x6.ktx2";
 
             // Supercompressed textures (ZLIB)
             public const string Rgb32_Unorm_4x4_Zlib1 = "valid_ASTC_4x4_UNORM_BLOCK_2D_ZLIB_1.ktx2";

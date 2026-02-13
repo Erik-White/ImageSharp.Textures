@@ -139,7 +139,7 @@ public partial class Ktx2AstcDecoderFlatTests
     }
 
     [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Ldr_6x6_ArrayTex_Mipmap)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Srgb_6x6_MipMap)]
     public void Ktx2AstcDecoder_CanDecode_MipMaps(TestTextureProvider provider)
     {
         int mimMapLevel = 0;

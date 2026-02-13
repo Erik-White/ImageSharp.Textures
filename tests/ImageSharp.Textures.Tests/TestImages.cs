@@ -71,7 +71,7 @@ public static class TestImages
             public const string Rgb32_Srgb_Large = "astc_ldr_10x5_FlightHelmet_baseColor.ktx2";
 
             // Textures with several levels of MipMaps
-            public const string Ldr_6x6_ArrayTex_Mipmap = "astc_ldr_6x6_arraytex_7_mipmap.ktx2";
+            public const string Rgb32_Srgb_6x6_MipMap = "astc_ldr_6x6_arraytex_7_mipmap.ktx2";
             public const string Mipmap_Ldr_Cubemap_6x6 = "astc_mipmap_ldr_cubemap_6x6.ktx2";
 
             // Supercompressed textures (ZLIB)
@@ -83,7 +83,7 @@ public static class TestImages
             public const string Rgb32_Unorm_4x4_Zstd9 = "valid_ASTC_4x4_UNORM_BLOCK_2D_ZSTD_9.ktx2";
 
             // Cubemap textures
-            public const string Ldr_Cubemap_6x6 = "astc_ldr_cubemap_6x6.ktx2";
+            public const string Rgb32_Srgb_6x6_Cube = "astc_ldr_cubemap_6x6.ktx2";
         }
     }
 }

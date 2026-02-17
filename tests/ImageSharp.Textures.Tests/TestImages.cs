@@ -85,4 +85,12 @@ public static class TestImages
             public const string Rgb32_Srgb_6x6_Cube = "astc_ldr_cubemap_6x6.ktx2";
         }
     }
+
+    public static class KtxA
+    {
+        public const string Rgba32_4x4 = "test_ktx_astc_apple@3x.ktx";
+        public const string Rgba32_4x4_Small = "rgba-4x4-small.ktx";
+        public const string Rgba32_4x4_Medium = "rgba-4x4-medium.ktx";
+        public const string Rgba32_4x4_Large = "rgba-4x4-large.ktx";
+    }
 }

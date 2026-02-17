@@ -21,6 +21,7 @@ Currently decoding the following texture formats are supported:
 - [DDS textures](https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dx-graphics-dds)
 - [KTX textures](https://registry.khronos.org/KTX/specs/1.0/ktxspec.v1.html)
 - [KTX2 textures](https://registry.khronos.org/KTX/specs/2.0/ktxspec.v2.html)
+- Apple KTX (KtxA) textures (Apple's proprietary KTX variant with LZFSE compression)
 
 with the following compressions:
 

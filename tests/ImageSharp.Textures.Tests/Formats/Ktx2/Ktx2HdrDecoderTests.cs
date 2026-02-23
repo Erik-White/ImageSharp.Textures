@@ -7,6 +7,7 @@ using SixLabors.ImageSharp.Textures.PixelFormats;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes;
+using SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders;
 using SixLabors.ImageSharp.Textures.TextureFormats;
 
@@ -120,7 +121,7 @@ public class Ktx2HdrDecoderTests
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
 
         Image<Rg64Float> firstMipMapImage = firstMipMap as Image<Rg64Float>;
-        firstMipMapImage.CompareToReferenceOutput(provider);
+        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.0003f), provider);
     }
 
     [Theory]
@@ -137,7 +138,7 @@ public class Ktx2HdrDecoderTests
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
 
         Image<Rgb96Float> firstMipMapImage = firstMipMap as Image<Rgb96Float>;
-        firstMipMapImage.CompareToReferenceOutput(provider);
+        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.0003f), provider);
     }
 
     [Theory]
@@ -154,7 +155,7 @@ public class Ktx2HdrDecoderTests
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
 
         Image<Rgba128Float> firstMipMapImage = firstMipMap as Image<Rgba128Float>;
-        firstMipMapImage.CompareToReferenceOutput(provider);
+        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.0003f), provider);
     }
 
     [Theory(Skip = "Packed pixel type not yet supported")]

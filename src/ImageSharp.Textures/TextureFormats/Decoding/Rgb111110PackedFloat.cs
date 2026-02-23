@@ -2,7 +2,7 @@
 // Licensed under the Six Labors Split License.
 
 using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
+using SixLabors.ImageSharp.Textures.Common.Helpers;
 
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 
@@ -13,6 +13,8 @@ namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 /// </summary>
 internal readonly struct Rgb111110PackedFloat : IBlock<Rgb111110PackedFloat>
 {
+    private const uint VulkanExponentBias = 15;
+
     /// <inheritdoc/>
     public int BitsPerPixel => 32;
 
@@ -47,10 +49,9 @@ internal readonly struct Rgb111110PackedFloat : IBlock<Rgb111110PackedFloat>
         {
             uint packed = BinaryPrimitives.ReadUInt32LittleEndian(inputSpan[(i * 4)..]);
 
-            // Decode from Vulkan B10G11R11 format (exponent bias 15).
-            float r = UnpackFloat11(packed & 0x7FFu);
-            float g = UnpackFloat11((packed >> 11) & 0x7FFu);
-            float b = UnpackFloat10((packed >> 22) & 0x3FFu);
+            float r = FloatHelper.UnpackFloat11ToFloat(packed & 0x7FFu, VulkanExponentBias);
+            float g = FloatHelper.UnpackFloat11ToFloat((packed >> 11) & 0x7FFu, VulkanExponentBias);
+            float b = FloatHelper.UnpackFloat10ToFloat((packed >> 22) & 0x3FFu, VulkanExponentBias);
 
             int outOffset = i * 16;
             BinaryPrimitives.WriteSingleLittleEndian(outputSpan[outOffset..], r);
@@ -60,65 +61,5 @@ internal readonly struct Rgb111110PackedFloat : IBlock<Rgb111110PackedFloat>
         }
 
         return output;
-    }
-
-    /// <summary>
-    /// Unpacks an 11-bit unsigned float (5-bit exponent bias 15, 6-bit mantissa) to IEEE float32.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static float UnpackFloat11(uint value)
-    {
-        uint e = (value >> 6) & 0x1Fu;
-        uint m = value & 0x3Fu;
-
-        if (e == 0)
-        {
-            if (m == 0)
-            {
-                return 0f;
-            }
-
-            // Denormalized: m * 2^(1 - 15 - 6) = m * 2^(-20)
-            return m * BitConverter.UInt32BitsToSingle(107u << 23);
-        }
-
-        if (e == 31)
-        {
-            uint ieee = (0xFFu << 23) | (m << 17);
-            return BitConverter.UInt32BitsToSingle(ieee);
-        }
-
-        // Normalized: 2^(e-15) * (1 + m/64), bias delta = 127 - 15 = 112
-        return BitConverter.UInt32BitsToSingle(((e + 112u) << 23) | (m << 17));
-    }
-
-    /// <summary>
-    /// Unpacks a 10-bit unsigned float (5-bit exponent bias 15, 5-bit mantissa) to IEEE float32.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static float UnpackFloat10(uint value)
-    {
-        uint e = (value >> 5) & 0x1Fu;
-        uint m = value & 0x1Fu;
-
-        if (e == 0)
-        {
-            if (m == 0)
-            {
-                return 0f;
-            }
-
-            // Denormalized: m * 2^(1 - 15 - 5) = m * 2^(-19)
-            return m * BitConverter.UInt32BitsToSingle(108u << 23);
-        }
-
-        if (e == 31)
-        {
-            uint ieee = (0xFFu << 23) | (m << 18);
-            return BitConverter.UInt32BitsToSingle(ieee);
-        }
-
-        // Normalized: 2^(e-15) * (1 + m/32), bias delta = 127 - 15 = 112
-        return BitConverter.UInt32BitsToSingle(((e + 112u) << 23) | (m << 18));
     }
 }

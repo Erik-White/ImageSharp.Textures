@@ -60,6 +60,8 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                     return AllocateMipMaps<L16>(memoryStream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_R16_SFLOAT:
                     return AllocateMipMaps<R16Float>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_R32_SFLOAT:
+                    return AllocateMipMaps<Fp32>(memoryStream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_R8G8_UNORM:
                 case VkFormat.VK_FORMAT_R8G8_SNORM:
                 case VkFormat.VK_FORMAT_R8G8_UINT:

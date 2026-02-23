@@ -1,8 +1,11 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Formats.Ktx2;
+using SixLabors.ImageSharp.Textures.PixelFormats;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
+using SixLabors.ImageSharp.Textures.Tests.TestUtilities;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders;
 using SixLabors.ImageSharp.Textures.TextureFormats;
@@ -11,17 +14,6 @@ namespace SixLabors.ImageSharp.Textures.Tests.Formats.Ktx2;
 
 /// <summary>
 /// Tests for HDR (High Dynamic Range) formats in KTX2 files.
-/// These formats include:
-/// - Floating-point textures: R16_SFLOAT, RG16_SFLOAT, RGB16_SFLOAT, RGBA16_SFLOAT,
-///   R32_SFLOAT, RG32_SFLOAT, RGB32_SFLOAT, RGBA32_SFLOAT
-/// - Packed HDR formats: E5B9G9R9_UFLOAT_PACK32 (RGB9E5), B10G11R11_UFLOAT_PACK32
-/// - Compressed HDR: BC6H_UFLOAT_BLOCK, BC6H_SFLOAT_BLOCK
-/// - ASTC HDR: Various ASTC_*_SFLOAT_BLOCK formats
-///
-/// Note: Test files for KTX2 HDR formats are not yet available in the test suite.
-/// This class serves as a placeholder for future HDR KTX2 test implementation.
-/// When test files become available, add them to tests/Images/Input/Ktx2/Hdr/
-/// and uncomment the tests below.
 /// </summary>
 [Trait("Format", "Ktx2")]
 [Trait("Format", "Hdr")]
@@ -31,7 +23,7 @@ public class Ktx2HdrDecoderTests
 
     [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.R16)]
-    public void Ktx2Decoder_CanDecode_R16_SFLOAT(TestTextureProvider provider)
+    public void Ktx2Decoder_CanDecode_R16_Unorm(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
@@ -41,72 +33,14 @@ public class Ktx2HdrDecoderTests
         Assert.True(flatTexture.MipMaps.Count > 0);
 
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
-    }
 
-    [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rg16)]
-    public void Ktx2Decoder_CanDecode_RG16_SFLOAT(TestTextureProvider provider)
-    {
-        using Texture texture = provider.GetTexture(Ktx2Decoder);
-        provider.SaveTextures(texture);
-        FlatTexture flatTexture = texture as FlatTexture;
-
-        Assert.NotNull(flatTexture?.MipMaps);
-        Assert.True(flatTexture.MipMaps.Count > 0);
-
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
-    }
-
-    [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgb16)]
-    public void Ktx2Decoder_CanDecode_RGB16_SFLOAT(TestTextureProvider provider)
-    {
-        using Texture texture = provider.GetTexture(Ktx2Decoder);
-        provider.SaveTextures(texture);
-        FlatTexture flatTexture = texture as FlatTexture;
-
-        Assert.NotNull(flatTexture?.MipMaps);
-        Assert.True(flatTexture.MipMaps.Count > 0);
-
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
-    }
-
-    [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgba16)]
-    public void Ktx2Decoder_CanDecode_RGBA16_SFLOAT(TestTextureProvider provider)
-    {
-        using Texture texture = provider.GetTexture(Ktx2Decoder);
-        provider.SaveTextures(texture);
-        FlatTexture flatTexture = texture as FlatTexture;
-
-        Assert.NotNull(flatTexture?.MipMaps);
-        Assert.True(flatTexture.MipMaps.Count > 0);
-
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
-    }
-
-    [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.R32)]
-    public void Ktx2Decoder_CanDecode_R32_SFLOAT(TestTextureProvider provider)
-    {
-        using Texture texture = provider.GetTexture(Ktx2Decoder);
-        provider.SaveTextures(texture);
-        FlatTexture flatTexture = texture as FlatTexture;
-
-        Assert.NotNull(flatTexture?.MipMaps);
-        Assert.True(flatTexture.MipMaps.Count > 0);
-
-        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
+        Image<L16> firstMipMapImage = firstMipMap as Image<L16>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
     }
 
     [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rg32)]
-    public void Ktx2Decoder_CanDecode_RG32_SFLOAT(TestTextureProvider provider)
+    public void Ktx2Decoder_CanDecode_RG32_Unorm(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
@@ -116,12 +50,14 @@ public class Ktx2HdrDecoderTests
         Assert.True(flatTexture.MipMaps.Count > 0);
 
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
+
+        Image<ImageSharp.PixelFormats.Rg32> firstMipMapImage = firstMipMap as Image<ImageSharp.PixelFormats.Rg32>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
     }
 
     [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgb32)]
-    public void Ktx2Decoder_CanDecode_RGG32_SFLOAT(TestTextureProvider provider)
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgb48)]
+    public void Ktx2Decoder_CanDecode_RGB48_Unorm(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
@@ -131,12 +67,14 @@ public class Ktx2HdrDecoderTests
         Assert.True(flatTexture.MipMaps.Count > 0);
 
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
+
+        Image<Rgb48> firstMipMapImage = firstMipMap as Image<Rgb48>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
     }
 
     [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgba32)]
-    public void Ktx2Decoder_CanDecode_RGBA32_SFLOAT(TestTextureProvider provider)
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgba64)]
+    public void Ktx2Decoder_CanDecode_RGBA64_Unorm(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
@@ -146,12 +84,82 @@ public class Ktx2HdrDecoderTests
         Assert.True(flatTexture.MipMaps.Count > 0);
 
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
+
+        Image<Rgba64> firstMipMapImage = firstMipMap as Image<Rgba64>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
     }
 
     [Theory]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.R32)]
+    public void Ktx2Decoder_CanDecode_R32_Sfloat(TestTextureProvider provider)
+    {
+        using Texture texture = provider.GetTexture(Ktx2Decoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        Assert.NotNull(flatTexture?.MipMaps);
+        Assert.True(flatTexture.MipMaps.Count > 0);
+
+        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+
+        Image<Fp32> firstMipMapImage = firstMipMap as Image<Fp32>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
+    }
+
+    [Theory]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rg64)]
+    public void Ktx2Decoder_CanDecode_RG48_Sfloat(TestTextureProvider provider)
+    {
+        using Texture texture = provider.GetTexture(Ktx2Decoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        Assert.NotNull(flatTexture?.MipMaps);
+        Assert.True(flatTexture.MipMaps.Count > 0);
+
+        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+
+        Image<Rg64Float> firstMipMapImage = firstMipMap as Image<Rg64Float>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
+    }
+
+    [Theory]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgb96)]
+    public void Ktx2Decoder_CanDecode_RGB96_Sfloat(TestTextureProvider provider)
+    {
+        using Texture texture = provider.GetTexture(Ktx2Decoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        Assert.NotNull(flatTexture?.MipMaps);
+        Assert.True(flatTexture.MipMaps.Count > 0);
+
+        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+
+        Image<Rgb96Float> firstMipMapImage = firstMipMap as Image<Rgb96Float>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
+    }
+
+    [Theory]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgba128)]
+    public void Ktx2Decoder_CanDecode_RGBA128_Sfloat(TestTextureProvider provider)
+    {
+        using Texture texture = provider.GetTexture(Ktx2Decoder);
+        provider.SaveTextures(texture);
+        FlatTexture flatTexture = texture as FlatTexture;
+
+        Assert.NotNull(flatTexture?.MipMaps);
+        Assert.True(flatTexture.MipMaps.Count > 0);
+
+        Image firstMipMap = flatTexture.MipMaps[0].GetImage();
+
+        Image<Rgba128Float> firstMipMapImage = firstMipMap as Image<Rgba128Float>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
+    }
+
+    [Theory(Skip = "Packed pixel type not yet supported")]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgb9e5)]
-    public void Ktx2Decoder_CanDecode_E5B9G9R9_UFLOAT_PACK32(TestTextureProvider provider)
+    public void Ktx2Decoder_CanDecode_Rgb9e5_Ufloat_Packed(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
@@ -161,12 +169,14 @@ public class Ktx2HdrDecoderTests
         Assert.True(flatTexture.MipMaps.Count > 0);
 
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
+
+        Image<Rgba128Float> firstMipMapImage = firstMipMap as Image<Rgba128Float>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
     }
 
-    [Theory]
+    [Theory(Skip = "Packed pixel type not yet supported")]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.B10g11r11)]
-    public void Ktx2Decoder_CanDecode_B10G11R11_UFLOAT_PACK32(TestTextureProvider provider)
+    public void Ktx2Decoder_CanDecode_B10g11r11_Ufloat_Packed(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);
         provider.SaveTextures(texture);
@@ -176,36 +186,8 @@ public class Ktx2HdrDecoderTests
         Assert.True(flatTexture.MipMaps.Count > 0);
 
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-        Assert.NotNull(firstMipMap);
+
+        Image<Rgba128Float> firstMipMapImage = firstMipMap as Image<Rgba128Float>;
+        firstMipMapImage.CompareToReferenceOutput(provider);
     }
-    //
-    // [Theory]
-    // [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.BC6H_UFloat)]
-    // public void Ktx2Decoder_CanDecode_BC6H_UFLOAT_BLOCK(TestTextureProvider provider)
-    // {
-    //     using Texture texture = provider.GetTexture(Ktx2Decoder);
-    //     provider.SaveTextures(texture);
-    //     var flatTexture = texture as FlatTexture;
-    //
-    //     Assert.NotNull(flatTexture?.MipMaps);
-    //     Assert.True(flatTexture.MipMaps.Count > 0);
-    //
-    //     Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-    //     Assert.NotNull(firstMipMap);
-    // }
-    //
-    // [Theory]
-    // [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.BC6H_SFloat)]
-    // public void Ktx2Decoder_CanDecode_BC6H_SFLOAT_BLOCK(TestTextureProvider provider)
-    // {
-    //     using Texture texture = provider.GetTexture(Ktx2Decoder);
-    //     provider.SaveTextures(texture);
-    //     var flatTexture = texture as FlatTexture;
-    //
-    //     Assert.NotNull(flatTexture?.MipMaps);
-    //     Assert.True(flatTexture.MipMaps.Count > 0);
-    //
-    //     Image firstMipMap = flatTexture.MipMaps[0].GetImage();
-    //     Assert.NotNull(firstMipMap);
-    // }
 }

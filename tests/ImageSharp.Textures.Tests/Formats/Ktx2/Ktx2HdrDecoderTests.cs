@@ -158,7 +158,7 @@ public class Ktx2HdrDecoderTests
         firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.0003f), provider);
     }
 
-    [Theory(Skip = "Packed pixel type not yet supported")]
+    [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.Rgb9e5)]
     public void Ktx2Decoder_CanDecode_Rgb9e5_Ufloat_Packed(TestTextureProvider provider)
     {
@@ -172,10 +172,10 @@ public class Ktx2HdrDecoderTests
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
 
         Image<Rgba128Float> firstMipMapImage = firstMipMap as Image<Rgba128Float>;
-        firstMipMapImage.CompareToReferenceOutput(provider);
+        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.0003f), provider);
     }
 
-    [Theory(Skip = "Packed pixel type not yet supported")]
+    [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Hdr.B10g11r11)]
     public void Ktx2Decoder_CanDecode_B10g11r11_Ufloat_Packed(TestTextureProvider provider)
     {
@@ -189,6 +189,6 @@ public class Ktx2HdrDecoderTests
         Image firstMipMap = flatTexture.MipMaps[0].GetImage();
 
         Image<Rgba128Float> firstMipMapImage = firstMipMap as Image<Rgba128Float>;
-        firstMipMapImage.CompareToReferenceOutput(provider);
+        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(0.0003f), provider);
     }
 }

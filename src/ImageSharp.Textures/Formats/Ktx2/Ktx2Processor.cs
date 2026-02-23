@@ -100,6 +100,10 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                     return AllocateMipMaps<Rgba128>(memoryStream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_R32G32B32A32_SFLOAT:
                     return AllocateMipMaps<Rgba128Float>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_B10G11R11_UFLOAT_PACK32:
+                    return AllocateMipMaps<Rgb111110PackedFloat>(memoryStream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:
+                    return AllocateMipMaps<Rgbe9995PackedFloat>(memoryStream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_B8G8R8_UNORM:
                 case VkFormat.VK_FORMAT_B8G8R8_SNORM:
                 case VkFormat.VK_FORMAT_B8G8R8_UINT:
@@ -273,6 +277,10 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                     return AllocateCubeMap<Rgba128>(stream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_R32G32B32A32_SFLOAT:
                     return AllocateCubeMap<Rgba128Float>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_B10G11R11_UFLOAT_PACK32:
+                    return AllocateCubeMap<Rgb111110PackedFloat>(stream, width, height, levelIndices);
+                case VkFormat.VK_FORMAT_E5B9G9R9_UFLOAT_PACK32:
+                    return AllocateCubeMap<Rgbe9995PackedFloat>(stream, width, height, levelIndices);
                 case VkFormat.VK_FORMAT_B8G8R8_UNORM:
                 case VkFormat.VK_FORMAT_B8G8R8_SNORM:
                 case VkFormat.VK_FORMAT_B8G8R8_UINT:

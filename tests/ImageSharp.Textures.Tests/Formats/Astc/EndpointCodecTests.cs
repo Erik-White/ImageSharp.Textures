@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using System.Buffers.Binary;
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 using SixLabors.ImageSharp.Textures.Astc.TexelBlock;
@@ -29,10 +28,10 @@ public class EndpointCodecTests
             EndpointEncoder.EncodeColorsForMode(low, high, quantRange, mode, out ColorEndpointMode _, values);
 
             // Assert value count matches expected
-            values.Should().HaveCount(mode.GetValuesCount());
+            Assert.Equal(mode.GetValuesCount(), values.Count);
 
             // Assert all values are within quantization range
-            values.Should().AllSatisfy(v => v.Should().BeInRange(0, quantRange));
+            Assert.All(values, v => Assert.InRange(v, 0, quantRange));
         }
     }
 
@@ -52,8 +51,8 @@ public class EndpointCodecTests
         {
             (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(white, black, quantRange, mode);
 
-            (low == white).Should().BeTrue();
-            (high == black).Should().BeTrue();
+            Assert.True(low == white);
+            Assert.True(high == black);
         }
     }
 
@@ -62,8 +61,8 @@ public class EndpointCodecTests
     {
         List<int> values = [132, 127, 116, 112, 183, 180, 31, 22];
 
-        EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbDirect, values).Should().BeTrue();
-        EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbaDirect, values).Should().BeTrue();
+        Assert.True(EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbDirect, values));
+        Assert.True(EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbaDirect, values));
     }
 
     [Fact]
@@ -77,8 +76,8 @@ public class EndpointCodecTests
         valuesClearedBit6[5] &= 0xBF;
         valuesClearedBit6[7] &= 0xBF;
 
-        EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbBaseOffset, valuesClearedBit6).Should().BeFalse();
-        EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbaBaseOffset, valuesClearedBit6).Should().BeFalse();
+        Assert.False(EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbBaseOffset, valuesClearedBit6));
+        Assert.False(EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbaBaseOffset, valuesClearedBit6));
 
         List<int> valuesSetBit6 = [.. baseValues];
         valuesSetBit6[1] |= 0x40;
@@ -86,8 +85,8 @@ public class EndpointCodecTests
         valuesSetBit6[5] |= 0x40;
         valuesSetBit6[7] |= 0x40;
 
-        EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbBaseOffset, valuesSetBit6).Should().BeTrue();
-        EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbaBaseOffset, valuesSetBit6).Should().BeTrue();
+        Assert.True(EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbBaseOffset, valuesSetBit6));
+        Assert.True(EndpointEncoder.UsesBlueContract(255, ColorEndpointMode.LdrRgbaBaseOffset, valuesSetBit6));
     }
 
     [Fact]
@@ -107,7 +106,7 @@ public class EndpointCodecTests
             List<int> values = [];
             EndpointEncoder.EncodeColorsForMode(low, high, endpointRange, EndpointEncodingMode.DirectRbg, out ColorEndpointMode astcMode, values);
 
-            EndpointEncoder.UsesBlueContract(endpointRange, astcMode, values).Should().BeTrue();
+            Assert.True(EndpointEncoder.UsesBlueContract(endpointRange, astcMode, values));
         }
     }
 
@@ -122,8 +121,8 @@ public class EndpointCodecTests
             255,
             mode);
 
-        (low == new RgbaColor(247, 247, 247, 255)).Should().BeTrue();
-        (high == new RgbaColor(2, 2, 2, 255)).Should().BeTrue();
+        Assert.True(low == new RgbaColor(247, 247, 247, 255));
+        Assert.True(high == new RgbaColor(2, 2, 2, 255));
 
         (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(
             new RgbaColor(80, 80, 50, 255),
@@ -131,8 +130,8 @@ public class EndpointCodecTests
             255,
             mode);
 
-        (low2 == new RgbaColor(70, 70, 70, 255)).Should().BeTrue();
-        (high2 == new RgbaColor(120, 120, 120, 255)).Should().BeTrue();
+        Assert.True(low2 == new RgbaColor(70, 70, 70, 255));
+        Assert.True(high2 == new RgbaColor(120, 120, 120, 255));
 
         (RgbaColor low3, RgbaColor high3) = EncodeAndDecodeColors(
             new RgbaColor(247, 248, 246, 255),
@@ -140,8 +139,8 @@ public class EndpointCodecTests
             15,
             mode);
 
-        (low3 == new RgbaColor(255, 255, 255, 255)).Should().BeTrue();
-        (high3 == new RgbaColor(0, 0, 0, 255)).Should().BeTrue();
+        Assert.True(low3 == new RgbaColor(255, 255, 255, 255));
+        Assert.True(high3 == new RgbaColor(0, 0, 0, 255));
 
         (RgbaColor low4, RgbaColor high4) = EncodeAndDecodeColors(
             new RgbaColor(64, 127, 192, 255),
@@ -149,8 +148,8 @@ public class EndpointCodecTests
             63,
             mode);
 
-        (low4 == new RgbaColor(130, 130, 130, 255)).Should().BeTrue();
-        (high4 == new RgbaColor(0, 0, 0, 255)).Should().BeTrue();
+        Assert.True(low4 == new RgbaColor(130, 130, 130, 255));
+        Assert.True(high4 == new RgbaColor(0, 0, 0, 255));
     }
 
     [Fact]
@@ -165,10 +164,10 @@ public class EndpointCodecTests
             63,
             mode);
 
-        ((low == new RgbaColor(130, 130, 130, 125)) ||
-            low.IsCloseTo(new RgbaColor(130, 130, 130, 125), 1)).Should().BeTrue();
-        ((high == new RgbaColor(0, 0, 0, 20)) ||
-            high.IsCloseTo(new RgbaColor(0, 0, 0, 20), 1)).Should().BeTrue();
+        Assert.True((low == new RgbaColor(130, 130, 130, 125)) ||
+            low.IsCloseTo(new RgbaColor(130, 130, 130, 125), 1));
+        Assert.True((high == new RgbaColor(0, 0, 0, 20)) ||
+            high.IsCloseTo(new RgbaColor(0, 0, 0, 20), 1));
 
         // Different alpha values
         (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(
@@ -177,8 +176,8 @@ public class EndpointCodecTests
             255,
             mode);
 
-        (low2 == new RgbaColor(247, 247, 247, 250)).Should().BeTrue();
-        (high2 == new RgbaColor(2, 2, 2, 172)).Should().BeTrue();
+        Assert.True(low2 == new RgbaColor(247, 247, 247, 250));
+        Assert.True(high2 == new RgbaColor(2, 2, 2, 172));
     }
 
     [Fact]
@@ -193,8 +192,8 @@ public class EndpointCodecTests
             RgbaColor high = new(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256), 255);
             (RgbaColor low1, RgbaColor high1) = EncodeAndDecodeColors(low, high, 255, mode);
 
-            (low1 == low).Should().BeTrue();
-            (high1 == high).Should().BeTrue();
+            Assert.True(low1 == low);
+            Assert.True(high1 == high);
         }
     }
 
@@ -209,8 +208,8 @@ public class EndpointCodecTests
             63,
             mode);
 
-        (low == new RgbaColor(65, 125, 190, 255)).Should().BeTrue();
-        (high == new RgbaColor(0, 0, 0, 255)).Should().BeTrue();
+        Assert.True(low == new RgbaColor(65, 125, 190, 255));
+        Assert.True(high == new RgbaColor(0, 0, 0, 255));
 
         (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(
             new RgbaColor(0, 0, 0, 255),
@@ -218,8 +217,8 @@ public class EndpointCodecTests
             63,
             mode);
 
-        (low2 == new RgbaColor(0, 0, 0, 255)).Should().BeTrue();
-        (high2 == new RgbaColor(65, 125, 190, 255)).Should().BeTrue();
+        Assert.True(low2 == new RgbaColor(0, 0, 0, 255));
+        Assert.True(high2 == new RgbaColor(65, 125, 190, 255));
     }
 
     [Fact]
@@ -233,8 +232,8 @@ public class EndpointCodecTests
             RgbaColor color = new(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256), 255);
             (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(color, color, 255, mode);
 
-            low.IsCloseTo(color, 1).Should().BeTrue();
-            high.IsCloseTo(color, 1).Should().BeTrue();
+            Assert.True(low.IsCloseTo(color, 1));
+            Assert.True(high.IsCloseTo(color, 1));
         }
     }
 
@@ -246,12 +245,12 @@ public class EndpointCodecTests
         RgbaColor high = new(80, 16, 160, 255);
 
         (RgbaColor decodedLow, RgbaColor decodedHigh) = EncodeAndDecodeColors(low, high, 255, mode);
-        decodedLow.IsCloseTo(low, 0).Should().BeTrue();
-        decodedHigh.IsCloseTo(high, 0).Should().BeTrue();
+        Assert.True(decodedLow.IsCloseTo(low, 0));
+        Assert.True(decodedHigh.IsCloseTo(high, 0));
 
         (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(low, high, 127, mode);
-        low2.IsCloseTo(low, 1).Should().BeTrue();
-        high2.IsCloseTo(high, 1).Should().BeTrue();
+        Assert.True(low2.IsCloseTo(low, 1));
+        Assert.True(high2.IsCloseTo(high, 1));
     }
 
     internal static TheoryData<RgbaColor, RgbaColor> RgbBaseOffsetColorPairs() => new()
@@ -271,8 +270,8 @@ public class EndpointCodecTests
         int[] values = EncodeRgbBaseOffset(expectedLow, expectedHigh);
         (RgbaColor decLow, RgbaColor decHigh) = EndpointCodec.DecodeColorsForMode(values, 255, ColorEndpointMode.LdrRgbBaseOffset);
 
-        (decLow == expectedLow).Should().BeTrue();
-        (decHigh == expectedHigh).Should().BeTrue();
+        Assert.True(decLow == expectedLow);
+        Assert.True(decHigh == expectedHigh);
     }
 
     [Fact]
@@ -296,8 +295,8 @@ public class EndpointCodecTests
             int[] values = EncodeRgbBaseOffset(color, color);
             (RgbaColor decLow, RgbaColor decHigh) = EndpointCodec.DecodeColorsForMode(values, 255, ColorEndpointMode.LdrRgbBaseOffset);
 
-            (decLow == color).Should().BeTrue();
-            (decHigh == color).Should().BeTrue();
+            Assert.True(decLow == color);
+            Assert.True(decHigh == color);
         }
     }
 
@@ -336,14 +335,14 @@ public class EndpointCodecTests
 
             // Unpack to intermediate block
             IntermediateBlock.IntermediateBlockData? intermediateBlock = IntermediateBlock.UnpackIntermediateBlock(physicalBlock);
-            intermediateBlock.Should().NotBeNull("checkerboard blocks should not be void extent");
+            Assert.NotNull(intermediateBlock);
             IntermediateBlock.IntermediateBlockData ib = intermediateBlock!.Value;
 
             // Verify endpoints exist
-            ib.EndpointCount.Should().BeGreaterThan(0, "block should have endpoints");
+            Assert.True(ib.EndpointCount > 0, "block should have endpoints");
 
             int colorRange = IntermediateBlock.EndpointRangeForBlock(ib);
-            colorRange.Should().BeGreaterThan(0, "color range should be valid");
+            Assert.True(colorRange > 0, "color range should be valid");
 
             // Check all endpoint pairs decode successfully to grayscale colors
             for (int ep = 0; ep < ib.EndpointCount; ep++)
@@ -356,17 +355,17 @@ public class EndpointCodecTests
                     endpoints.Mode);
 
                 // Assert - Checkerboard should produce grayscale colors (R == G == B)
-                low.R.Should().Be(low.G, $"block {i} low endpoint should be grayscale");
-                low.G.Should().Be(low.B, $"block {i} low endpoint should be grayscale");
-                high.R.Should().Be(high.G, $"block {i} high endpoint should be grayscale");
-                high.G.Should().Be(high.B, $"block {i} high endpoint should be grayscale");
+                Assert.True(low.R == low.G, $"block {i} low endpoint should be grayscale");
+                Assert.True(low.G == low.B, $"block {i} low endpoint should be grayscale");
+                Assert.True(high.R == high.G, $"block {i} high endpoint should be grayscale");
+                Assert.True(high.G == high.B, $"block {i} high endpoint should be grayscale");
             }
 
             blocksDecoded++;
         }
 
         // Verify we decoded a reasonable number of blocks
-        blocksDecoded.Should().BeGreaterThan(0, "should have decoded at least one block");
+        Assert.True(blocksDecoded > 0);
     }
 
     private static (RgbaColor Low, RgbaColor High) EncodeAndDecodeColors(

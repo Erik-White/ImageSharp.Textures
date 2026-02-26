@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.BiseEncoding;
 using SixLabors.ImageSharp.Textures.Astc.BiseEncoding.Quantize;
 
@@ -14,7 +13,7 @@ public class QuantizationTests
     {
         for (int range = Quantization.EndpointRangeMinValue; range <= byte.MaxValue; range++)
         {
-            Quantization.QuantizeCEValueToRange(byte.MaxValue, range).Should().BeLessThanOrEqualTo(range);
+            Assert.True(Quantization.QuantizeCEValueToRange(byte.MaxValue, range) <= range);
         }
     }
 
@@ -23,7 +22,7 @@ public class QuantizationTests
     {
         for (int range = 1; range < Quantization.WeightRangeMaxValue; range++)
         {
-            Quantization.QuantizeWeightToRange(64, range).Should().BeLessThanOrEqualTo(range);
+            Assert.True(Quantization.QuantizeWeightToRange(64, range) <= range);
         }
     }
 
@@ -37,7 +36,7 @@ public class QuantizationTests
         {
             foreach (int value in testValues)
             {
-                Quantization.QuantizeCEValueToRange(value, range).Should().BeLessThanOrEqualTo(range);
+                Assert.True(Quantization.QuantizeCEValueToRange(value, range) <= range);
             }
         }
     }
@@ -52,7 +51,7 @@ public class QuantizationTests
         {
             foreach (int value in testValues)
             {
-                Quantization.QuantizeWeightToRange(value, range).Should().BeLessThanOrEqualTo(range);
+                Assert.True(Quantization.QuantizeWeightToRange(value, range) <= range);
             }
         }
     }
@@ -69,7 +68,7 @@ public class QuantizationTests
                 int unquantized = Quantization.UnquantizeWeightFromRange(quantizedValue, range);
                 int requantized = Quantization.QuantizeWeightToRange(unquantized, range);
 
-                requantized.Should().Be(quantizedValue);
+                Assert.Equal(quantizedValue, requantized);
             }
         }
     }
@@ -86,7 +85,7 @@ public class QuantizationTests
                 int unquantized = Quantization.UnquantizeCEValueFromRange(quantizedValue, range);
                 int requantized = Quantization.QuantizeCEValueToRange(unquantized, range);
 
-                requantized.Should().Be(quantizedValue);
+                Assert.Equal(quantizedValue, requantized);
             }
         }
     }
@@ -103,7 +102,7 @@ public class QuantizationTests
     {
         int result = Quantization.UnquantizeCEValueFromRange(quantizedValue, range);
 
-        result.Should().BeLessThan(256);
+        Assert.True(result < 256);
     }
 
     [Theory]
@@ -115,7 +114,7 @@ public class QuantizationTests
     {
         int result = Quantization.UnquantizeWeightFromRange(quantizedValue, range);
 
-        result.Should().BeLessThanOrEqualTo(64);
+        Assert.True(result <= 64);
     }
 
     [Fact]
@@ -139,8 +138,9 @@ public class QuantizationTests
                 int[] testValues = [0, 13, 173, 208, 255];
                 foreach (int value in testValues)
                 {
-                    Quantization.QuantizeCEValueToRange(value, desiredRange)
-                        .Should().Be(Quantization.QuantizeCEValueToRange(value, expectedRange));
+                    Assert.Equal(
+                        Quantization.QuantizeCEValueToRange(value, expectedRange),
+                        Quantization.QuantizeCEValueToRange(value, desiredRange));
                 }
             }
 
@@ -150,13 +150,14 @@ public class QuantizationTests
                 int[] testValues = [0, 12, 23, 63];
                 foreach (int value in testValues)
                 {
-                    Quantization.QuantizeWeightToRange(value, desiredRange)
-                        .Should().Be(Quantization.QuantizeWeightToRange(value, expectedRange));
+                    Assert.Equal(
+                        Quantization.QuantizeWeightToRange(value, expectedRange),
+                        Quantization.QuantizeWeightToRange(value, desiredRange));
                 }
             }
         }
 
-        rangeIndex.Should().Be(ranges.Length - 1);
+        Assert.Equal(ranges.Length - 1, rangeIndex);
     }
 
     [Fact]
@@ -164,7 +165,7 @@ public class QuantizationTests
     {
         for (int value = byte.MinValue; value <= byte.MaxValue; value++)
         {
-            Quantization.QuantizeCEValueToRange(value, byte.MaxValue).Should().Be(value);
+            Assert.Equal(value, Quantization.QuantizeCEValueToRange(value, byte.MaxValue));
         }
     }
 
@@ -180,11 +181,11 @@ public class QuantizationTests
             {
                 int quantizedValue = Quantization.QuantizeCEValueToRange(value, range);
 
-                quantizedValue.Should().BeGreaterThanOrEqualTo(lastQuantizedValue);
+                Assert.True(quantizedValue >= lastQuantizedValue);
                 lastQuantizedValue = quantizedValue;
             }
 
-            lastQuantizedValue.Should().Be(range);
+            Assert.Equal(range, lastQuantizedValue);
         }
     }
 
@@ -206,11 +207,11 @@ public class QuantizationTests
             {
                 int quantizedValue = Quantization.QuantizeWeightToRange(value, range);
 
-                quantizedValue.Should().BeGreaterThanOrEqualTo(lastQuantizedValue);
+                Assert.True(quantizedValue >= lastQuantizedValue);
                 lastQuantizedValue = quantizedValue;
             }
 
-            lastQuantizedValue.Should().Be(range);
+            Assert.Equal(range, lastQuantizedValue);
         }
     }
 
@@ -230,7 +231,7 @@ public class QuantizationTests
             int halfMaxQuantBits = Math.Max(0, cevBits - numBits - 1);
             int largestCevToZero = (1 << halfMaxQuantBits) - 1;
 
-            Quantization.QuantizeCEValueToRange(largestCevToZero, range).Should().Be(0);
+            Assert.Equal(0, Quantization.QuantizeCEValueToRange(largestCevToZero, range));
         }
     }
 
@@ -250,7 +251,7 @@ public class QuantizationTests
             int halfMaxQuantBits = Math.Max(0, weightBits - numBits - 1);
             int largestWeightToZero = (1 << halfMaxQuantBits) - 1;
 
-            Quantization.QuantizeWeightToRange(largestWeightToZero, range).Should().Be(0);
+            Assert.Equal(0, Quantization.QuantizeWeightToRange(largestWeightToZero, range));
         }
     }
 
@@ -262,7 +263,7 @@ public class QuantizationTests
 
         List<int> quantized = [.. values.Select(v => Quantization.UnquantizeWeightFromRange(v, 9))];
 
-        quantized.Should().Equal(quintExpected);
+        Assert.Equal(quintExpected, quantized);
     }
 
     [Fact]
@@ -273,7 +274,7 @@ public class QuantizationTests
 
         List<int> quantized = [.. values.Select(v => Quantization.UnquantizeWeightFromRange(v, 11))];
 
-        quantized.Should().Equal(tritExpected);
+        Assert.Equal(tritExpected, quantized);
     }
 
     [Fact]
@@ -282,7 +283,7 @@ public class QuantizationTests
         for (int range = 0; range < Quantization.EndpointRangeMinValue; range++)
         {
             Action action = () => Quantization.QuantizeCEValueToRange(0, range);
-            action.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.Throws<ArgumentOutOfRangeException>(action);
         }
     }
 
@@ -292,7 +293,7 @@ public class QuantizationTests
         for (int range = 0; range < Quantization.EndpointRangeMinValue; range++)
         {
             Action action = () => Quantization.UnquantizeCEValueFromRange(0, range);
-            action.Should().Throw<ArgumentOutOfRangeException>();
+            Assert.Throws<ArgumentOutOfRangeException>(action);
         }
     }
 
@@ -301,7 +302,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.QuantizeWeightToRange(0, 0);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Fact]
@@ -309,7 +310,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.UnquantizeWeightFromRange(0, 0);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -320,7 +321,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.QuantizeCEValueToRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -331,7 +332,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.UnquantizeCEValueFromRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -341,7 +342,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.QuantizeCEValueToRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -351,7 +352,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.UnquantizeCEValueFromRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -362,7 +363,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.QuantizeWeightToRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -373,7 +374,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.UnquantizeWeightFromRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -383,7 +384,7 @@ public class QuantizationTests
     {
         Action action = () => Quantization.QuantizeWeightToRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -393,6 +394,6 @@ public class QuantizationTests
     {
         Action action = () => Quantization.UnquantizeWeightFromRange(value, range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 }

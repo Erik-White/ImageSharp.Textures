@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using System.ComponentModel;
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.BiseEncoding;
 using SixLabors.ImageSharp.Textures.Astc.IO;
 
@@ -17,7 +16,7 @@ public class IntegerSequenceCodecTests
         for (int i = 1; i < 32; ++i)
         {
             (BiseEncodingMode mode, int _) = BoundedIntegerSequenceCodec.GetPackingModeBitCount(i);
-            mode.Should().NotBe(BiseEncodingMode.Unknown, $"Range {i} should not yield Unknown encoding mode");
+            Assert.True(mode != BiseEncodingMode.Unknown, $"Range {i} should not yield Unknown encoding mode");
         }
     }
 
@@ -64,8 +63,8 @@ public class IntegerSequenceCodecTests
             (BiseEncodingMode mode, int bitCount) = BoundedIntegerSequenceCodec.GetPackingModeBitCount(i);
             (BiseEncodingMode expectedMode, int expectedBitCount) = expected[i - 1];
 
-            mode.Should().Be(expectedMode, $"range {i} mode should match");
-            bitCount.Should().Be(expectedBitCount, $"range {i} bit count should match");
+            Assert.True(mode == expectedMode, $"range {i} mode should match");
+            Assert.True(bitCount == expectedBitCount, $"range {i} bit count should match");
         }
     }
 
@@ -76,7 +75,7 @@ public class IntegerSequenceCodecTests
     {
         Action action = () => BoundedIntegerSequenceCodec.GetPackingModeBitCount(range);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -89,8 +88,8 @@ public class IntegerSequenceCodecTests
         int bitCount = BoundedIntegerSequenceCodec.GetBitCount(BiseEncodingMode.BitEncoding, valueCount, 1);
         int bitCountForRange = BoundedIntegerSequenceCodec.GetBitCountForRange(valueCount, 1);
 
-        bitCount.Should().Be(valueCount);
-        bitCountForRange.Should().Be(valueCount);
+        Assert.Equal(valueCount, bitCount);
+        Assert.Equal(valueCount, bitCountForRange);
     }
 
     [Theory]
@@ -103,8 +102,8 @@ public class IntegerSequenceCodecTests
         int bitCount = BoundedIntegerSequenceCodec.GetBitCount(BiseEncodingMode.BitEncoding, valueCount, 2);
         int bitCountForRange = BoundedIntegerSequenceCodec.GetBitCountForRange(valueCount, 3);
 
-        bitCount.Should().Be(expected);
-        bitCountForRange.Should().Be(expected);
+        Assert.Equal(expected, bitCount);
+        Assert.Equal(expected, bitCountForRange);
     }
 
     [Fact]
@@ -117,8 +116,8 @@ public class IntegerSequenceCodecTests
         int bitCount = BoundedIntegerSequenceCodec.GetBitCount(BiseEncodingMode.TritEncoding, valueCount, bits);
         int bitCountForRange = BoundedIntegerSequenceCodec.GetBitCountForRange(valueCount, 23);
 
-        bitCount.Should().Be(expectedBitCount);
-        bitCountForRange.Should().Be(bitCount);
+        Assert.Equal(expectedBitCount, bitCount);
+        Assert.Equal(bitCount, bitCountForRange);
     }
 
     [Fact]
@@ -131,8 +130,8 @@ public class IntegerSequenceCodecTests
         int bitCount = BoundedIntegerSequenceCodec.GetBitCount(BiseEncodingMode.TritEncoding, valueCount, bits);
         int bitCountForRange = BoundedIntegerSequenceCodec.GetBitCountForRange(valueCount, 11);
 
-        bitCount.Should().Be(expectedBitCount);
-        bitCountForRange.Should().Be(bitCount);
+        Assert.Equal(expectedBitCount, bitCount);
+        Assert.Equal(bitCount, bitCountForRange);
     }
 
     [Fact]
@@ -145,8 +144,8 @@ public class IntegerSequenceCodecTests
         int bitCount = BoundedIntegerSequenceCodec.GetBitCount(BiseEncodingMode.QuintEncoding, valueCount, bits);
         int bitCountForRange = BoundedIntegerSequenceCodec.GetBitCountForRange(valueCount, 79);
 
-        bitCount.Should().Be(expectedBitCount);
-        bitCountForRange.Should().Be(bitCount);
+        Assert.Equal(expectedBitCount, bitCount);
+        Assert.Equal(bitCount, bitCountForRange);
     }
 
     [Fact]
@@ -161,7 +160,7 @@ public class IntegerSequenceCodecTests
 
         int bitCount = BoundedIntegerSequenceCodec.GetBitCount(BiseEncodingMode.QuintEncoding, valueCount, bits);
 
-        bitCount.Should().Be(expectedBitCount);
+        Assert.Equal(expectedBitCount, bitCount);
     }
 
     [Fact]
@@ -181,16 +180,16 @@ public class IntegerSequenceCodecTests
         encoder.Encode(ref bitSink);
 
         // Verify encoded data
-        bitSink.Bits.Should().Be(19);
-        bitSink.TryGetBits<ulong>(19, out ulong encoded).Should().BeTrue();
-        encoded.Should().Be(0x4A7D3UL);
+        Assert.Equal(19u, bitSink.Bits);
+        Assert.True(bitSink.TryGetBits<ulong>(19, out ulong encoded));
+        Assert.Equal(0x4A7D3UL, encoded);
 
         // Decode
         BitStream bitSrc = new(encoded, 19);
         BoundedIntegerSequenceDecoder decoder = new(valueRange);
         int[] decoded = decoder.Decode(3, ref bitSrc);
 
-        decoded.Should().Equal(values);
+        Assert.Equal(values, decoded);
     }
 
     [Fact]
@@ -206,8 +205,8 @@ public class IntegerSequenceCodecTests
         int[] decoded = decoder.Decode(expectedValues.Length, ref bitSrc);
 
         // Check decoded values
-        decoded.Should().HaveCount(expectedValues.Length);
-        decoded.Should().Equal(expectedValues);
+        Assert.Equal(expectedValues.Length, decoded.Length);
+        Assert.Equal(expectedValues, decoded);
 
         // Re-encode
         BitStream bitSink = default;
@@ -220,9 +219,9 @@ public class IntegerSequenceCodecTests
         encoder.Encode(ref bitSink);
 
         // Re-encoded should match original
-        bitSink.Bits.Should().Be(35);
-        bitSink.TryGetBits<ulong>(35, out ulong reencoded).Should().BeTrue();
-        reencoded.Should().Be(encoding);
+        Assert.Equal(35u, bitSink.Bits);
+        Assert.True(bitSink.TryGetBits<ulong>(35, out ulong reencoded));
+        Assert.Equal(encoding, reencoded);
     }
 
     [Fact]
@@ -242,16 +241,16 @@ public class IntegerSequenceCodecTests
         encoder.Encode(ref bitSink);
 
         // Verify encoded data
-        bitSink.Bits.Should().Be(18);
-        bitSink.TryGetBits<ulong>(18, out ulong encoded).Should().BeTrue();
-        encoded.Should().Be(0x37357UL);
+        Assert.Equal(18u, bitSink.Bits);
+        Assert.True(bitSink.TryGetBits<ulong>(18, out ulong encoded));
+        Assert.Equal(0x37357UL, encoded);
 
         // Decode
         BitStream bitSrc = new(encoded, 19);
         BoundedIntegerSequenceDecoder decoder = new(valueRange);
         int[] decoded = decoder.Decode(5, ref bitSrc);
 
-        decoded.Should().Equal(values);
+        Assert.Equal(values, decoded);
     }
 
     [Fact]
@@ -267,8 +266,8 @@ public class IntegerSequenceCodecTests
         int[] decoded = decoder.Decode(expectedValues.Length, ref bitSrc);
 
         // Check decoded values
-        decoded.Should().HaveCount(expectedValues.Length);
-        decoded.Should().Equal(expectedValues);
+        Assert.Equal(expectedValues.Length, decoded.Length);
+        Assert.Equal(expectedValues, decoded);
 
         // Re-encode
         BitStream bitSink = default;
@@ -281,9 +280,9 @@ public class IntegerSequenceCodecTests
         encoder.Encode(ref bitSink);
 
         // Assert re-encoded matches original
-        bitSink.Bits.Should().Be(58);
-        bitSink.TryGetBits<ulong>(58, out ulong reencoded).Should().BeTrue();
-        reencoded.Should().Be(encoding);
+        Assert.Equal(58u, bitSink.Bits);
+        Assert.True(bitSink.TryGetBits<ulong>(58, out ulong reencoded));
+        Assert.Equal(encoding, reencoded);
     }
 
     [Fact]
@@ -320,15 +319,15 @@ public class IntegerSequenceCodecTests
 
             encoder.Encode(ref bitSink);
 
-            bitSink.TryGetBits<ulong>((int)bitSink.Bits, out ulong encoded).Should().BeTrue();
+            Assert.True(bitSink.TryGetBits<ulong>((int)bitSink.Bits, out ulong encoded));
 
             // Decode
             BitStream bitSrc = new(encoded, 64);
             BoundedIntegerSequenceDecoder decoder = new(range);
             int[] decoded = decoder.Decode(valueCount, ref bitSrc);
 
-            decoded.Should().HaveCount(generated.Count);
-            decoded.Should().Equal(generated);
+            Assert.Equal(generated.Count, decoded.Length);
+            Assert.Equal(generated, decoded);
         }
     }
 }

@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 using SixLabors.ImageSharp.Textures.Astc.IO;
@@ -27,14 +26,14 @@ public class HdrComparisonTests
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Verify we get Float16 output
-        hdrResult.Length.Should().Be(4); // 1 pixel, 4 channels
+        Assert.Equal(4, hdrResult.Length); // 1 pixel, 4 channels
 
         // HDR content can have values > 1.0 (this file may or may not, but should allow it)
         foreach (float value in hdrResult)
         {
-            float.IsNaN(value).Should().BeFalse();
-            float.IsInfinity(value).Should().BeFalse();
-            value.Should().BeGreaterThanOrEqualTo(0.0f);
+            Assert.False(float.IsNaN(value));
+            Assert.False(float.IsInfinity(value));
+            Assert.True(value >= 0.0f);
         }
     }
 
@@ -51,13 +50,13 @@ public class HdrComparisonTests
         Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
-        hdrResult.Length.Should().Be(4);
+        Assert.Equal(4, hdrResult.Length);
 
         // LDR content should map to 0.0-1.0 range when decoded with HDR API
         foreach (float value in hdrResult)
         {
-            value.Should().BeGreaterThanOrEqualTo(0.0f);
-            value.Should().BeLessThanOrEqualTo(1.0f);
+            Assert.True(value >= 0.0f);
+            Assert.True(value <= 1.0f);
         }
     }
 
@@ -73,13 +72,13 @@ public class HdrComparisonTests
         // Decode with LDR API
         Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
 
-        ldrResult.Length.Should().Be(4);
+        Assert.Equal(4, ldrResult.Length);
 
         // All values must be in LDR range
         foreach (byte value in ldrResult)
         {
-            value.Should().BeGreaterThanOrEqualTo(0);
-            value.Should().BeLessThanOrEqualTo(255);
+            Assert.True(value >= 0);
+            Assert.True(value <= 255);
         }
     }
 
@@ -105,7 +104,7 @@ public class HdrComparisonTests
 
             float expectedHdr = ldrValue / 255.0f;
 
-            Math.Abs(hdrValue - expectedHdr).Should().BeLessThan(0.01f);
+            Assert.True(Math.Abs(hdrValue - expectedHdr) < 0.01f);
         }
     }
 
@@ -122,12 +121,12 @@ public class HdrComparisonTests
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Should produce Width * Height * 4 values
-        hdrResult.Length.Should().Be(astcFile.Width * astcFile.Height * 4);
+        Assert.Equal(astcFile.Width * astcFile.Height * 4, hdrResult.Length);
 
         foreach (float value in hdrResult)
         {
-            float.IsNaN(value).Should().BeFalse();
-            float.IsInfinity(value).Should().BeFalse();
+            Assert.False(float.IsNaN(value));
+            Assert.False(float.IsInfinity(value));
         }
     }
 
@@ -146,8 +145,8 @@ public class HdrComparisonTests
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Both should produce correct output sizes
-        ldrResult.Length.Should().Be(astcFile.Width * astcFile.Height * 4);
-        hdrResult.Length.Should().Be(astcFile.Width * astcFile.Height * 4);
+        Assert.Equal(astcFile.Width * astcFile.Height * 4, ldrResult.Length);
+        Assert.Equal(astcFile.Width * astcFile.Height * 4, hdrResult.Length);
     }
 
     [Fact]
@@ -164,10 +163,10 @@ public class HdrComparisonTests
         AstcFile ldrFile = AstcFile.FromMemory(ldrData);
 
         // Both are 1x1 with 6x6 footprint
-        hdrFile.Width.Should().Be(ldrFile.Width);
-        hdrFile.Height.Should().Be(ldrFile.Height);
-        hdrFile.Footprint.Width.Should().Be(ldrFile.Footprint.Width);
-        hdrFile.Footprint.Height.Should().Be(ldrFile.Footprint.Height);
+        Assert.Equal(ldrFile.Width, hdrFile.Width);
+        Assert.Equal(ldrFile.Height, hdrFile.Height);
+        Assert.Equal(ldrFile.Footprint.Width, hdrFile.Footprint.Width);
+        Assert.Equal(ldrFile.Footprint.Height, hdrFile.Footprint.Height);
 
         // Both should decode successfully with HDR API
         Span<float> hdrDecoded = AstcDecoder.DecompressHdrImage(
@@ -175,8 +174,8 @@ public class HdrComparisonTests
         Span<float> ldrDecoded = AstcDecoder.DecompressHdrImage(
             ldrFile.Blocks, ldrFile.Width, ldrFile.Height, ldrFile.Footprint);
 
-        hdrDecoded.Length.Should().Be(4);
-        ldrDecoded.Length.Should().Be(4);
+        Assert.Equal(4, hdrDecoded.Length);
+        Assert.Equal(4, ldrDecoded.Length);
     }
 
     [Fact]
@@ -205,7 +204,7 @@ public class HdrComparisonTests
             float fromConversion = hdrFromLdr[i] / 65535.0f;
             float fromDirect = hdrDirect[i];
 
-            Math.Abs(fromConversion - fromDirect).Should().BeLessThan(0.0001f);
+            Assert.True(Math.Abs(fromConversion - fromDirect) < 0.0001f);
         }
     }
 }

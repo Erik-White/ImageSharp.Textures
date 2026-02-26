@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;
@@ -28,10 +27,10 @@ public class FootprintTests
     {
         Footprint footprint = Footprint.FromFootprintType(type);
 
-        footprint.Type.Should().Be(type);
-        footprint.Width.Should().Be(expectedWidth);
-        footprint.Height.Should().Be(expectedHeight);
-        footprint.PixelCount.Should().Be(expectedWidth * expectedHeight);
+        Assert.Equal(type, footprint.Type);
+        Assert.Equal(expectedWidth, footprint.Width);
+        Assert.Equal(expectedHeight, footprint.Height);
+        Assert.Equal(expectedWidth * expectedHeight, footprint.PixelCount);
     }
 
     [Fact]
@@ -48,8 +47,8 @@ public class FootprintTests
 
         List<Footprint> footprints = [.. allTypes.Select(Footprint.FromFootprintType)];
 
-        footprints.Should().HaveCount(allTypes.Length);
-        footprints.Should().OnlyHaveUniqueItems();
+        Assert.Equal(allTypes.Length, footprints.Count);
+        Assert.Equal(footprints.Count, footprints.Distinct().Count());
     }
 
     [Fact]
@@ -57,8 +56,8 @@ public class FootprintTests
     {
         Footprint footprint = Footprint.FromFootprintType(FootprintType.Footprint10x8);
 
-        footprint.PixelCount.Should().Be(footprint.Width * footprint.Height);
-        footprint.PixelCount.Should().Be(80);
+        Assert.Equal(footprint.Width * footprint.Height, footprint.PixelCount);
+        Assert.Equal(80, footprint.PixelCount);
     }
 
     [Fact]
@@ -67,8 +66,8 @@ public class FootprintTests
         Footprint footprint1 = Footprint.FromFootprintType(FootprintType.Footprint6x6);
         Footprint footprint2 = Footprint.FromFootprintType(FootprintType.Footprint6x6);
 
-        footprint1.Should().Be(footprint2);
-        (footprint1 == footprint2).Should().BeTrue();
+        Assert.Equal(footprint2, footprint1);
+        Assert.True(footprint1 == footprint2);
     }
 
     [Fact]
@@ -77,7 +76,7 @@ public class FootprintTests
         Footprint footprint1 = Footprint.FromFootprintType(FootprintType.Footprint6x6);
         Footprint footprint2 = Footprint.FromFootprintType(FootprintType.Footprint8x8);
 
-        footprint1.Should().NotBe(footprint2);
-        (footprint1 != footprint2).Should().BeTrue();
+        Assert.NotEqual(footprint2, footprint1);
+        Assert.True(footprint1 != footprint2);
     }
 }

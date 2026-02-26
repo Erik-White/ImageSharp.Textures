@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.BiseEncoding;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 
@@ -28,7 +27,7 @@ public class WeightInfillTests
     {
         int bitCount = BoundedIntegerSequenceCodec.GetBitCountForRange(width * height, range);
 
-        bitCount.Should().Be(expectedBitCount);
+        Assert.Equal(expectedBitCount, bitCount);
     }
 
     [Fact]
@@ -42,7 +41,7 @@ public class WeightInfillTests
         int[] result = new int[footprint.PixelCount];
         DecimationTable.InfillWeights(weights, di, result);
 
-        result.Should().HaveCount(expected.Length);
-        result.Should().Equal(expected);
+        Assert.Equal(expected.Length, result.Length);
+        Assert.Equal(expected, result);
     }
 }

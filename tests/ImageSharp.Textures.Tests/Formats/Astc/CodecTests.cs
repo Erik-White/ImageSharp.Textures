@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Textures.Astc;
@@ -23,7 +22,7 @@ public class CodecTests
 
         Span<byte> result = AstcDecoder.DecompressImage(data, 0, height, FootprintType.Footprint4x4);
 
-        result.ToArray().Should().BeEmpty();
+        Assert.Empty(result.ToArray());
     }
 
     [Fact]
@@ -34,7 +33,7 @@ public class CodecTests
 
         Span<byte> result = AstcDecoder.DecompressImage(data, width, 0, FootprintType.Footprint4x4);
 
-        result.ToArray().Should().BeEmpty();
+        Assert.Empty(result.ToArray());
     }
 
     [Fact]
@@ -47,7 +46,7 @@ public class CodecTests
 
         Span<byte> result = AstcDecoder.DecompressImage(invalidData, width, height, FootprintType.Footprint4x4);
 
-        result.ToArray().Should().BeEmpty();
+        Assert.Empty(result.ToArray());
     }
 
     [Fact]
@@ -60,7 +59,7 @@ public class CodecTests
 
         Span<byte> result = AstcDecoder.DecompressImage(mismatchedData, width, height, FootprintType.Footprint4x4);
 
-        result.ToArray().Should().BeEmpty();
+        Assert.Empty(result.ToArray());
     }
 
     [Theory]
@@ -83,8 +82,8 @@ public class CodecTests
         int expectedBlockCount = blocksWide * blocksHigh;
 
         // Check ASTC data structure
-        (astcData.Length % PhysicalBlock.SizeInBytes).Should().Be(0, "astc byte length must be multiple of block size");
-        (astcData.Length / PhysicalBlock.SizeInBytes).Should().Be(expectedBlockCount, $"ASTC block count should match expected");
+        Assert.Equal(0, astcData.Length % PhysicalBlock.SizeInBytes);
+        Assert.Equal(expectedBlockCount, astcData.Length / PhysicalBlock.SizeInBytes);
 
         // Verify all blocks can be unpacked
         for (int i = 0; i < astcData.Length; i += PhysicalBlock.SizeInBytes)
@@ -94,7 +93,7 @@ public class CodecTests
             BlockInfo info = BlockInfo.Decode(bits);
             LogicalBlock? logicalBlock = LogicalBlock.UnpackLogicalBlock(footprint, bits, in info);
 
-            logicalBlock.Should().NotBeNull("all blocks should unpack successfully");
+            Assert.NotNull(logicalBlock);
         }
 
         byte[] decodedPixels = AstcDecoder.DecompressImage(astcData, width, height, footprintType).ToArray();
@@ -122,9 +121,9 @@ public class CodecTests
         AstcFile file = AstcFile.FromMemory(astcBytes);
 
         // Check file header
-        file.Footprint.Type.Should().Be(footprint);
-        file.Width.Should().Be(width);
-        file.Height.Should().Be(height);
+        Assert.Equal(footprint, file.Footprint.Type);
+        Assert.Equal(width, file.Width);
+        Assert.Equal(height, file.Height);
 
         byte[] decodedPixels = AstcDecoder.DecompressImage(file).ToArray();
         using Image<Rgba32> actualImage = Image.LoadPixelData<Rgba32>(decodedPixels, width, height);

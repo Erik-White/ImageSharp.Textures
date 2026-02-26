@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc;
 using SixLabors.ImageSharp.Textures.Astc.IO;
 
@@ -51,6 +50,6 @@ public class IntegrationTests
 
         Span<byte> result = AstcDecoder.DecompressImage(astc);
 
-        result.Length.Should().BeGreaterThan(0, because: $"decoding should succeed for {basename}");
+        Assert.True(result.Length > 0, $"decoding should succeed for {basename}");
     }
 }

@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using System.ComponentModel;
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 using SixLabors.ImageSharp.Textures.Astc.IO;
@@ -26,9 +25,9 @@ public class HdrImageTests
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
         // The HDR-A-1x1.astc file has a 6x6 footprint based on the header
-        astcFile.Footprint.Width.Should().Be(6);
-        astcFile.Footprint.Height.Should().Be(6);
-        astcFile.Footprint.Type.Should().Be(FootprintType.Footprint6x6);
+        Assert.Equal(6, astcFile.Footprint.Width);
+        Assert.Equal(6, astcFile.Footprint.Height);
+        Assert.Equal(FootprintType.Footprint6x6, astcFile.Footprint.Type);
     }
 
     [Fact]
@@ -46,14 +45,14 @@ public class HdrImageTests
             astcFile.Footprint);
 
         // Should produce 1 pixel with 4 values (RGBA)
-        hdrResult.Length.Should().Be(RgbaColor.BytesPerPixel);
+        Assert.Equal(RgbaColor.BytesPerPixel, hdrResult.Length);
 
         // HDR values can exceed 1.0
         // Just verify they're in a reasonable range (0.0 to 10.0)
         foreach (float value in hdrResult)
         {
-            value.Should().BeGreaterThanOrEqualTo(0.0f);
-            value.Should().BeLessThan(10.0f);
+            Assert.True(value >= 0.0f);
+            Assert.True(value < 10.0f);
         }
     }
 
@@ -72,7 +71,7 @@ public class HdrImageTests
             astcFile.Footprint);
 
         // Should produce Width * Height pixels, each with 4 values
-        hdrResult.Length.Should().Be(astcFile.Width * astcFile.Height * RgbaColor.BytesPerPixel);
+        Assert.Equal(astcFile.Width * astcFile.Height * RgbaColor.BytesPerPixel, hdrResult.Length);
 
         // Verify at least some HDR values exceed 1.0 (typical for HDR content)
         int valuesGreaterThanOne = 0;
@@ -84,7 +83,7 @@ public class HdrImageTests
             }
         }
 
-        valuesGreaterThanOne.Should().Be(64);
+        Assert.Equal(64, valuesGreaterThanOne);
     }
 
     [Fact]
@@ -105,13 +104,13 @@ public class HdrImageTests
         Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
 
         // Should produce 1 pixel with 4 bytes (RGBA)
-        ldrResult.Length.Should().Be(RgbaColor.BytesPerPixel);
+        Assert.Equal(RgbaColor.BytesPerPixel, ldrResult.Length);
 
         // All values should be in LDR range
         foreach (byte value in ldrResult)
         {
-            value.Should().BeGreaterThanOrEqualTo(byte.MinValue);
-            value.Should().BeLessThanOrEqualTo(byte.MaxValue);
+            Assert.True(value >= byte.MinValue);
+            Assert.True(value <= byte.MaxValue);
         }
     }
 
@@ -130,8 +129,8 @@ public class HdrImageTests
         Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
 
         // Both should produce output for 1 pixel
-        hdrResult.Length.Should().Be(4);
-        ldrResult.Length.Should().Be(4);
+        Assert.Equal(4, hdrResult.Length);
+        Assert.Equal(4, ldrResult.Length);
 
         // The relative ordering of RGB channels should be consistent between APIs.
         // If HDR channel i > channel j, then LDR channel i should be >= channel j
@@ -142,11 +141,11 @@ public class HdrImageTests
             {
                 if (hdrResult[i] > hdrResult[j])
                 {
-                    ldrResult[i].Should().BeGreaterThanOrEqualTo(ldrResult[j]);
+                    Assert.True(ldrResult[i] >= ldrResult[j]);
                 }
                 else if (hdrResult[i] < hdrResult[j])
                 {
-                    ldrResult[i].Should().BeLessThanOrEqualTo(ldrResult[j]);
+                    Assert.True(ldrResult[i] <= ldrResult[j]);
                 }
             }
         }

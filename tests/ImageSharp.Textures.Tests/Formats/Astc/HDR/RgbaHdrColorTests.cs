@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc.HDR;
@@ -13,10 +12,10 @@ public class RgbaHdrColorTests
     {
         RgbaHdrColor color = new(1000, 2000, 3000, 4000);
 
-        color.R.Should().Be(1000);
-        color.G.Should().Be(2000);
-        color.B.Should().Be(3000);
-        color.A.Should().Be(4000);
+        Assert.Equal(1000, color.R);
+        Assert.Equal(2000, color.G);
+        Assert.Equal(3000, color.B);
+        Assert.Equal(4000, color.A);
     }
 
     [Fact]
@@ -24,10 +23,10 @@ public class RgbaHdrColorTests
     {
         RgbaHdrColor color = new(1000, 2000, 3000, 4000);
 
-        color[0].Should().Be(1000);
-        color[1].Should().Be(2000);
-        color[2].Should().Be(3000);
-        color[3].Should().Be(4000);
+        Assert.Equal(1000, color[0]);
+        Assert.Equal(2000, color[1]);
+        Assert.Equal(3000, color[2]);
+        Assert.Equal(4000, color[3]);
     }
 
     [Fact]
@@ -37,7 +36,7 @@ public class RgbaHdrColorTests
 
         Action act = () => _ = color[4];
 
-        act.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(act);
     }
 
     [Fact]
@@ -47,10 +46,10 @@ public class RgbaHdrColorTests
 
         RgbaHdrColor hdrColor = RgbaHdrColor.FromRgba(ldrColor);
 
-        hdrColor.R.Should().Be(0);        // 0 * 257 = 0
-        hdrColor.G.Should().Be(32639);    // 127 * 257 = 32639
-        hdrColor.B.Should().Be(65535);    // 255 * 257 = 65535
-        hdrColor.A.Should().Be(51400);    // 200 * 257 = 51400
+        Assert.Equal(0, hdrColor.R);        // 0 * 257 = 0
+        Assert.Equal(32639, hdrColor.G);    // 127 * 257 = 32639
+        Assert.Equal(65535, hdrColor.B);    // 255 * 257 = 65535
+        Assert.Equal(51400, hdrColor.A);    // 200 * 257 = 51400
     }
 
     [Fact]
@@ -60,10 +59,10 @@ public class RgbaHdrColorTests
 
         RgbaColor ldrColor = hdrColor.ToLowDynamicRange();
 
-        ldrColor.R.Should().Be(0);     // 0 >> 8 = 0
-        ldrColor.G.Should().Be(127);   // 32639 >> 8 = 127
-        ldrColor.B.Should().Be(255);   // 65535 >> 8 = 255
-        ldrColor.A.Should().Be(200);   // 51400 >> 8 = 200
+        Assert.Equal(0, ldrColor.R);     // 0 >> 8 = 0
+        Assert.Equal(127, ldrColor.G);   // 32639 >> 8 = 127
+        Assert.Equal(255, ldrColor.B);   // 65535 >> 8 = 255
+        Assert.Equal(200, ldrColor.A);   // 51400 >> 8 = 200
     }
 
     [Fact]
@@ -74,10 +73,10 @@ public class RgbaHdrColorTests
         RgbaHdrColor hdrColor = RgbaHdrColor.FromRgba(original);
         RgbaColor result = hdrColor.ToLowDynamicRange();
 
-        result.R.Should().Be(original.R);
-        result.G.Should().Be(original.G);
-        result.B.Should().Be(original.B);
-        result.A.Should().Be(original.A);
+        Assert.Equal(original.R, result.R);
+        Assert.Equal(original.G, result.G);
+        Assert.Equal(original.B, result.B);
+        Assert.Equal(original.A, result.A);
     }
 
     [Fact]
@@ -88,7 +87,7 @@ public class RgbaHdrColorTests
 
         bool result = color1.IsCloseTo(color2, 10);
 
-        result.Should().BeTrue();
+        Assert.True(result);
     }
 
     [Fact]
@@ -99,7 +98,7 @@ public class RgbaHdrColorTests
 
         bool result = color1.IsCloseTo(color2, 10);
 
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -107,9 +106,9 @@ public class RgbaHdrColorTests
     {
         RgbaHdrColor empty = RgbaHdrColor.Empty;
 
-        empty.R.Should().Be(0);
-        empty.G.Should().Be(0);
-        empty.B.Should().Be(0);
-        empty.A.Should().Be(0);
+        Assert.Equal(0, empty.R);
+        Assert.Equal(0, empty.G);
+        Assert.Equal(0, empty.B);
+        Assert.Equal(0, empty.A);
     }
 }

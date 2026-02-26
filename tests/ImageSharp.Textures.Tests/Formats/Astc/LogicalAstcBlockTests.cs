@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Astc.Core;
@@ -24,8 +23,8 @@ public class LogicalAstcBlockTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
         LogicalBlock logicalBlock = new(footprint);
 
-        logicalBlock.GetFootprint().Should().Be(footprint);
-        logicalBlock.GetFootprint().Type.Should().Be(footprintType);
+        Assert.Equal(footprint, logicalBlock.GetFootprint());
+        Assert.Equal(footprintType, logicalBlock.GetFootprint().Type);
     }
 
     [Fact]
@@ -36,7 +35,7 @@ public class LogicalAstcBlockTests
 
         Footprint result = logicalBlock.GetFootprint();
 
-        result.Should().Be(footprint);
+        Assert.Equal(footprint, result);
     }
 
     [Theory]
@@ -49,7 +48,7 @@ public class LogicalAstcBlockTests
 
         logicalBlock.SetWeightAt(1, 1, weight);
 
-        logicalBlock.WeightAt(1, 1).Should().Be(weight);
+        Assert.Equal(weight, logicalBlock.WeightAt(1, 1));
     }
 
     [Theory]
@@ -62,7 +61,7 @@ public class LogicalAstcBlockTests
 
         Action action = () => logicalBlock.SetWeightAt(0, 0, weight);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public class LogicalAstcBlockTests
 
         int weight = logicalBlock.WeightAt(2, 2);
 
-        weight.Should().Be(0);
+        Assert.Equal(0, weight);
     }
 
     [Fact]
@@ -82,7 +81,7 @@ public class LogicalAstcBlockTests
 
         bool result = logicalBlock.IsDualPlane();
 
-        result.Should().BeFalse();
+        Assert.False(result);
     }
 
     [Fact]
@@ -92,7 +91,7 @@ public class LogicalAstcBlockTests
 
         logicalBlock.SetDualPlaneChannel(0);
 
-        logicalBlock.IsDualPlane().Should().BeTrue();
+        Assert.True(logicalBlock.IsDualPlane());
     }
 
     [Fact]
@@ -103,7 +102,7 @@ public class LogicalAstcBlockTests
 
         logicalBlock.SetDualPlaneChannel(-1);
 
-        logicalBlock.IsDualPlane().Should().BeFalse();
+        Assert.False(logicalBlock.IsDualPlane());
     }
 
     [Fact]
@@ -113,8 +112,8 @@ public class LogicalAstcBlockTests
 
         Action action = () => logicalBlock.SetDualPlaneWeightAt(0, 2, 3, 1);
 
-        action.Should().Throw<InvalidOperationException>()
-            .WithMessage("Not a dual plane block");
+        var ex = Assert.Throws<InvalidOperationException>(action);
+        Assert.Contains("Not a dual plane block", ex.Message);
     }
 
     [Fact]
@@ -126,8 +125,8 @@ public class LogicalAstcBlockTests
 
         logicalBlock.SetDualPlaneWeightAt(0, 2, 3, 1);
 
-        logicalBlock.WeightAt(2, 3).Should().Be(2);
-        logicalBlock.DualPlaneWeightAt(0, 2, 3).Should().Be(1);
+        Assert.Equal(2, logicalBlock.WeightAt(2, 3));
+        Assert.Equal(1, logicalBlock.DualPlaneWeightAt(0, 2, 3));
     }
 
     [Fact]
@@ -140,7 +139,7 @@ public class LogicalAstcBlockTests
 
         for (int i = 1; i < 4; ++i)
         {
-            logicalBlock.DualPlaneWeightAt(i, 2, 3).Should().Be(2);
+            Assert.Equal(2, logicalBlock.DualPlaneWeightAt(i, 2, 3));
         }
     }
 
@@ -152,7 +151,7 @@ public class LogicalAstcBlockTests
 
         int result = logicalBlock.DualPlaneWeightAt(0, 2, 3);
 
-        result.Should().Be(42);
+        Assert.Equal(42, result);
     }
 
     [Fact]
@@ -165,11 +164,11 @@ public class LogicalAstcBlockTests
 
         logicalBlock.SetDualPlaneChannel(-1);
 
-        logicalBlock.IsDualPlane().Should().BeFalse();
-        logicalBlock.WeightAt(2, 3).Should().Be(2);
+        Assert.False(logicalBlock.IsDualPlane());
+        Assert.Equal(2, logicalBlock.WeightAt(2, 3));
         for (int i = 0; i < 4; ++i)
         {
-            logicalBlock.DualPlaneWeightAt(i, 2, 3).Should().Be(2);
+            Assert.Equal(2, logicalBlock.DualPlaneWeightAt(i, 2, 3));
         }
     }
 
@@ -189,8 +188,8 @@ public class LogicalAstcBlockTests
         RgbaColor colorAtMinWeight = logicalBlock.ColorAt(0, 0);
         RgbaColor colorAtMaxWeight = logicalBlock.ColorAt(1, 1);
 
-        colorAtMinWeight.R.Should().Be(color1.R);
-        colorAtMaxWeight.R.Should().BeCloseTo(color2.R, 1);
+        Assert.Equal(color1.R, colorAtMinWeight.R);
+        Assert.True(Math.Abs(colorAtMaxWeight.R - color2.R) <= 1);
     }
 
     [Fact]
@@ -226,18 +225,18 @@ public class LogicalAstcBlockTests
                 if (((i ^ j) & 1) == 1)
                 {
                     // Weight 0 = first endpoint
-                    color.R.Should().Be(endpointA.R);
-                    color.G.Should().Be(endpointA.G);
-                    color.B.Should().Be(endpointA.B);
-                    color.A.Should().Be(endpointA.A);
+                    Assert.Equal(endpointA.R, color.R);
+                    Assert.Equal(endpointA.G, color.G);
+                    Assert.Equal(endpointA.B, color.B);
+                    Assert.Equal(endpointA.A, color.A);
                 }
                 else
                 {
                     // Weight 64 = second endpoint
-                    color.R.Should().Be(endpointB.R);
-                    color.G.Should().Be(endpointB.G);
-                    color.B.Should().Be(endpointB.B);
-                    color.A.Should().Be(endpointB.A);
+                    Assert.Equal(endpointB.R, color.R);
+                    Assert.Equal(endpointB.G, color.G);
+                    Assert.Equal(endpointB.B, color.B);
+                    Assert.Equal(endpointB.A, color.A);
                 }
             }
         }
@@ -254,7 +253,7 @@ public class LogicalAstcBlockTests
 
         Action action = () => logicalBlock.ColorAt(x, y);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Fact]
@@ -279,12 +278,12 @@ public class LogicalAstcBlockTests
         Action setEndpoint0 = () => logicalBlock.SetEndpoints(redEndpoint, blackEndpoint, 0);
         Action setEndpoint1 = () => logicalBlock.SetEndpoints(greenEndpoint, blackEndpoint, 1);
 
-        setEndpoint0.Should().NotThrow();
-        setEndpoint1.Should().NotThrow();
+        setEndpoint0();
+        setEndpoint1();
 
         // Should not be able to set endpoints for non-existent partition 2
         Action setEndpoint2 = () => logicalBlock.SetEndpoints(redEndpoint, blackEndpoint, 2);
-        setEndpoint2.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(setEndpoint2);
     }
 
     [Fact]
@@ -298,9 +297,8 @@ public class LogicalAstcBlockTests
 
         Action action = () => logicalBlock.SetPartition(wrongPartition);
 
-        action.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("New partitions may not be for a different footprint");
+        var ex = Assert.Throws<InvalidOperationException>(action);
+        Assert.Contains("New partitions may not be for a different footprint", ex.Message);
     }
 
     [Theory]
@@ -314,7 +312,7 @@ public class LogicalAstcBlockTests
 
         Action action = () => logicalBlock.SetEndpoints(color1, color2, subset);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Fact]
@@ -325,7 +323,7 @@ public class LogicalAstcBlockTests
 
         LogicalBlock? result = LogicalBlock.UnpackLogicalBlock(Footprint.Get8x8(), bits, in info);
 
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -336,8 +334,8 @@ public class LogicalAstcBlockTests
 
         LogicalBlock? result = LogicalBlock.UnpackLogicalBlock(Footprint.Get8x8(), bits, in info);
 
-        result.Should().NotBeNull();
-        result!.GetFootprint().Should().Be(Footprint.Get8x8());
+        Assert.NotNull(result);
+        Assert.Equal(Footprint.Get8x8(), result!.GetFootprint());
     }
 
     [Fact]
@@ -348,8 +346,8 @@ public class LogicalAstcBlockTests
 
         LogicalBlock? result = LogicalBlock.UnpackLogicalBlock(Footprint.Get6x5(), bits, in info);
 
-        result.Should().NotBeNull();
-        result!.GetFootprint().Should().Be(Footprint.Get6x5());
+        Assert.NotNull(result);
+        Assert.Equal(Footprint.Get6x5(), result!.GetFootprint());
     }
 
     [Theory]

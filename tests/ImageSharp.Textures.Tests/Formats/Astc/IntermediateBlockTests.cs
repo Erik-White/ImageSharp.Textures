@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 using SixLabors.ImageSharp.Textures.Astc.TexelBlock;
@@ -20,7 +19,7 @@ public class IntermediateBlockTests
 
         IntermediateBlock.VoidExtentData? result = IntermediateBlock.UnpackVoidExtent(errorBlock);
 
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -30,7 +29,7 @@ public class IntermediateBlockTests
 
         IntermediateBlock.IntermediateBlockData? result = IntermediateBlock.UnpackIntermediateBlock(errorBlock);
 
-        result.Should().BeNull();
+        Assert.Null(result);
     }
 
     [Fact]
@@ -45,7 +44,7 @@ public class IntermediateBlockTests
 
         int result = IntermediateBlock.EndpointRangeForBlock(data);
 
-        result.Should().Be(-1);
+        Assert.Equal(-1, result);
     }
 
     [Fact]
@@ -60,8 +59,8 @@ public class IntermediateBlockTests
 
         (string? error, UInt128 _) = IntermediateBlockPacker.Pack(data);
 
-        error.Should().NotBeNull();
-        error.Should().Contain("Incorrect number of weights");
+        Assert.NotNull(error);
+        Assert.Contains("Incorrect number of weights", error);
     }
 
     [Fact]
@@ -81,7 +80,7 @@ public class IntermediateBlockTests
 
         int result = IntermediateBlock.EndpointRangeForBlock(data);
 
-        result.Should().Be(-2);
+        Assert.Equal(-2, result);
     }
 
     [Fact]
@@ -102,8 +101,8 @@ public class IntermediateBlockTests
 
         (string? error, UInt128 _) = IntermediateBlockPacker.Pack(data);
 
-        error.Should().NotBeNull();
-        error.Should().Contain("illegal color range");
+        Assert.NotNull(error);
+        Assert.Contains("illegal color range", error);
     }
 
     [Fact]
@@ -136,11 +135,11 @@ public class IntermediateBlockTests
             data.WeightGridY = h;
             int colorRange = IntermediateBlock.EndpointRangeForBlock(data);
 
-            colorRange.Should().BeLessThanOrEqualTo(lastColorRange);
+            Assert.True(colorRange <= lastColorRange);
             lastColorRange = Math.Min(colorRange, lastColorRange);
         }
 
-        lastColorRange.Should().BeLessThan(byte.MaxValue);
+        Assert.True(lastColorRange < byte.MaxValue);
     }
 
     [Fact]
@@ -150,15 +149,15 @@ public class IntermediateBlockTests
 
         IntermediateBlock.IntermediateBlockData? data = IntermediateBlock.UnpackIntermediateBlock(block);
 
-        block.GetColorValuesRange().Should().Be(255);
-        data.Should().NotBeNull();
+        Assert.Equal(255, block.GetColorValuesRange());
+        Assert.NotNull(data);
         IntermediateBlock.IntermediateBlockData ib = data!.Value;
-        ib.EndpointCount.Should().Be(1);
-        ib.Endpoints[0].Mode.Should().Be(ColorEndpointMode.LdrLumaDirect);
-        ib.Endpoints[0].Colors[0].Should().Be(byte.MinValue);
-        ib.Endpoints[0].Colors[1].Should().Be(byte.MaxValue);
-        ib.Endpoints[0].ColorCount.Should().Be(2);
-        ib.EndpointRange.Should().Be(byte.MaxValue);
+        Assert.Equal(1, ib.EndpointCount);
+        Assert.Equal(ColorEndpointMode.LdrLumaDirect, ib.Endpoints[0].Mode);
+        Assert.Equal(byte.MinValue, ib.Endpoints[0].Colors[0]);
+        Assert.Equal(byte.MaxValue, ib.Endpoints[0].Colors[1]);
+        Assert.Equal(2, ib.Endpoints[0].ColorCount);
+        Assert.Equal(byte.MaxValue, ib.EndpointRange);
     }
 
     [Fact]
@@ -168,24 +167,24 @@ public class IntermediateBlockTests
 
         IntermediateBlock.IntermediateBlockData? result = IntermediateBlock.UnpackIntermediateBlock(block);
 
-        result.Should().NotBeNull();
+        Assert.NotNull(result);
         IntermediateBlock.IntermediateBlockData data = result!.Value;
 
-        data.WeightGridX.Should().Be(6);
-        data.WeightGridY.Should().Be(5);
-        data.WeightRange.Should().Be(7);
-        data.PartitionId.Should().BeNull();
-        data.DualPlaneChannel.Should().BeNull();
+        Assert.Equal(6, data.WeightGridX);
+        Assert.Equal(5, data.WeightGridY);
+        Assert.Equal(7, data.WeightRange);
+        Assert.Null(data.PartitionId);
+        Assert.Null(data.DualPlaneChannel);
 
-        data.WeightsCount.Should().Be(30);
-        data.Weights.AsSpan(0, data.WeightsCount).ToArray().Should().AllBeEquivalentTo(0);
+        Assert.Equal(30, data.WeightsCount);
+        Assert.All(data.Weights.AsSpan(0, data.WeightsCount).ToArray(), item => Assert.Equal(0, item));
 
-        data.EndpointCount.Should().Be(1);
+        Assert.Equal(1, data.EndpointCount);
         IntermediateBlock.IntermediateEndpointData endpoint = data.Endpoints[0];
-        endpoint.Mode.Should().Be(ColorEndpointMode.LdrLumaDirect);
-        endpoint.ColorCount.Should().Be(2);
-        endpoint.Colors[0].Should().Be(byte.MinValue);
-        endpoint.Colors[1].Should().Be(byte.MaxValue);
+        Assert.Equal(ColorEndpointMode.LdrLumaDirect, endpoint.Mode);
+        Assert.Equal(2, endpoint.ColorCount);
+        Assert.Equal(byte.MinValue, endpoint.Colors[0]);
+        Assert.Equal(byte.MaxValue, endpoint.Colors[1]);
     }
 
     [Fact]
@@ -213,8 +212,8 @@ public class IntermediateBlockTests
 
         (string? error, UInt128 packed) = IntermediateBlockPacker.Pack(data);
 
-        error.Should().BeNull();
-        packed.Should().Be((UInt128)0x0000000001FE000173UL);
+        Assert.Null(error);
+        Assert.Equal((UInt128)0x0000000001FE000173UL, packed);
     }
 
     [Fact]
@@ -224,26 +223,26 @@ public class IntermediateBlockTests
         PhysicalBlock block = PhysicalBlock.Create(original);
         IntermediateBlock.IntermediateBlockData? data = IntermediateBlock.UnpackIntermediateBlock(block);
 
-        data.Should().NotBeNull();
+        Assert.NotNull(data);
         IntermediateBlock.IntermediateBlockData intermediate = data!.Value;
 
         // Check unpacked values
-        intermediate.WeightGridX.Should().Be(2);
-        intermediate.WeightGridY.Should().Be(3);
-        intermediate.WeightRange.Should().Be(15);
-        intermediate.PartitionId.Should().BeNull();
-        intermediate.DualPlaneChannel.Should().BeNull();
-        intermediate.EndpointCount.Should().Be(1);
-        intermediate.Endpoints[0].Mode.Should().Be(ColorEndpointMode.LdrLumaDirect);
-        intermediate.Endpoints[0].ColorCount.Should().Be(2);
-        intermediate.Endpoints[0].Colors[0].Should().Be(255);
-        intermediate.Endpoints[0].Colors[1].Should().Be(0);
+        Assert.Equal(2, intermediate.WeightGridX);
+        Assert.Equal(3, intermediate.WeightGridY);
+        Assert.Equal(15, intermediate.WeightRange);
+        Assert.Null(intermediate.PartitionId);
+        Assert.Null(intermediate.DualPlaneChannel);
+        Assert.Equal(1, intermediate.EndpointCount);
+        Assert.Equal(ColorEndpointMode.LdrLumaDirect, intermediate.Endpoints[0].Mode);
+        Assert.Equal(2, intermediate.Endpoints[0].ColorCount);
+        Assert.Equal(255, intermediate.Endpoints[0].Colors[0]);
+        Assert.Equal(0, intermediate.Endpoints[0].Colors[1]);
 
         // Repack
         (string? error, UInt128 repacked) = IntermediateBlockPacker.Pack(intermediate);
 
-        error.Should().BeNull();
-        repacked.Should().Be(original);
+        Assert.Null(error);
+        Assert.Equal(original, repacked);
     }
 
     [Fact]
@@ -253,15 +252,15 @@ public class IntermediateBlockTests
 
         IntermediateBlock.VoidExtentData? result = IntermediateBlock.UnpackVoidExtent(block);
 
-        result.Should().NotBeNull();
+        Assert.NotNull(result);
         IntermediateBlock.VoidExtentData data = result!.Value;
 
-        data.R.Should().Be(0);
-        data.G.Should().Be(0);
-        data.B.Should().Be(0);
-        data.A.Should().Be(0);
+        Assert.Equal(0, data.R);
+        Assert.Equal(0, data.G);
+        Assert.Equal(0, data.B);
+        Assert.Equal(0, data.A);
 
-        data.Coords.Should().AllSatisfy(c => c.Should().Be((1 << 13) - 1));
+        Assert.All(data.Coords, c => Assert.Equal((1 << 13) - 1, c));
     }
 
     [Fact]
@@ -272,18 +271,18 @@ public class IntermediateBlockTests
 
         IntermediateBlock.VoidExtentData? result = IntermediateBlock.UnpackVoidExtent(block);
 
-        result.Should().NotBeNull();
+        Assert.NotNull(result);
         IntermediateBlock.VoidExtentData data = result!.Value;
 
-        data.R.Should().Be(0xbeef);
-        data.G.Should().Be(0xdead);
-        data.B.Should().Be(0xbeef);
-        data.A.Should().Be(0xdead);
+        Assert.Equal(0xbeef, data.R);
+        Assert.Equal(0xdead, data.G);
+        Assert.Equal(0xbeef, data.B);
+        Assert.Equal(0xdead, data.A);
 
-        data.Coords[0].Should().Be(0);
-        data.Coords[1].Should().Be(8191);
-        data.Coords[2].Should().Be(0);
-        data.Coords[3].Should().Be(8191);
+        Assert.Equal(0, data.Coords[0]);
+        Assert.Equal(8191, data.Coords[1]);
+        Assert.Equal(0, data.Coords[2]);
+        Assert.Equal(8191, data.Coords[3]);
     }
 
     [Fact]
@@ -305,8 +304,8 @@ public class IntermediateBlockTests
 
         (string? error, UInt128 packed) = IntermediateBlockPacker.Pack(data);
 
-        error.Should().BeNull();
-        packed.Should().Be((UInt128)0xFFFFFFFFFFFFFDFCUL);
+        Assert.Null(error);
+        Assert.Equal((UInt128)0xFFFFFFFFFFFFFDFCUL, packed);
     }
 
     [Fact]
@@ -323,8 +322,8 @@ public class IntermediateBlockTests
 
         (string? error, UInt128 packed) = IntermediateBlockPacker.Pack(data);
 
-        error.Should().BeNull();
-        packed.Should().Be(new UInt128(0xdeadbeefdeadbeefUL, 0xFFF8003FFE000DFCUL));
+        Assert.Null(error);
+        Assert.Equal(new UInt128(0xdeadbeefdeadbeefUL, 0xFFF8003FFE000DFCUL), packed);
     }
 
     [Theory]
@@ -337,13 +336,13 @@ public class IntermediateBlockTests
 
         IntermediateBlock.IntermediateBlockData? unpacked = IntermediateBlock.UnpackIntermediateBlock(block);
 
-        unpacked.Should().NotBeNull();
+        Assert.NotNull(unpacked);
         IntermediateBlock.IntermediateBlockData ib = unpacked!.Value;
 
         (string? error, UInt128 repacked) = IntermediateBlockPacker.Pack(ib);
 
-        error.Should().BeNull();
-        repacked.Should().Be(original);
+        Assert.Null(error);
+        Assert.Equal(original, repacked);
     }
 
     [Theory]
@@ -363,7 +362,7 @@ public class IntermediateBlockTests
         byte[] astcData = LoadASTCFile(imageName);
         int numBlocks = (imgDim / astcDim) * (imgDim / astcDim);
 
-        (astcData.Length % PhysicalBlock.SizeInBytes).Should().Be(0);
+        Assert.Equal(0, astcData.Length % PhysicalBlock.SizeInBytes);
 
         for (int i = 0; i < numBlocks; ++i)
         {
@@ -378,25 +377,25 @@ public class IntermediateBlockTests
             if (originalBlock.IsVoidExtent)
             {
                 IntermediateBlock.VoidExtentData? voidData = IntermediateBlock.UnpackVoidExtent(originalBlock);
-                voidData.Should().NotBeNull();
+                Assert.NotNull(voidData);
 
                 (string? error, UInt128 packed) = IntermediateBlockPacker.Pack(voidData!.Value);
-                error.Should().BeNull();
+                Assert.Null(error);
                 repacked = packed;
             }
             else
             {
                 IntermediateBlock.IntermediateBlockData? intermediateData = IntermediateBlock.UnpackIntermediateBlock(originalBlock);
-                intermediateData.Should().NotBeNull();
+                Assert.NotNull(intermediateData);
                 IntermediateBlock.IntermediateBlockData ibData = intermediateData!.Value;
 
                 // Verify endpoint range was set
-                ibData.EndpointRange.Should().Be(originalBlock.GetColorValuesRange());
+                Assert.Equal(originalBlock.GetColorValuesRange(), ibData.EndpointRange);
 
                 // Clear endpoint range before repacking (to test calculation)
                 ibData.EndpointRange = null;
                 (string? error, UInt128 packed) = IntermediateBlockPacker.Pack(ibData);
-                error.Should().BeNull();
+                Assert.Null(error);
                 repacked = packed;
             }
 
@@ -408,7 +407,7 @@ public class IntermediateBlockTests
 
     private static void VerifyBlockPropertiesMatch(PhysicalBlock repacked, PhysicalBlock original)
     {
-        repacked.IsIllegalEncoding.Should().BeFalse();
+        Assert.False(repacked.IsIllegalEncoding);
 
         // Verify color bits match
         int repackedColorBitCount = repacked.GetColorBitCount().Value;
@@ -419,45 +418,45 @@ public class IntermediateBlockTests
         UInt128 originalColorMask = UInt128Extensions.OnesMask(originalColorBitCount);
         UInt128 originalColorBits = (original.BlockBits >> original.GetColorStartBit().Value) & originalColorMask;
 
-        repackedColorMask.Should().Be(originalColorMask);
-        repackedColorBits.Should().Be(originalColorBits);
+        Assert.Equal(originalColorMask, repackedColorMask);
+        Assert.Equal(originalColorBits, repackedColorBits);
 
         // Verify void extent properties
-        repacked.IsVoidExtent.Should().Be(original.IsVoidExtent);
-        repacked.GetVoidExtentCoordinates().Should().Equal(original.GetVoidExtentCoordinates());
+        Assert.Equal(original.IsVoidExtent, repacked.IsVoidExtent);
+        Assert.Equal(original.GetVoidExtentCoordinates(), repacked.GetVoidExtentCoordinates());
 
         // Verify weight properties
-        repacked.GetWeightGridDimensions().Should().Be(original.GetWeightGridDimensions());
-        repacked.GetWeightRange().Should().Be(original.GetWeightRange());
-        repacked.GetWeightBitCount().Should().Be(original.GetWeightBitCount());
-        repacked.GetWeightStartBit().Should().Be(original.GetWeightStartBit());
+        Assert.Equal(original.GetWeightGridDimensions(), repacked.GetWeightGridDimensions());
+        Assert.Equal(original.GetWeightRange(), repacked.GetWeightRange());
+        Assert.Equal(original.GetWeightBitCount(), repacked.GetWeightBitCount());
+        Assert.Equal(original.GetWeightStartBit(), repacked.GetWeightStartBit());
 
         // Verify dual plane properties
-        repacked.IsDualPlane.Should().Be(original.IsDualPlane);
-        repacked.GetDualPlaneChannel().Should().Be(original.GetDualPlaneChannel());
+        Assert.Equal(original.IsDualPlane, repacked.IsDualPlane);
+        Assert.Equal(original.GetDualPlaneChannel(), repacked.GetDualPlaneChannel());
 
         // Verify partition properties
-        repacked.GetPartitionsCount().Should().Be(original.GetPartitionsCount());
-        repacked.GetPartitionId().Should().Be(original.GetPartitionId());
+        Assert.Equal(original.GetPartitionsCount(), repacked.GetPartitionsCount());
+        Assert.Equal(original.GetPartitionId(), repacked.GetPartitionId());
 
         // Verify color value properties
-        repacked.GetColorValuesCount().Should().Be(original.GetColorValuesCount());
-        repacked.GetColorValuesRange().Should().Be(original.GetColorValuesRange());
+        Assert.Equal(original.GetColorValuesCount(), repacked.GetColorValuesCount());
+        Assert.Equal(original.GetColorValuesRange(), repacked.GetColorValuesRange());
 
         // Verify endpoint modes for all partitions
         int numParts = repacked.GetPartitionsCount().GetValueOrDefault(0);
         for (int j = 0; j < numParts; ++j)
         {
-            repacked.GetEndpointMode(j).Should().Be(original.GetEndpointMode(j));
+            Assert.True(repacked.GetEndpointMode(j) == original.GetEndpointMode(j), $"Endpoint mode mismatch at partition {j}");
         }
     }
 
     private static byte[] LoadASTCFile(string basename)
     {
         string filename = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.InputFolder, basename + ".astc"));
-        File.Exists(filename).Should().BeTrue($"Testdata missing: {filename}");
+        Assert.True(File.Exists(filename), $"Testdata missing: {filename}");
         byte[] data = File.ReadAllBytes(filename);
-        data.Length.Should().BeGreaterThanOrEqualTo(16, "ASTC file too small");
+        Assert.True(data.Length >= 16, "ASTC file too small");
         return [.. data.Skip(16)];
     }
 }

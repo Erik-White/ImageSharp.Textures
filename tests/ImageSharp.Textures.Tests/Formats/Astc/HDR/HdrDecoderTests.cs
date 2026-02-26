@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 
@@ -21,16 +20,16 @@ public class HdrDecoderTests
         Span<float> hdrResult = AstcDecoder.DecompressHdrImage(astcData, 4, 4, footprint);
 
         // Verify output size: 4x4 pixels, 4 Half values (RGBA) per pixel
-        hdrResult.Length.Should().Be(4 * 4 * 4); // 64 Half values total
+        Assert.Equal(4 * 4 * 4, hdrResult.Length); // 64 Half values total
 
         foreach (float value in hdrResult)
         {
-            float.IsNaN(value).Should().BeFalse();
-            float.IsInfinity(value).Should().BeFalse();
+            Assert.False(float.IsNaN(value));
+            Assert.False(float.IsInfinity(value));
 
             // Values should be in reasonable range for normalized colors
-            value.Should().BeGreaterThanOrEqualTo(0.0f);
-            value.Should().BeLessThanOrEqualTo(1.1f); // Allow slight overshoot for HDR
+            Assert.True(value >= 0.0f);
+            Assert.True(value <= 1.1f); // Allow slight overshoot for HDR
         }
     }
 
@@ -55,7 +54,7 @@ public class HdrDecoderTests
             Span<float> result = AstcDecoder.DecompressHdrImage(astcData, fp.Width, fp.Height, footprint);
 
             // Should produce footprint.Width * footprint.Height pixels, each with 4 Half values
-            result.Length.Should().Be(fp.Width * fp.Height * 4);
+            Assert.Equal(fp.Width * fp.Height * 4, result.Length);
         }
     }
 
@@ -66,7 +65,7 @@ public class HdrDecoderTests
 
         Span<float> result = AstcDecoder.DecompressHdrImage(emptyData, 64, 64, FootprintType.Footprint4x4);
 
-        result.Length.Should().Be(0);
+        Assert.Equal(0, result.Length);
     }
 
     [Fact]
@@ -77,7 +76,7 @@ public class HdrDecoderTests
 
         Span<float> result = AstcDecoder.DecompressHdrImage(astcData, 0, 0, footprint);
 
-        result.Length.Should().Be(0);
+        Assert.Equal(0, result.Length);
     }
 
     [Fact]
@@ -88,9 +87,9 @@ public class HdrDecoderTests
         RgbaHdrColor hdrColor = RgbaHdrColor.FromRgba(ldrColor);
         RgbaColor backToLdr = hdrColor.ToLowDynamicRange();
 
-        backToLdr.R.Should().Be(ldrColor.R);
-        backToLdr.G.Should().Be(ldrColor.G);
-        backToLdr.B.Should().Be(ldrColor.B);
-        backToLdr.A.Should().Be(ldrColor.A);
+        Assert.Equal(ldrColor.R, backToLdr.R);
+        Assert.Equal(ldrColor.G, backToLdr.G);
+        Assert.Equal(ldrColor.B, backToLdr.B);
+        Assert.Equal(ldrColor.A, backToLdr.A);
     }
 }

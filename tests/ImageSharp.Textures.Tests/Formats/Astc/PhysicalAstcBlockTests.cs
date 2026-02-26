@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Astc.TexelBlock;
 
@@ -18,7 +17,7 @@ public class PhysicalAstcBlockTests
 
         PhysicalBlock block = PhysicalBlock.Create(expectedLow);
 
-        block.BlockBits.Should().Be((UInt128)expectedLow);
+        Assert.Equal((UInt128)expectedLow, block.BlockBits);
     }
 
     [Fact]
@@ -28,7 +27,7 @@ public class PhysicalAstcBlockTests
 
         PhysicalBlock block = PhysicalBlock.Create(expected);
 
-        block.BlockBits.Should().Be(expected);
+        Assert.Equal(expected, block.BlockBits);
     }
 
     [Fact]
@@ -39,7 +38,7 @@ public class PhysicalAstcBlockTests
         PhysicalBlock block1 = PhysicalBlock.Create(value);
         PhysicalBlock block2 = PhysicalBlock.Create((UInt128)value);
 
-        block1.BlockBits.Should().Be(block2.BlockBits);
+        Assert.Equal(block2.BlockBits, block1.BlockBits);
     }
 
     [Fact]
@@ -47,7 +46,7 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create((UInt128)0xFFFFFFFFFFFFFDFCUL);
 
-        block.IsVoidExtent.Should().BeTrue();
+        Assert.True(block.IsVoidExtent);
     }
 
     [Fact]
@@ -55,7 +54,7 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(0x0000000001FE000173UL);
 
-        block.IsVoidExtent.Should().BeFalse();
+        Assert.False(block.IsVoidExtent);
     }
 
     [Fact]
@@ -63,7 +62,7 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(ErrorBlock);
 
-        block.IsVoidExtent.Should().BeFalse();
+        Assert.False(block.IsVoidExtent);
     }
 
     [Fact]
@@ -73,12 +72,12 @@ public class PhysicalAstcBlockTests
 
         int[] coords = block.GetVoidExtentCoordinates();
 
-        coords.Should().NotBeNull();
-        coords.Should().HaveCount(4);
-        coords![0].Should().Be(0);
-        coords[1].Should().Be(8191);
-        coords[2].Should().Be(0);
-        coords[3].Should().Be(8191);
+        Assert.NotNull(coords);
+        Assert.Equal(4, coords.Length);
+        Assert.Equal(0, coords![0]);
+        Assert.Equal(8191, coords[1]);
+        Assert.Equal(0, coords[2]);
+        Assert.Equal(8191, coords[3]);
     }
 
     [Fact]
@@ -88,8 +87,8 @@ public class PhysicalAstcBlockTests
 
         int[] coords = block.GetVoidExtentCoordinates();
 
-        block.IsVoidExtent.Should().BeTrue();
-        coords.Should().BeNull();
+        Assert.True(block.IsVoidExtent);
+        Assert.Null(coords);
     }
 
     [Fact]
@@ -98,8 +97,8 @@ public class PhysicalAstcBlockTests
         PhysicalBlock block1 = PhysicalBlock.Create(0x0008004002001DFCUL);
         PhysicalBlock block2 = PhysicalBlock.Create(0x0007FFC001FFFDFCUL);
 
-        block1.IsIllegalEncoding.Should().BeTrue();
-        block2.IsIllegalEncoding.Should().BeTrue();
+        Assert.True(block1.IsIllegalEncoding);
+        Assert.True(block2.IsIllegalEncoding);
     }
 
     [Fact]
@@ -108,10 +107,10 @@ public class PhysicalAstcBlockTests
         PhysicalBlock original = PhysicalBlock.Create(0xFFF8003FFE000DFCUL, 0UL);
         PhysicalBlock modified = PhysicalBlock.Create(0xFFF8003FFE000DFCUL, 0xdeadbeefdeadbeef);
 
-        original.IsIllegalEncoding.Should().BeFalse();
-        original.IsVoidExtent.Should().BeTrue();
-        modified.IsIllegalEncoding.Should().BeFalse();
-        modified.IsVoidExtent.Should().BeTrue();
+        Assert.False(original.IsIllegalEncoding);
+        Assert.True(original.IsVoidExtent);
+        Assert.False(modified.IsIllegalEncoding);
+        Assert.True(modified.IsVoidExtent);
     }
 
     [Fact]
@@ -121,8 +120,8 @@ public class PhysicalAstcBlockTests
 
         int? weightRange = block.GetWeightRange();
 
-        weightRange.Should().HaveValue();
-        weightRange.Should().Be(7);
+        Assert.NotNull(weightRange);
+        Assert.Equal(7, weightRange);
     }
 
     [Fact]
@@ -132,7 +131,7 @@ public class PhysicalAstcBlockTests
 
         int? weightRange = block.GetWeightRange();
 
-        weightRange.Should().BeNull();
+        Assert.Null(weightRange);
     }
 
     [Fact]
@@ -142,8 +141,8 @@ public class PhysicalAstcBlockTests
 
         int? weightRange = block.GetWeightRange();
 
-        weightRange.Should().HaveValue();
-        weightRange.Should().Be(1);
+        Assert.NotNull(weightRange);
+        Assert.Equal(1, weightRange);
     }
 
     [Fact]
@@ -153,7 +152,7 @@ public class PhysicalAstcBlockTests
 
         int? weightRange = block.GetWeightRange();
 
-        weightRange.Should().BeNull();
+        Assert.Null(weightRange);
     }
 
     [Fact]
@@ -163,9 +162,9 @@ public class PhysicalAstcBlockTests
 
         (int Width, int Height)? dims = block.GetWeightGridDimensions();
 
-        dims.Should().NotBeNull();
-        dims!.Value.Width.Should().Be(6);
-        dims.Value.Height.Should().Be(5);
+        Assert.NotNull(dims);
+        Assert.Equal(6, dims!.Value.Width);
+        Assert.Equal(5, dims.Value.Height);
     }
 
     [Fact]
@@ -175,9 +174,9 @@ public class PhysicalAstcBlockTests
 
         (int Width, int Height)? dims = block.GetWeightGridDimensions();
 
-        dims.Should().BeNull();
+        Assert.Null(dims);
         string error = block.IdentifyInvalidEncodingIssues();
-        error.Should().Contain("Invalid block encoding");
+        Assert.Contains("Invalid block encoding", error);
     }
 
     [Fact]
@@ -187,9 +186,9 @@ public class PhysicalAstcBlockTests
 
         (int Width, int Height)? dims = block.GetWeightGridDimensions();
 
-        dims.Should().NotBeNull();
-        dims!.Value.Width.Should().Be(3);
-        dims.Value.Height.Should().Be(5);
+        Assert.NotNull(dims);
+        Assert.Equal(3, dims!.Value.Width);
+        Assert.Equal(5, dims.Value.Height);
     }
 
     [Fact]
@@ -199,9 +198,9 @@ public class PhysicalAstcBlockTests
 
         (int Width, int Height)? dims = block.GetWeightGridDimensions();
 
-        dims.Should().NotBeNull();
-        dims!.Value.Width.Should().Be(8);
-        dims.Value.Height.Should().Be(8);
+        Assert.NotNull(dims);
+        Assert.Equal(8, dims!.Value.Width);
+        Assert.Equal(8, dims.Value.Height);
     }
 
     [Fact]
@@ -211,7 +210,7 @@ public class PhysicalAstcBlockTests
 
         (int Width, int Height)? dims = block.GetWeightGridDimensions();
 
-        dims.Should().BeNull();
+        Assert.Null(dims);
     }
 
     [Fact]
@@ -219,7 +218,7 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(0x0000000001FE000173UL);
 
-        block.IsDualPlane.Should().BeFalse();
+        Assert.False(block.IsDualPlane);
     }
 
     [Fact]
@@ -227,7 +226,7 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(0x0000000001FE0005FFUL);
 
-        block.IsDualPlane.Should().BeTrue();
+        Assert.True(block.IsDualPlane);
     }
 
     [Fact]
@@ -235,7 +234,7 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(ErrorBlock);
 
-        block.IsDualPlane.Should().BeFalse();
+        Assert.False(block.IsDualPlane);
     }
 
     [Fact]
@@ -243,9 +242,9 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(0x0000000001FE000573UL);
 
-        block.IsDualPlane.Should().BeFalse();
-        block.GetWeightGridDimensions().Should().BeNull();
-        block.IdentifyInvalidEncodingIssues().Should().Contain("Invalid block encoding");
+        Assert.False(block.IsDualPlane);
+        Assert.Null(block.GetWeightGridDimensions());
+        Assert.Contains("Invalid block encoding", block.IdentifyInvalidEncodingIssues());
     }
 
     [Fact]
@@ -253,8 +252,8 @@ public class PhysicalAstcBlockTests
     {
         PhysicalBlock block = PhysicalBlock.Create(0x0000000001FE000108UL);
 
-        block.IsDualPlane.Should().BeFalse();
-        block.IsIllegalEncoding.Should().BeFalse();
+        Assert.False(block.IsDualPlane);
+        Assert.False(block.IsIllegalEncoding);
     }
 
     [Fact]
@@ -264,7 +263,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetWeightBitCount();
 
-        bitCount.Should().Be(90);
+        Assert.Equal(90, bitCount);
     }
 
     [Fact]
@@ -274,7 +273,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetWeightBitCount();
 
-        bitCount.Should().Be(90);
+        Assert.Equal(90, bitCount);
     }
 
     [Fact]
@@ -284,7 +283,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetWeightBitCount();
 
-        bitCount.Should().BeNull();
+        Assert.Null(bitCount);
     }
 
     [Fact]
@@ -294,7 +293,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetWeightBitCount();
 
-        bitCount.Should().BeNull();
+        Assert.Null(bitCount);
     }
 
     [Fact]
@@ -304,7 +303,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetWeightBitCount();
 
-        bitCount.Should().BeNull();
+        Assert.Null(bitCount);
     }
 
     [Fact]
@@ -314,7 +313,7 @@ public class PhysicalAstcBlockTests
 
         int? startBit = block.GetWeightStartBit();
 
-        startBit.Should().Be(64);
+        Assert.Equal(64, startBit);
     }
 
     [Fact]
@@ -324,7 +323,7 @@ public class PhysicalAstcBlockTests
 
         int? startBit = block.GetWeightStartBit();
 
-        startBit.Should().BeNull();
+        Assert.Null(startBit);
     }
 
     [Fact]
@@ -334,15 +333,15 @@ public class PhysicalAstcBlockTests
 
         int? startBit = block.GetWeightStartBit();
 
-        startBit.Should().BeNull();
+        Assert.Null(startBit);
     }
 
     [Fact]
     public void IsIllegalEncoding_WithValidBlocks_ShouldReturnFalse()
     {
-        PhysicalBlock.Create(0x0000000001FE000173UL).IsIllegalEncoding.Should().BeFalse();
-        PhysicalBlock.Create(0x0000000001FE0005FFUL).IsIllegalEncoding.Should().BeFalse();
-        PhysicalBlock.Create(0x0000000001FE000108UL).IsIllegalEncoding.Should().BeFalse();
+        Assert.False(PhysicalBlock.Create(0x0000000001FE000173UL).IsIllegalEncoding);
+        Assert.False(PhysicalBlock.Create(0x0000000001FE0005FFUL).IsIllegalEncoding);
+        Assert.False(PhysicalBlock.Create(0x0000000001FE000108UL).IsIllegalEncoding);
     }
 
     [Fact]
@@ -352,8 +351,8 @@ public class PhysicalAstcBlockTests
 
         string error = block.IdentifyInvalidEncodingIssues();
 
-        error.Should().NotBeNull();
-        error.Should().Contain("Invalid block encoding");
+        Assert.NotNull(error);
+        Assert.Contains("Invalid block encoding", error);
     }
 
     [Fact]
@@ -363,8 +362,8 @@ public class PhysicalAstcBlockTests
 
         string error = block.IdentifyInvalidEncodingIssues();
 
-        error.Should().NotBeNull();
-        error.Should().Contain("Invalid block encoding");
+        Assert.NotNull(error);
+        Assert.Contains("Invalid block encoding", error);
     }
 
     [Theory]
@@ -377,7 +376,7 @@ public class PhysicalAstcBlockTests
 
         string error = block.IdentifyInvalidEncodingIssues();
 
-        error.Should().NotBeNull();
+        Assert.NotNull(error);
     }
 
     [Fact]
@@ -387,9 +386,9 @@ public class PhysicalAstcBlockTests
 
         string error = block.IdentifyInvalidEncodingIssues();
 
-        block.GetPartitionsCount().Should().BeNull();
-        error.Should().NotBeNull();
-        error.Should().Contain("Invalid block encoding");
+        Assert.Null(block.GetPartitionsCount());
+        Assert.NotNull(error);
+        Assert.Contains("Invalid block encoding", error);
     }
 
     [Theory]
@@ -402,7 +401,7 @@ public class PhysicalAstcBlockTests
 
         int? partitions = block.GetPartitionsCount();
 
-        partitions.Should().BeNull();
+        Assert.Null(partitions);
     }
 
     [Theory]
@@ -416,7 +415,7 @@ public class PhysicalAstcBlockTests
 
         int? count = block.GetPartitionsCount();
 
-        count.Should().Be(expectedCount);
+        Assert.Equal(expectedCount, count);
     }
 
     [Theory]
@@ -428,7 +427,7 @@ public class PhysicalAstcBlockTests
 
         int? partitionId = block.GetPartitionId();
 
-        partitionId.Should().Be(expectedId);
+        Assert.Equal(expectedId, partitionId);
     }
 
     [Fact]
@@ -438,7 +437,7 @@ public class PhysicalAstcBlockTests
 
         int? partitionId = block.GetPartitionId();
 
-        partitionId.Should().BeNull();
+        Assert.Null(partitionId);
     }
 
     [Fact]
@@ -448,7 +447,7 @@ public class PhysicalAstcBlockTests
 
         int? partitionId = block.GetPartitionId();
 
-        partitionId.Should().BeNull();
+        Assert.Null(partitionId);
     }
 
     [Fact]
@@ -459,7 +458,7 @@ public class PhysicalAstcBlockTests
         for (int i = 0; i < 4; ++i)
         {
             ColorEndpointMode? mode = block.GetEndpointMode(i);
-            mode.Should().Be(ColorEndpointMode.LdrLumaDirect);
+            Assert.Equal(ColorEndpointMode.LdrLumaDirect, mode);
         }
     }
 
@@ -471,8 +470,8 @@ public class PhysicalAstcBlockTests
         ColorEndpointMode? mode0 = block.GetEndpointMode(0);
         ColorEndpointMode? mode1 = block.GetEndpointMode(1);
 
-        mode0.Should().Be(ColorEndpointMode.LdrLumaDirect);
-        mode1.Should().Be(ColorEndpointMode.LdrLumaBaseOffset);
+        Assert.Equal(ColorEndpointMode.LdrLumaDirect, mode0);
+        Assert.Equal(ColorEndpointMode.LdrLumaBaseOffset, mode1);
     }
 
     [Fact]
@@ -482,7 +481,7 @@ public class PhysicalAstcBlockTests
 
         ColorEndpointMode? mode = block.GetEndpointMode(0);
 
-        mode.Should().BeNull();
+        Assert.Null(mode);
     }
 
     [Theory]
@@ -495,7 +494,7 @@ public class PhysicalAstcBlockTests
 
         ColorEndpointMode? mode = block.GetEndpointMode(index);
 
-        mode.Should().BeNull();
+        Assert.Null(mode);
     }
 
     [Fact]
@@ -505,7 +504,7 @@ public class PhysicalAstcBlockTests
 
         int? count = block.GetColorValuesCount();
 
-        count.Should().Be(2);
+        Assert.Equal(2, count);
     }
 
     [Fact]
@@ -515,7 +514,7 @@ public class PhysicalAstcBlockTests
 
         int? count = block.GetColorValuesCount();
 
-        count.Should().Be(4);
+        Assert.Equal(4, count);
     }
 
     [Fact]
@@ -525,7 +524,7 @@ public class PhysicalAstcBlockTests
 
         int? count = block.GetColorValuesCount();
 
-        count.Should().BeNull();
+        Assert.Null(count);
     }
 
     [Fact]
@@ -535,7 +534,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetColorBitCount();
 
-        bitCount.Should().Be(16);
+        Assert.Equal(16, bitCount);
     }
 
     [Fact]
@@ -545,7 +544,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetColorBitCount();
 
-        bitCount.Should().Be(64);
+        Assert.Equal(64, bitCount);
     }
 
     [Fact]
@@ -555,7 +554,7 @@ public class PhysicalAstcBlockTests
 
         int? bitCount = block.GetColorBitCount();
 
-        bitCount.Should().BeNull();
+        Assert.Null(bitCount);
     }
 
     [Fact]
@@ -565,7 +564,7 @@ public class PhysicalAstcBlockTests
 
         int? range = block.GetColorValuesRange();
 
-        range.Should().Be(255);
+        Assert.Equal(255, range);
     }
 
     [Fact]
@@ -575,7 +574,7 @@ public class PhysicalAstcBlockTests
 
         int? range = block.GetColorValuesRange();
 
-        range.Should().Be((1 << 16) - 1);
+        Assert.Equal((1 << 16) - 1, range);
     }
 
     [Fact]
@@ -585,7 +584,7 @@ public class PhysicalAstcBlockTests
 
         int? range = block.GetColorValuesRange();
 
-        range.Should().BeNull();
+        Assert.Null(range);
     }
 
     [Theory]
@@ -601,7 +600,7 @@ public class PhysicalAstcBlockTests
 
         int? startBit = block.GetColorStartBit();
 
-        startBit.Should().Be(expectedStartBit);
+        Assert.Equal(expectedStartBit, startBit);
     }
 
     [Fact]
@@ -611,6 +610,6 @@ public class PhysicalAstcBlockTests
 
         int? startBit = block.GetColorStartBit();
 
-        startBit.Should().BeNull();
+        Assert.Null(startBit);
     }
 }

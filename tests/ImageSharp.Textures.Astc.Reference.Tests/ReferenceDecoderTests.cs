@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 using SixLabors.ImageSharp.Textures.Astc.IO;
 using SixLabors.ImageSharp.Textures.Astc.Reference.Tests.Utils;
@@ -235,8 +234,8 @@ public class ReferenceDecoderTests
     private static void CompareRgba8(Span<byte> actual, byte[] expected, int width, int height, string label)
     {
         int pixelCount = width * height * RgbaColor.BytesPerPixel;
-        actual.Length.Should().Be(pixelCount, because: $"actual output size should match for {label}");
-        expected.Length.Should().Be(pixelCount, because: $"expected output size should match for {label}");
+        Assert.True(actual.Length == pixelCount, $"actual output size should match for {label}");
+        Assert.True(expected.Length == pixelCount, $"expected output size should match for {label}");
 
         int mismatches = 0;
         int worstDiff = 0;

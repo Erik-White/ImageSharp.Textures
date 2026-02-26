@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;
@@ -15,7 +14,7 @@ public class BitOperationsTests
 
         UInt128 result = BitOperations.GetBits(value, 0, 8);
 
-        result.Low().Should().Be(0x21UL);
+        Assert.Equal(0x21UL, result.Low());
     }
 
     [Fact]
@@ -25,7 +24,7 @@ public class BitOperationsTests
 
         UInt128 result = BitOperations.GetBits(value, 0, 0);
 
-        result.Should().Be(UInt128.Zero);
+        Assert.Equal(UInt128.Zero, result);
     }
 
     [Fact]
@@ -35,7 +34,7 @@ public class BitOperationsTests
 
         ulong result = BitOperations.GetBits(value, 0, 8);
 
-        result.Should().Be(0x21UL);
+        Assert.Equal(0x21UL, result);
     }
 
     [Fact]
@@ -45,7 +44,7 @@ public class BitOperationsTests
 
         ulong result = BitOperations.GetBits(value, 0, 0);
 
-        result.Should().Be(0UL);
+        Assert.Equal(0UL, result);
     }
 
     [Theory]
@@ -59,8 +58,8 @@ public class BitOperationsTests
         (int a1, int b1) = BitOperations.TransferPrecision(inputA, inputB);
         (int a2, int b2) = BitOperations.TransferPrecision(inputA, inputB);
 
-        a1.Should().Be(a2);
-        b1.Should().Be(b2);
+        Assert.Equal(a2, a1);
+        Assert.Equal(b2, b1);
     }
 
     [Fact]
@@ -70,8 +69,7 @@ public class BitOperationsTests
         {
             for (int b = byte.MinValue; b <= byte.MaxValue; b++)
             {
-                Action action = () => BitOperations.TransferPrecision(a, b);
-                action.Should().NotThrow();
+                BitOperations.TransferPrecision(a, b);
             }
         }
     }
@@ -88,8 +86,8 @@ public class BitOperationsTests
         (int a1, int b1) = BitOperations.TransferPrecisionInverse(inputA, inputB);
         (int a2, int b2) = BitOperations.TransferPrecisionInverse(inputA, inputB);
 
-        a1.Should().Be(a2);
-        b1.Should().Be(b2);
+        Assert.Equal(a2, a1);
+        Assert.Equal(b2, b1);
     }
 
     [Theory]
@@ -101,7 +99,7 @@ public class BitOperationsTests
     {
         Action action = () => BitOperations.TransferPrecisionInverse(a, b);
 
-        action.Should().Throw<ArgumentOutOfRangeException>();
+        Assert.Throws<ArgumentOutOfRangeException>(action);
     }
 
     [Theory]
@@ -117,7 +115,7 @@ public class BitOperationsTests
         // Apply regular to decode
         (int decodedA, int decodedB) = BitOperations.TransferPrecision(encodedA, encodedB);
 
-        decodedA.Should().Be(originalA);
-        decodedB.Should().Be(originalB);
+        Assert.Equal(originalA, decodedA);
+        Assert.Equal(originalB, decodedB);
     }
 }

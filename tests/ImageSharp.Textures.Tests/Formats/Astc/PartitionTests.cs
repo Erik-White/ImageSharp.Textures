@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using System.Globalization;
-using AwesomeAssertions;
 using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Astc.Core;
 
@@ -41,7 +40,7 @@ public class PartitionTests
 
         int distance = Partition.PartitionMetric(partitionA, partitionB);
 
-        distance.Should().Be(2);
+        Assert.Equal(2, distance);
     }
 
     [Fact]
@@ -71,7 +70,7 @@ public class PartitionTests
 
         int distance = Partition.PartitionMetric(partitionA, partitionB);
 
-        distance.Should().Be(3);
+        Assert.Equal(3, distance);
     }
 
     [Fact]
@@ -101,7 +100,7 @@ public class PartitionTests
 
         int distance = Partition.PartitionMetric(partitionA, partitionB);
 
-        distance.Should().Be(1);
+        Assert.Equal(1, distance);
     }
 
     [Fact]
@@ -119,7 +118,7 @@ public class PartitionTests
 
         Partition partition = Partition.GetASTCPartition(Footprint.Get10x6(), 3, 557);
 
-        partition.Assignment.Should().Equal(expected);
+        Assert.Equal(expected, partition.Assignment);
     }
 
     [Fact]
@@ -128,7 +127,7 @@ public class PartitionTests
         Partition partition0 = Partition.GetASTCPartition(Footprint.Get6x6(), 2, 0);
         Partition partition1 = Partition.GetASTCPartition(Footprint.Get6x6(), 2, 1);
 
-        partition0.Assignment.Should().NotEqual(partition1.Assignment);
+        Assert.NotEqual(partition1.Assignment, partition0.Assignment);
     }
 
     [Fact]
@@ -149,7 +148,7 @@ public class PartitionTests
 
         Partition closestAstcPartition = Partition.FindClosestASTCPartition(partition);
 
-        closestAstcPartition.PartitionCount.Should().Be(partition.PartitionCount);
+        Assert.Equal(partition.PartitionCount, closestAstcPartition.PartitionCount);
     }
 
     [Fact]
@@ -166,16 +165,16 @@ public class PartitionTests
         Partition closestPartition = Partition.FindClosestASTCPartition(modifiedPartition);
 
         // The closest partition should be a valid ASTC partition with the same footprint and number of parts
-        closestPartition.Footprint.Should().Be(astcPartition.Footprint);
-        closestPartition.PartitionCount.Should().Be(astcPartition.PartitionCount);
-        closestPartition.PartitionId.Should().HaveValue("returned partition should have a valid ID");
+        Assert.Equal(astcPartition.Footprint, closestPartition.Footprint);
+        Assert.Equal(astcPartition.PartitionCount, closestPartition.PartitionCount);
+        Assert.NotNull(closestPartition.PartitionId);
 
         // Verify we can retrieve the same partition again using its ID
         Partition verifyPartition = Partition.GetASTCPartition(
             closestPartition.Footprint,
             closestPartition.PartitionCount,
             closestPartition.PartitionId!.Value);
-        verifyPartition.Should().Be(closestPartition);
+        Assert.Equal(closestPartition, verifyPartition);
     }
 
     [Theory]
@@ -217,11 +216,9 @@ public class PartitionTests
             Partition astcPartition = Partition.FindClosestASTCPartition(partition);
 
             // Matched partition should have fewer or equal subsets
-            astcPartition.PartitionCount
-                .Should()
-                .BeLessThanOrEqualTo(
-                    partition.PartitionCount,
-                    $"Footprint {footprintType}, Test #{i}: Selected partition with ID {astcPartition.PartitionId?.ToString(CultureInfo.InvariantCulture) ?? "null"}");
+            Assert.True(
+                astcPartition.PartitionCount <= partition.PartitionCount,
+                $"Footprint {footprintType}, Test #{i}: Selected partition with ID {astcPartition.PartitionId?.ToString(CultureInfo.InvariantCulture) ?? "null"}");
         }
     }
 }

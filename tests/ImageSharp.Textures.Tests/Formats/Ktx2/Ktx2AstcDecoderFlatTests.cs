@@ -37,6 +37,7 @@ public partial class Ktx2AstcDecoderFlatTests
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgba32_12x12)]
     public void CanDecode_Rgba32_Blocksizes(TestTextureProvider provider)
     {
+        string blockSize = GetBlockSizeFromFileName(provider.InputFile);
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);
         FlatTexture flatTexture = texture as FlatTexture;
@@ -51,10 +52,7 @@ public partial class Ktx2AstcDecoderFlatTests
 
         Image<Rgba32> firstMipMapImage = firstMipMap as Image<Rgba32>;
 
-        // Note that the comparer is given a higher threshold to allow for the lossy compression of ASTC,
-        // especially at larger block sizes, but the output is still expected to be very similar to the reference image.
-        // A single reference image is used to save on the amount of test data otherwise required for each block size.
-        firstMipMapImage.CompareToReferenceOutput(ImageComparer.TolerantPercentage(4.0f), provider, appendPixelTypeToFileName: false);
+        firstMipMapImage.CompareToReferenceOutput(ImageComparer.Exact, provider, testOutputDetails: blockSize);
     }
 
     [Theory]

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders;
@@ -41,10 +42,28 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
                     basePath = Path.Combine(basePath, featureLevel);
                 }
 
+                if (!Directory.Exists(basePath))
+                {
+                    continue;
+                }
+
+                // First try direct path construction (handles subdirectory paths like "Flat/Astc/file.ktx2").
                 string file = Path.Combine(basePath, this.inputFile);
                 if (File.Exists(file))
                 {
-                    var testTextureProvider = new TestTextureProvider(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, file, false);
+                    TestTextureProvider testTextureProvider = new(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, file, false);
+                    yield return new object[] { testTextureProvider };
+                    continue;
+                }
+
+                // Fall back to case-insensitive filename matching to handle
+                // cross-platform casing differences (e.g. ".DDS" vs ".dds").
+                string match = Directory.GetFiles(basePath)
+                    .FirstOrDefault(f => Path.GetFileName(f).Equals(this.inputFile, StringComparison.OrdinalIgnoreCase));
+
+                if (match is not null)
+                {
+                    TestTextureProvider testTextureProvider = new(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, match, false);
                     yield return new object[] { testTextureProvider };
                 }
             }

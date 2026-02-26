@@ -353,47 +353,46 @@ public class LogicalAstcBlockTests
     [Theory]
 
     // Synthetic test images
-    [InlineData("footprint_4x4", false, FootprintType.Footprint4x4, 32, 32)]
-    [InlineData("footprint_5x4", false, FootprintType.Footprint5x4, 32, 32)]
-    [InlineData("footprint_5x5", false, FootprintType.Footprint5x5, 32, 32)]
-    [InlineData("footprint_6x5", false, FootprintType.Footprint6x5, 32, 32)]
-    [InlineData("footprint_6x6", false, FootprintType.Footprint6x6, 32, 32)]
-    [InlineData("footprint_8x5", false, FootprintType.Footprint8x5, 32, 32)]
-    [InlineData("footprint_8x6", false, FootprintType.Footprint8x6, 32, 32)]
-    [InlineData("footprint_8x8", false, FootprintType.Footprint8x8, 32, 32)]
-    [InlineData("footprint_10x5", false, FootprintType.Footprint10x5, 32, 32)]
-    [InlineData("footprint_10x6", false, FootprintType.Footprint10x6, 32, 32)]
-    [InlineData("footprint_10x8", false, FootprintType.Footprint10x8, 32, 32)]
-    [InlineData("footprint_10x10", false, FootprintType.Footprint10x10, 32, 32)]
-    [InlineData("footprint_12x10", false, FootprintType.Footprint12x10, 32, 32)]
-    [InlineData("footprint_12x12", false, FootprintType.Footprint12x12, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_4x4, TestImages.Astc.Expected.Footprint_4x4, FootprintType.Footprint4x4, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_5x4, TestImages.Astc.Expected.Footprint_5x4, FootprintType.Footprint5x4, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_5x5, TestImages.Astc.Expected.Footprint_5x5, FootprintType.Footprint5x5, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_6x5, TestImages.Astc.Expected.Footprint_6x5, FootprintType.Footprint6x5, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_6x6, TestImages.Astc.Expected.Footprint_6x6, FootprintType.Footprint6x6, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_8x5, TestImages.Astc.Expected.Footprint_8x5, FootprintType.Footprint8x5, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_8x6, TestImages.Astc.Expected.Footprint_8x6, FootprintType.Footprint8x6, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_8x8, TestImages.Astc.Expected.Footprint_8x8, FootprintType.Footprint8x8, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_10x5, TestImages.Astc.Expected.Footprint_10x5, FootprintType.Footprint10x5, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_10x6, TestImages.Astc.Expected.Footprint_10x6, FootprintType.Footprint10x6, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_10x8, TestImages.Astc.Expected.Footprint_10x8, FootprintType.Footprint10x8, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_10x10, TestImages.Astc.Expected.Footprint_10x10, FootprintType.Footprint10x10, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_12x10, TestImages.Astc.Expected.Footprint_12x10, FootprintType.Footprint12x10, 32, 32)]
+    [InlineData(TestImages.Astc.Footprint_12x12, TestImages.Astc.Expected.Footprint_12x12, FootprintType.Footprint12x12, 32, 32)]
 
     // RGB without alpha images
-    [InlineData("rgb_4x4", false, FootprintType.Footprint4x4, 224, 288)]
-    [InlineData("rgb_5x4", false, FootprintType.Footprint5x4, 224, 288)]
-    [InlineData("rgb_6x6", false, FootprintType.Footprint6x6, 224, 288)]
-    [InlineData("rgb_8x8", false, FootprintType.Footprint8x8, 224, 288)]
-    [InlineData("rgb_12x12", false, FootprintType.Footprint12x12, 224, 288)]
+    [InlineData(TestImages.Astc.Rgb_4x4, TestImages.Astc.Expected.Rgb_4x4, FootprintType.Footprint4x4, 224, 288)]
+    [InlineData(TestImages.Astc.Rgb_5x4, TestImages.Astc.Expected.Rgb_5x4, FootprintType.Footprint5x4, 224, 288)]
+    [InlineData(TestImages.Astc.Rgb_6x6, TestImages.Astc.Expected.Rgb_6x6, FootprintType.Footprint6x6, 224, 288)]
+    [InlineData(TestImages.Astc.Rgb_8x8, TestImages.Astc.Expected.Rgb_8x8, FootprintType.Footprint8x8, 224, 288)]
+    [InlineData(TestImages.Astc.Rgb_12x12, TestImages.Astc.Expected.Rgb_12x12, FootprintType.Footprint12x12, 224, 288)]
 
     // RGB with alpha images
-    [InlineData("atlas_small_4x4", true, FootprintType.Footprint4x4, 256, 256)]
-    [InlineData("atlas_small_5x5", true, FootprintType.Footprint5x5, 256, 256)]
-    [InlineData("atlas_small_6x6", true, FootprintType.Footprint6x6, 256, 256)]
-    [InlineData("atlas_small_8x8", true, FootprintType.Footprint8x8, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_4x4, TestImages.Astc.Expected.Atlas_Small_4x4, FootprintType.Footprint4x4, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_5x5, TestImages.Astc.Expected.Atlas_Small_5x5, FootprintType.Footprint5x5, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_6x6, TestImages.Astc.Expected.Atlas_Small_6x6, FootprintType.Footprint6x6, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_8x8, TestImages.Astc.Expected.Atlas_Small_8x8, FootprintType.Footprint8x8, 256, 256)]
     public void UnpackLogicalBlock_FromImage_ShouldDecodeCorrectly(
-        string imageName,
-        bool hasAlpha,
+        string inputFile,
+        string expectedFile,
         FootprintType footprintType,
         int width,
         int height)
     {
-        _ = hasAlpha;
         Footprint footprint = Footprint.FromFootprintType(footprintType);
-        byte[] astcData = TestFile.Create(Path.Combine(TestImages.Astc.InputFolder, imageName + ".astc")).Bytes[16..];
+        byte[] astcData = TestFile.Create(inputFile).Bytes[16..];
 
         using Image<Rgba32> decodedImage = DecodeAstcBlocksToImage(footprint, astcData, width, height);
 
-        string expectedPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.ExpectedFolder, imageName + ".bmp"));
+        string expectedPath = TestFile.GetInputFileFullPath(expectedFile);
         using Image<Rgba32> expectedImage = Image.Load<Rgba32>(expectedPath);
         ImageComparer.TolerantPercentage(1.0f).VerifySimilarity(expectedImage, decodedImage);
     }

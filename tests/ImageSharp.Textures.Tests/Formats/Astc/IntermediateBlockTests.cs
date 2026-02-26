@@ -346,20 +346,20 @@ public class IntermediateBlockTests
     }
 
     [Theory]
-    [InlineData("checkered_4", 4)]
-    [InlineData("checkered_5", 5)]
-    [InlineData("checkered_6", 6)]
-    [InlineData("checkered_7", 7)]
-    [InlineData("checkered_8", 8)]
-    [InlineData("checkered_9", 9)]
-    [InlineData("checkered_10", 10)]
-    [InlineData("checkered_11", 11)]
-    [InlineData("checkered_12", 12)]
-    public void PackUnpack_WithTestDataBlocks_ShouldPreserveBlockProperties(string imageName, int checkeredDim)
+    [InlineData(TestImages.Astc.Checkered_4, 4)]
+    [InlineData(TestImages.Astc.Checkered_5, 5)]
+    [InlineData(TestImages.Astc.Checkered_6, 6)]
+    [InlineData(TestImages.Astc.Checkered_7, 7)]
+    [InlineData(TestImages.Astc.Checkered_8, 8)]
+    [InlineData(TestImages.Astc.Checkered_9, 9)]
+    [InlineData(TestImages.Astc.Checkered_10, 10)]
+    [InlineData(TestImages.Astc.Checkered_11, 11)]
+    [InlineData(TestImages.Astc.Checkered_12, 12)]
+    public void PackUnpack_WithTestDataBlocks_ShouldPreserveBlockProperties(string inputFile, int checkeredDim)
     {
         const int astcDim = 8;
         int imgDim = checkeredDim * astcDim;
-        byte[] astcData = LoadASTCFile(imageName);
+        byte[] astcData = LoadASTCFile(inputFile);
         int numBlocks = (imgDim / astcDim) * (imgDim / astcDim);
 
         Assert.Equal(0, astcData.Length % PhysicalBlock.SizeInBytes);
@@ -451,9 +451,9 @@ public class IntermediateBlockTests
         }
     }
 
-    private static byte[] LoadASTCFile(string basename)
+    private static byte[] LoadASTCFile(string inputFile)
     {
-        string filename = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.InputFolder, basename + ".astc"));
+        string filename = TestFile.GetInputFileFullPath(inputFile);
         Assert.True(File.Exists(filename), $"Testdata missing: {filename}");
         byte[] data = File.ReadAllBytes(filename);
         Assert.True(data.Length >= 16, "ASTC file too small");

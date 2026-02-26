@@ -9,47 +9,47 @@ namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;
 public class IntegrationTests
 {
     [Theory]
-    [InlineData("atlas_small_4x4")]
-    [InlineData("atlas_small_5x5")]
-    [InlineData("atlas_small_6x6")]
-    [InlineData("atlas_small_8x8")]
-    [InlineData("checkerboard")]
-    [InlineData("checkered_4")]
-    [InlineData("checkered_5")]
-    [InlineData("checkered_6")]
-    [InlineData("checkered_7")]
-    [InlineData("checkered_8")]
-    [InlineData("checkered_9")]
-    [InlineData("checkered_10")]
-    [InlineData("checkered_11")]
-    [InlineData("checkered_12")]
-    [InlineData("footprint_4x4")]
-    [InlineData("footprint_5x4")]
-    [InlineData("footprint_5x5")]
-    [InlineData("footprint_6x5")]
-    [InlineData("footprint_6x6")]
-    [InlineData("footprint_8x5")]
-    [InlineData("footprint_8x6")]
-    [InlineData("footprint_8x8")]
-    [InlineData("footprint_10x5")]
-    [InlineData("footprint_10x6")]
-    [InlineData("footprint_10x8")]
-    [InlineData("footprint_10x10")]
-    [InlineData("footprint_12x10")]
-    [InlineData("footprint_12x12")]
-    [InlineData("rgb_4x4")]
-    [InlineData("rgb_5x4")]
-    [InlineData("rgb_6x6")]
-    [InlineData("rgb_8x8")]
-    [InlineData("rgb_12x12")]
-    public void DecompressToImage_WithTestdataFile_ShouldDecodeSuccessfully(string basename)
+    [InlineData(TestImages.Astc.Atlas_Small_4x4)]
+    [InlineData(TestImages.Astc.Atlas_Small_5x5)]
+    [InlineData(TestImages.Astc.Atlas_Small_6x6)]
+    [InlineData(TestImages.Astc.Atlas_Small_8x8)]
+    [InlineData(TestImages.Astc.Checkerboard)]
+    [InlineData(TestImages.Astc.Checkered_4)]
+    [InlineData(TestImages.Astc.Checkered_5)]
+    [InlineData(TestImages.Astc.Checkered_6)]
+    [InlineData(TestImages.Astc.Checkered_7)]
+    [InlineData(TestImages.Astc.Checkered_8)]
+    [InlineData(TestImages.Astc.Checkered_9)]
+    [InlineData(TestImages.Astc.Checkered_10)]
+    [InlineData(TestImages.Astc.Checkered_11)]
+    [InlineData(TestImages.Astc.Checkered_12)]
+    [InlineData(TestImages.Astc.Footprint_4x4)]
+    [InlineData(TestImages.Astc.Footprint_5x4)]
+    [InlineData(TestImages.Astc.Footprint_5x5)]
+    [InlineData(TestImages.Astc.Footprint_6x5)]
+    [InlineData(TestImages.Astc.Footprint_6x6)]
+    [InlineData(TestImages.Astc.Footprint_8x5)]
+    [InlineData(TestImages.Astc.Footprint_8x6)]
+    [InlineData(TestImages.Astc.Footprint_8x8)]
+    [InlineData(TestImages.Astc.Footprint_10x5)]
+    [InlineData(TestImages.Astc.Footprint_10x6)]
+    [InlineData(TestImages.Astc.Footprint_10x8)]
+    [InlineData(TestImages.Astc.Footprint_10x10)]
+    [InlineData(TestImages.Astc.Footprint_12x10)]
+    [InlineData(TestImages.Astc.Footprint_12x12)]
+    [InlineData(TestImages.Astc.Rgb_4x4)]
+    [InlineData(TestImages.Astc.Rgb_5x4)]
+    [InlineData(TestImages.Astc.Rgb_6x6)]
+    [InlineData(TestImages.Astc.Rgb_8x8)]
+    [InlineData(TestImages.Astc.Rgb_12x12)]
+    public void DecompressToImage_WithTestdataFile_ShouldDecodeSuccessfully(string inputFile)
     {
-        string filePath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.InputFolder, basename + ".astc"));
+        string filePath = TestFile.GetInputFileFullPath(inputFile);
         byte[] bytes = File.ReadAllBytes(filePath);
         AstcFile astc = AstcFile.FromMemory(bytes);
 
         Span<byte> result = AstcDecoder.DecompressImage(astc);
 
-        Assert.True(result.Length > 0, $"decoding should succeed for {basename}");
+        Assert.True(result.Length > 0, $"decoding should succeed for {inputFile}");
     }
 }

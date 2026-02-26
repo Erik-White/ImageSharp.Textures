@@ -63,17 +63,18 @@ public class CodecTests
     }
 
     [Theory]
-    [InlineData("atlas_small_4x4", FootprintType.Footprint4x4, 256, 256)]
-    [InlineData("atlas_small_5x5", FootprintType.Footprint5x5, 256, 256)]
-    [InlineData("atlas_small_6x6", FootprintType.Footprint6x6, 256, 256)]
-    [InlineData("atlas_small_8x8", FootprintType.Footprint8x8, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_4x4, TestImages.Astc.Expected.Atlas_Small_4x4, FootprintType.Footprint4x4, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_5x5, TestImages.Astc.Expected.Atlas_Small_5x5, FootprintType.Footprint5x5, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_6x6, TestImages.Astc.Expected.Atlas_Small_6x6, FootprintType.Footprint6x6, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_8x8, TestImages.Astc.Expected.Atlas_Small_8x8, FootprintType.Footprint8x8, 256, 256)]
     public void ASTCDecompressToRGBA_WithValidData_ShouldMatchExpected(
-        string imageName,
+        string inputFile,
+        string expectedFile,
         FootprintType footprintType,
         int width,
         int height)
     {
-        byte[] astcData = TestFile.Create(Path.Combine(TestImages.Astc.InputFolder, imageName + ".astc")).Bytes[16..];
+        byte[] astcData = TestFile.Create(inputFile).Bytes[16..];
         Footprint footprint = Footprint.FromFootprintType(footprintType);
         int blockWidth = footprint.Width;
         int blockHeight = footprint.Height;
@@ -100,23 +101,24 @@ public class CodecTests
         using Image<Rgba32> actualImage = Image.LoadPixelData<Rgba32>(decodedPixels, width, height);
         actualImage.Mutate(x => x.Flip(FlipMode.Vertical));
 
-        string expectedImagePath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.ExpectedFolder, imageName + ".bmp"));
+        string expectedImagePath = TestFile.GetInputFileFullPath(expectedFile);
         using Image<Rgba32> expectedImage = Image.Load<Rgba32>(expectedImagePath);
         ImageComparer.TolerantPercentage(0.1f).VerifySimilarity(expectedImage, actualImage);
     }
 
     [Theory]
-    [InlineData("atlas_small_4x4", FootprintType.Footprint4x4, 256, 256)]
-    [InlineData("atlas_small_5x5", FootprintType.Footprint5x5, 256, 256)]
-    [InlineData("atlas_small_6x6", FootprintType.Footprint6x6, 256, 256)]
-    [InlineData("atlas_small_8x8", FootprintType.Footprint8x8, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_4x4, TestImages.Astc.Expected.Atlas_Small_4x4, FootprintType.Footprint4x4, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_5x5, TestImages.Astc.Expected.Atlas_Small_5x5, FootprintType.Footprint5x5, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_6x6, TestImages.Astc.Expected.Atlas_Small_6x6, FootprintType.Footprint6x6, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_8x8, TestImages.Astc.Expected.Atlas_Small_8x8, FootprintType.Footprint8x8, 256, 256)]
     public void DecompressToImage_WithAstcFile_ShouldMatchExpected(
-        string imageName,
+        string inputFile,
+        string expectedFile,
         FootprintType footprint,
         int width,
         int height)
     {
-        string astcPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.InputFolder, imageName + ".astc"));
+        string astcPath = TestFile.GetInputFileFullPath(inputFile);
         byte[] astcBytes = File.ReadAllBytes(astcPath);
         AstcFile file = AstcFile.FromMemory(astcBytes);
 
@@ -129,7 +131,7 @@ public class CodecTests
         using Image<Rgba32> actualImage = Image.LoadPixelData<Rgba32>(decodedPixels, width, height);
         actualImage.Mutate(x => x.Flip(FlipMode.Vertical));
 
-        string expectedImagePath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.ExpectedFolder, imageName + ".bmp"));
+        string expectedImagePath = TestFile.GetInputFileFullPath(expectedFile);
         using Image<Rgba32> expectedImage = Image.Load<Rgba32>(expectedImagePath);
         ImageComparer.TolerantPercentage(0.1f).VerifySimilarity(expectedImage, actualImage);
     }

@@ -19,7 +19,7 @@ public class HdrImageTests
     [Description("Verify that the ASTC file header is correctly parsed for HDR content, including footprint detection")]
     public void DecodeHdrFile_VerifyFootprintDetection()
     {
-        string astcPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.HdrFolder, "HDR-A-1x1.astc"));
+        string astcPath = TestFile.GetInputFileFullPath(TestImages.Astc.Hdr.Hdr_A_1x1);
 
         byte[] astcData = File.ReadAllBytes(astcPath);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
@@ -33,7 +33,7 @@ public class HdrImageTests
     [Fact]
     public void DecodeHdrAstcFile_1x1Pixel_ShouldProduceValidHdrOutput()
     {
-        string astcPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.HdrFolder, "HDR-A-1x1.astc"));
+        string astcPath = TestFile.GetInputFileFullPath(TestImages.Astc.Hdr.Hdr_A_1x1);
 
         byte[] astcData = File.ReadAllBytes(astcPath);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
@@ -59,7 +59,7 @@ public class HdrImageTests
     [Fact]
     public void DecodeHdrAstcFile_Tile_ShouldProduceValidHdrOutput()
     {
-        string astcPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.HdrFolder, "hdr-tile.astc"));
+        string astcPath = TestFile.GetInputFileFullPath(TestImages.Astc.Hdr.Hdr_Tile);
 
         byte[] astcData = File.ReadAllBytes(astcPath);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
@@ -90,7 +90,7 @@ public class HdrImageTests
     [Description("Verify that HDR ASTC files can be decoded with the LDR API, producing clamped values")]
     public void DecodeHdrAstcFile_WithLdrApi_ShouldClampValues()
     {
-        string astcPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.HdrFolder, "HDR-A-1x1.astc"));
+        string astcPath = TestFile.GetInputFileFullPath(TestImages.Astc.Hdr.Hdr_A_1x1);
 
         if (!File.Exists(astcPath))
         {
@@ -118,7 +118,7 @@ public class HdrImageTests
     [Description("Verify that HDR and LDR APIs produce consistent relative channel values for the same HDR ASTC file")]
     public void HdrAndLdrApis_OnSameHdrFile_ShouldProduceConsistentRelativeValues()
     {
-        string astcPath = TestFile.GetInputFileFullPath(Path.Combine(TestImages.Astc.HdrFolder, "HDR-A-1x1.astc"));
+        string astcPath = TestFile.GetInputFileFullPath(TestImages.Astc.Hdr.Hdr_A_1x1);
 
         byte[] astcData = File.ReadAllBytes(astcPath);
         AstcFile astcFile = AstcFile.FromMemory(astcData);

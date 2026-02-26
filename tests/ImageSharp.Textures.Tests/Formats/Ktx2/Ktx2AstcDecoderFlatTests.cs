@@ -35,7 +35,7 @@ public partial class Ktx2AstcDecoderFlatTests
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgba32_10x10)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgba32_12x10)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgba32_12x12)]
-    public void Ktx2AstcDecoder_CanDecode_Rgba32_Blocksizes(TestTextureProvider provider)
+    public void CanDecode_Rgba32_Blocksizes(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);
@@ -72,7 +72,7 @@ public partial class Ktx2AstcDecoderFlatTests
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_10x10)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_12x10)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_12x12)]
-    public void Ktx2AstcDecoder_CanDecode_Rgba32_Unorm(TestTextureProvider provider)
+    public void CanDecode_Rgba32_Unorm(TestTextureProvider provider)
     {
         string blockSize = GetBlockSizeFromFileName(provider.InputFile);
         using Texture texture = provider.GetTexture(KtxDecoder);
@@ -105,7 +105,7 @@ public partial class Ktx2AstcDecoderFlatTests
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_sRgb_10x10)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_sRgb_12x10)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_sRgb_12x12)]
-    public void Ktx2AstcDecoder_CanDecode_Rgba32_Srgb(TestTextureProvider provider)
+    public void CanDecode_Rgba32_Srgb(TestTextureProvider provider)
     {
         string blockSize = GetBlockSizeFromFileName(provider.InputFile);
         using Texture texture = provider.GetTexture(KtxDecoder);
@@ -125,7 +125,7 @@ public partial class Ktx2AstcDecoderFlatTests
 
     [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Srgb_Large)]
-    public void Ktx2AstcDecoder_CanDecode_Rgba32_Srgb_Large(TestTextureProvider provider)
+    public void CanDecode_Rgba32_Srgb_Large(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);
@@ -141,7 +141,7 @@ public partial class Ktx2AstcDecoderFlatTests
 
     [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Srgb_6x6_MipMap)]
-    public void Ktx2AstcDecoder_CanDecode_MipMaps(TestTextureProvider provider)
+    public void CanDecode_MipMaps(TestTextureProvider provider)
     {
         int mimMapLevel = 0;
 
@@ -161,7 +161,7 @@ public partial class Ktx2AstcDecoderFlatTests
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zlib9)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zstd1)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zstd9)]
-    public void Ktx2AstcDecoder_CanDecode_Rgba32_Supercompressed(TestTextureProvider provider)
+    public void CanDecode_Rgba32_Supercompressed(TestTextureProvider provider)
     {
         string fileName = Path.GetFileNameWithoutExtension(provider.InputFile);
         string compressionDetails = fileName.Contains("ZLIB", StringComparison.Ordinal)

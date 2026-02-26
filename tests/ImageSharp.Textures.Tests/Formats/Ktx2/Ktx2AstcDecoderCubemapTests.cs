@@ -21,7 +21,7 @@ public class Ktx2AstcDecoderCubemapTests
 
     [Theory]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Cubemap, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Srgb_6x6_Cube)]
-    public void Ktx2AstcDecoder_CanDecode_All_Faces(TestTextureProvider provider)
+    public void CanDecode_All_Faces(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);

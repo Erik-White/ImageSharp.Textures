@@ -20,7 +20,7 @@ public class KtxAstcDecoderTests
 
     [Theory]
     [WithFile(TestTextureFormat.Ktx, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx.Astc.Rgb32_8x8)]
-    public void KtxAstcDecoder_CanDecode_Rgba32_Blocksizes(TestTextureProvider provider)
+    public void CanDecode_Rgba32_Blocksizes(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);

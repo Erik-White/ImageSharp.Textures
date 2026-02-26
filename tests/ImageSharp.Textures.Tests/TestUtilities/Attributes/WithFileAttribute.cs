@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders;
 using Xunit.Sdk;
@@ -19,15 +17,13 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
         private readonly TestTextureType textureType;
         private readonly TestTextureTool textureTool;
         private readonly string inputFile;
-        private readonly bool isRegex;
 
-        public WithFileAttribute(TestTextureFormat textureFormat, TestTextureType textureType, TestTextureTool textureTool, string inputFile, bool isRegex = false)
+        public WithFileAttribute(TestTextureFormat textureFormat, TestTextureType textureType, TestTextureTool textureTool, string inputFile)
         {
             this.textureFormat = textureFormat;
             this.textureType = textureType;
             this.textureTool = textureTool;
             this.inputFile = inputFile;
-            this.isRegex = isRegex;
         }
 
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
@@ -38,16 +34,15 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
 
             foreach (string featureLevel in featureLevels)
             {
-                string path = Path.Combine(TestEnvironment.InputImagesDirectoryFullPath, this.textureFormat.ToString());
+                string basePath = Path.Combine(TestEnvironment.InputImagesDirectoryFullPath, this.textureFormat.ToString());
 
                 if (!string.IsNullOrEmpty(featureLevel))
                 {
-                    path = Path.Combine(path, featureLevel);
+                    basePath = Path.Combine(basePath, featureLevel);
                 }
 
-                string[] files = Directory.GetFiles(path);
-                string[] filteredFiles = files.Where(f => this.isRegex ? new Regex(this.inputFile).IsMatch(Path.GetFileName(f)) : Path.GetFileName(f).Equals(this.inputFile, StringComparison.OrdinalIgnoreCase)).ToArray();
-                foreach (string file in filteredFiles)
+                string file = Path.Combine(basePath, this.inputFile);
+                if (File.Exists(file))
                 {
                     var testTextureProvider = new TestTextureProvider(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, file, false);
                     yield return new object[] { testTextureProvider };

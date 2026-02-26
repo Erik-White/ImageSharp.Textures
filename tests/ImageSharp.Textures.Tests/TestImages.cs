@@ -10,7 +10,7 @@ public static class TestImages
 {
     public static class Astc
     {
-        public const string InputFolder = "Astc/Input";
+        public const string InputFolder = "Astc";
         public const string ExpectedFolder = "Astc/Expected";
         public const string HdrFolder = "Astc/HDR";
     }

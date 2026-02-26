@@ -1,17 +1,21 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.InteractiveTest;
+using System;
+using System.Collections.Generic;
 
-public static class Extensions
+namespace SixLabors.ImageSharp.Textures.InteractiveTest
 {
-    public static void AddOrReplace(this Dictionary<string, object> dictionary, string key, object value)
+    public static class Extensions
     {
-        if (dictionary.ContainsKey(key))
+        public static void AddOrReplace(this Dictionary<string, object> dictionary, string key, object value)
         {
-            dictionary.Remove(key);
-        }
+            if (dictionary.ContainsKey(key))
+            {
+                dictionary.Remove(key);
+            }
 
-        dictionary.Add(key, value);
+            dictionary.Add(key, value);
+        }
     }
 }

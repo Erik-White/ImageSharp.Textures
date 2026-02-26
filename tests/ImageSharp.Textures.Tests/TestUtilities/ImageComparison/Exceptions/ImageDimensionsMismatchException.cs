@@ -1,18 +1,19 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison.Exceptions;
-
-public class ImageDimensionsMismatchException : ImagesSimilarityException
+namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison.Exceptions
 {
-    public ImageDimensionsMismatchException(Size expectedSize, Size actualSize)
-        : base($"The image dimensions {actualSize} do not match the expected {expectedSize}!")
+    public class ImageDimensionsMismatchException : ImagesSimilarityException
     {
-        this.ExpectedSize = expectedSize;
-        this.ActualSize = actualSize;
+        public ImageDimensionsMismatchException(Size expectedSize, Size actualSize)
+            : base($"The image dimensions {actualSize} do not match the expected {expectedSize}!")
+        {
+            this.ExpectedSize = expectedSize;
+            this.ActualSize = actualSize;
+        }
+
+        public Size ExpectedSize { get; }
+
+        public Size ActualSize { get; }
     }
-
-    public Size ExpectedSize { get; }
-
-    public Size ActualSize { get; }
 }

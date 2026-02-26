@@ -1,26 +1,29 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats.Ktx;
+using System.IO;
 
-/// <summary>
-/// Image decoder for KTX textures.
-/// </summary>
-public sealed class KtxDecoder : ITextureDecoder, IKtxDecoderOptions, ITextureInfoDetector
+namespace SixLabors.ImageSharp.Textures.Formats.Ktx
 {
-    /// <inheritdoc/>
-    public Texture DecodeTexture(Configuration configuration, Stream stream)
+    /// <summary>
+    /// Image decoder for KTX textures.
+    /// </summary>
+    public sealed class KtxDecoder : ITextureDecoder, IKtxDecoderOptions, ITextureInfoDetector
     {
-        Guard.NotNull(stream, nameof(stream));
+        /// <inheritdoc/>
+        public Texture DecodeTexture(Configuration configuration, Stream stream)
+        {
+            Guard.NotNull(stream, nameof(stream));
 
-        return new KtxDecoderCore(configuration, this).DecodeTexture(stream);
-    }
+            return new KtxDecoderCore(configuration, this).DecodeTexture(stream);
+        }
 
-    /// <inheritdoc/>
-    public ITextureInfo Identify(Configuration configuration, Stream stream)
-    {
-        Guard.NotNull(stream, nameof(stream));
+        /// <inheritdoc/>
+        public ITextureInfo Identify(Configuration configuration, Stream stream)
+        {
+            Guard.NotNull(stream, nameof(stream));
 
-        return new KtxDecoderCore(configuration, this).Identify(stream);
+            return new KtxDecoderCore(configuration, this).Identify(stream);
+        }
     }
 }

@@ -1,34 +1,37 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats.Ktx;
+using System.Collections.Generic;
 
-/// <summary>
-/// Registers the texture decoders and mime type detectors for the ktx format.
-/// </summary>
-public sealed class KtxFormat : ITextureFormat
+namespace SixLabors.ImageSharp.Textures.Formats.Ktx
 {
     /// <summary>
-    /// Prevents a default instance of the <see cref="KtxFormat" /> class from being created.
+    /// Registers the texture decoders and mime type detectors for the ktx format.
     /// </summary>
-    private KtxFormat()
+    public sealed class KtxFormat : ITextureFormat
     {
+        /// <summary>
+        /// Prevents a default instance of the <see cref="KtxFormat" /> class from being created.
+        /// </summary>
+        private KtxFormat()
+        {
+        }
+
+        /// <summary>
+        /// Gets the current instance.
+        /// </summary>
+        public static KtxFormat Instance { get; } = new KtxFormat();
+
+        /// <inheritdoc/>
+        public string Name => "KTX";
+
+        /// <inheritdoc/>
+        public string DefaultMimeType => "image/ktx";
+
+        /// <inheritdoc/>
+        public IEnumerable<string> MimeTypes => KtxConstants.MimeTypes;
+
+        /// <inheritdoc/>
+        public IEnumerable<string> FileExtensions => KtxConstants.FileExtensions;
     }
-
-    /// <summary>
-    /// Gets the current instance.
-    /// </summary>
-    public static KtxFormat Instance { get; } = new KtxFormat();
-
-    /// <inheritdoc/>
-    public string Name => "KTX";
-
-    /// <inheritdoc/>
-    public string DefaultMimeType => "image/ktx";
-
-    /// <inheritdoc/>
-    public IEnumerable<string> MimeTypes => KtxConstants.MimeTypes;
-
-    /// <inheritdoc/>
-    public IEnumerable<string> FileExtensions => KtxConstants.FileExtensions;
 }

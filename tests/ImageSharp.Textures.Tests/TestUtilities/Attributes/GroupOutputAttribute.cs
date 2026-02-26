@@ -1,15 +1,18 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes;
+using System;
 
-/// <summary>
-/// The output produced by this test class should be grouped into the specified subfolder.
-/// </summary>
-[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-public class GroupOutputAttribute : Attribute
+namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
 {
-    public GroupOutputAttribute(string subfolder) => this.Subfolder = subfolder;
+    /// <summary>
+    /// The output produced by this test class should be grouped into the specified subfolder.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    public class GroupOutputAttribute : Attribute
+    {
+        public GroupOutputAttribute(string subfolder) => this.Subfolder = subfolder;
 
-    public string Subfolder { get; }
+        public string Subfolder { get; }
+    }
 }

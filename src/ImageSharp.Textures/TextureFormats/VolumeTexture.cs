@@ -1,46 +1,50 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.TextureFormats;
+using System;
+using System.Collections.Generic;
 
-/// <summary>
-/// Represents a volume texture.
-/// </summary>
-/// <seealso cref="SixLabors.ImageSharp.Textures.Texture" />
-public class VolumeTexture : Texture
+namespace SixLabors.ImageSharp.Textures.TextureFormats
 {
-    private bool isDisposed;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="VolumeTexture"/> class.
+    /// Represents a volume texture.
     /// </summary>
-    public VolumeTexture() => this.Slices = [];
-
-    /// <summary>
-    /// Gets a list of flat textures from which the volume texture is composed of.
-    /// </summary>
-    public List<FlatTexture> Slices { get; }
-
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    /// <seealso cref="SixLabors.ImageSharp.Textures.Texture" />
+    public class VolumeTexture : Texture
     {
-        if (this.isDisposed)
-        {
-            return;
-        }
+        private bool isDisposed;
 
-        if (disposing)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VolumeTexture"/> class.
+        /// </summary>
+        public VolumeTexture() => this.Slices = new List<FlatTexture>();
+
+        /// <summary>
+        /// Gets a list of flat textures from which the volume texture is composed of.
+        /// </summary>
+        public List<FlatTexture> Slices { get; }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
         {
-            foreach (FlatTexture slice in this.Slices)
+            if (this.isDisposed)
             {
-                slice.Dispose();
+                return;
             }
+
+            if (disposing)
+            {
+                foreach (FlatTexture slice in this.Slices)
+                {
+                    slice.Dispose();
+                }
+            }
+
+            this.isDisposed = true;
         }
 
-        this.isDisposed = true;
+        /// <inheritdoc/>
+        internal override void EnsureNotDisposed()
+            => ObjectDisposedException.ThrowIf(this.isDisposed, "Trying to execute an operation on a disposed image.");
     }
-
-    /// <inheritdoc/>
-    internal override void EnsureNotDisposed()
-        => ObjectDisposedException.ThrowIf(this.isDisposed, "Trying to execute an operation on a disposed image.");
 }

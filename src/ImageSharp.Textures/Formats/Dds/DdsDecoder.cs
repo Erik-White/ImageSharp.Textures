@@ -1,26 +1,29 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats.Dds;
+using System.IO;
 
-/// <summary>
-/// Image decoder for DDS textures.
-/// </summary>
-public sealed class DdsDecoder : ITextureDecoder, IDdsDecoderOptions, ITextureInfoDetector
+namespace SixLabors.ImageSharp.Textures.Formats.Dds
 {
-    /// <inheritdoc/>
-    public Texture DecodeTexture(Configuration configuration, Stream stream)
+    /// <summary>
+    /// Image decoder for DDS textures.
+    /// </summary>
+    public sealed class DdsDecoder : ITextureDecoder, IDdsDecoderOptions, ITextureInfoDetector
     {
-        Guard.NotNull(stream, nameof(stream));
+        /// <inheritdoc/>
+        public Texture DecodeTexture(Configuration configuration, Stream stream)
+        {
+            Guard.NotNull(stream, nameof(stream));
 
-        return new DdsDecoderCore(configuration, this).DecodeTexture(stream);
-    }
+            return new DdsDecoderCore(configuration, this).DecodeTexture(stream);
+        }
 
-    /// <inheritdoc/>
-    public ITextureInfo Identify(Configuration configuration, Stream stream)
-    {
-        Guard.NotNull(stream, nameof(stream));
+        /// <inheritdoc/>
+        public ITextureInfo Identify(Configuration configuration, Stream stream)
+        {
+            Guard.NotNull(stream, nameof(stream));
 
-        return new DdsDecoderCore(configuration, this).Identify(stream);
+            return new DdsDecoderCore(configuration, this).Identify(stream);
+        }
     }
 }

@@ -3,55 +3,56 @@
 
 using ImGuiNET;
 
-namespace SixLabors.ImageSharp.Textures.InteractiveTest.UI;
-
-public class MenuBar
+namespace SixLabors.ImageSharp.Textures.InteractiveTest.UI
 {
-    public bool DarkMode { get; private set; }
-
-    public bool DemoMode { get; }
-
-    public MenuBar()
+    public class MenuBar
     {
-        this.DarkMode = true;
-        this.DemoMode = false;
-    }
+        public bool DarkMode { get; private set; }
 
-    public void Render(out float menuHeight)
-    {
-        if (this.DarkMode)
+        public bool DemoMode { get; }
+
+        public MenuBar()
         {
-            ImGui.StyleColorsDark();
-        }
-        else
-        {
-            ImGui.StyleColorsLight();
+            this.DarkMode = true;
+            this.DemoMode = false;
         }
 
-        menuHeight = 0.0f;
-        if (ImGui.BeginMainMenuBar())
+        public void Render(out float menuHeight)
         {
-            if (ImGui.BeginMenu("Theme"))
+            if (this.DarkMode)
             {
-                if (ImGui.MenuItem("Light", string.Empty, !this.DarkMode, this.DarkMode))
-                {
-                    this.DarkMode = false;
-                }
-
-                if (ImGui.MenuItem("Dark", string.Empty, this.DarkMode, !this.DarkMode))
-                {
-                    this.DarkMode = true;
-                }
-
-                // if (ImGui.MenuItem("Demo", "", DemoMode))
-                // {
-                //     DemoMode = !DemoMode;
-                // }
-                ImGui.EndMenu();
+                ImGui.StyleColorsDark();
+            }
+            else
+            {
+                ImGui.StyleColorsLight();
             }
 
-            menuHeight = ImGui.GetWindowHeight();
-            ImGui.EndMainMenuBar();
+            menuHeight = 0.0f;
+            if (ImGui.BeginMainMenuBar())
+            {
+                if (ImGui.BeginMenu("Theme"))
+                {
+                    if (ImGui.MenuItem("Light", string.Empty, !this.DarkMode, this.DarkMode))
+                    {
+                        this.DarkMode = false;
+                    }
+
+                    if (ImGui.MenuItem("Dark", string.Empty, this.DarkMode, !this.DarkMode))
+                    {
+                        this.DarkMode = true;
+                    }
+
+                    // if (ImGui.MenuItem("Demo", "", DemoMode))
+                    // {
+                    //     DemoMode = !DemoMode;
+                    // }
+                    ImGui.EndMenu();
+                }
+
+                menuHeight = ImGui.GetWindowHeight();
+                ImGui.EndMainMenuBar();
+            }
         }
     }
 }

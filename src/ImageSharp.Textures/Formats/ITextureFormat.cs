@@ -1,60 +1,63 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats;
+using System.Collections.Generic;
 
-/// <summary>
-/// Defines the contract for an image format.
-/// </summary>
-public interface ITextureFormat
+namespace SixLabors.ImageSharp.Textures.Formats
 {
     /// <summary>
-    /// Gets the name that describes this image format.
+    /// Defines the contract for an image format.
     /// </summary>
-    string Name { get; }
+    public interface ITextureFormat
+    {
+        /// <summary>
+        /// Gets the name that describes this image format.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// Gets the default mimetype that the image format uses
+        /// </summary>
+        string DefaultMimeType { get; }
+
+        /// <summary>
+        /// Gets all the mimetypes that have been used by this image format.
+        /// </summary>
+        IEnumerable<string> MimeTypes { get; }
+
+        /// <summary>
+        /// Gets the file extensions this image format commonly uses.
+        /// </summary>
+        IEnumerable<string> FileExtensions { get; }
+    }
 
     /// <summary>
-    /// Gets the default mimetype that the image format uses
+    /// Defines the contract for an image format containing metadata.
     /// </summary>
-    string DefaultMimeType { get; }
+    /// <typeparam name="TFormatMetadata">The type of format metadata.</typeparam>
+    public interface IImageFormat<out TFormatMetadata> : ITextureFormat
+        where TFormatMetadata : class
+    {
+        /// <summary>
+        /// Creates a default instance of the format metadata.
+        /// </summary>
+        /// <returns>The <typeparamref name="TFormatMetadata"/>.</returns>
+        TFormatMetadata CreateDefaultFormatMetadata();
+    }
 
     /// <summary>
-    /// Gets all the mimetypes that have been used by this image format.
+    /// Defines the contract for an image format containing metadata with multiple frames.
     /// </summary>
-    IEnumerable<string> MimeTypes { get; }
-
-    /// <summary>
-    /// Gets the file extensions this image format commonly uses.
-    /// </summary>
-    IEnumerable<string> FileExtensions { get; }
-}
-
-/// <summary>
-/// Defines the contract for an image format containing metadata.
-/// </summary>
-/// <typeparam name="TFormatMetadata">The type of format metadata.</typeparam>
-public interface IImageFormat<out TFormatMetadata> : ITextureFormat
-    where TFormatMetadata : class
-{
-    /// <summary>
-    /// Creates a default instance of the format metadata.
-    /// </summary>
-    /// <returns>The <typeparamref name="TFormatMetadata"/>.</returns>
-    TFormatMetadata CreateDefaultFormatMetadata();
-}
-
-/// <summary>
-/// Defines the contract for an image format containing metadata with multiple frames.
-/// </summary>
-/// <typeparam name="TFormatMetadata">The type of format metadata.</typeparam>
-/// <typeparam name="TFormatFrameMetadata">The type of format frame metadata.</typeparam>
-public interface IImageFormat<out TFormatMetadata, out TFormatFrameMetadata> : IImageFormat<TFormatMetadata>
-    where TFormatMetadata : class
-    where TFormatFrameMetadata : class
-{
-    /// <summary>
-    /// Creates a default instance of the format frame metadata.
-    /// </summary>
-    /// <returns>The <typeparamref name="TFormatFrameMetadata"/>.</returns>
-    TFormatFrameMetadata CreateDefaultFormatFrameMetadata();
+    /// <typeparam name="TFormatMetadata">The type of format metadata.</typeparam>
+    /// <typeparam name="TFormatFrameMetadata">The type of format frame metadata.</typeparam>
+    public interface IImageFormat<out TFormatMetadata, out TFormatFrameMetadata> : IImageFormat<TFormatMetadata>
+        where TFormatMetadata : class
+        where TFormatFrameMetadata : class
+    {
+        /// <summary>
+        /// Creates a default instance of the format frame metadata.
+        /// </summary>
+        /// <returns>The <typeparamref name="TFormatFrameMetadata"/>.</returns>
+        TFormatFrameMetadata CreateDefaultFormatFrameMetadata();
+    }
 }

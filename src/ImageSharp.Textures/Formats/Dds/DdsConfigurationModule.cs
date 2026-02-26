@@ -1,17 +1,18 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats.Dds;
-
-/// <summary>
-/// Registers the image encoders, decoders and mime type detectors for texture formats.
-/// </summary>
-public sealed class DdsConfigurationModule : IConfigurationModule
+namespace SixLabors.ImageSharp.Textures.Formats.Dds
 {
-    /// <inheritdoc/>
-    public void Configure(Configuration configuration)
+    /// <summary>
+    /// Registers the image encoders, decoders and mime type detectors for texture formats.
+    /// </summary>
+    public sealed class DdsConfigurationModule : IConfigurationModule
     {
-        configuration.ImageFormatsManager.SetDecoder(DdsFormat.Instance, new DdsDecoder());
-        configuration.ImageFormatsManager.AddImageFormatDetector(new DdsImageFormatDetector());
+        /// <inheritdoc/>
+        public void Configure(Configuration configuration)
+        {
+            configuration.ImageFormatsManager.SetDecoder(DdsFormat.Instance, new DdsDecoder());
+            configuration.ImageFormatsManager.AddImageFormatDetector(new DdsImageFormatDetector());
+        }
     }
 }

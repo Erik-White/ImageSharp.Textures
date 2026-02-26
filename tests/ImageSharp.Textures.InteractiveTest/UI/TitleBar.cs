@@ -4,27 +4,28 @@
 using System.Numerics;
 using ImGuiNET;
 
-namespace SixLabors.ImageSharp.Textures.InteractiveTest.UI;
-
-public class TitleBar
+namespace SixLabors.ImageSharp.Textures.InteractiveTest.UI
 {
-    public void Render(int page)
+    public class TitleBar
     {
-        Vector2 position = ImGui.GetCursorScreenPos();
-
-        if (ImGui.BeginChild("TitleBar", new Vector2(0, 30), true, ImGuiWindowFlags.None))
+        public void Render(int page)
         {
-            Vector2 size = ImGui.GetWindowSize();
+            Vector2 position = ImGui.GetCursorScreenPos();
 
-            Vector4 inactiveColor = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
-            Vector4 activeColor = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.ButtonActive));
+            if (ImGui.BeginChild("TitleBar", new Vector2(0, 30), true, ImGuiWindowFlags.None))
+            {
+                Vector2 size = ImGui.GetWindowSize();
 
-            ImGui.TextColored(page == 0 ? activeColor : inactiveColor, "Welcome");
-            ImGui.SameLine(0, 16);
-            ImGui.TextColored(page == 1 ? activeColor : inactiveColor, "Preview");
+                Vector4 inactiveColor = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.Text));
+                Vector4 activeColor = ImGui.ColorConvertU32ToFloat4(ImGui.GetColorU32(ImGuiCol.ButtonActive));
 
-            ImGui.EndChild();
-            ImGui.GetWindowDrawList().AddRectFilled(position, position + size, ImGui.GetColorU32(ImGuiCol.TitleBgActive));
+                ImGui.TextColored(page == 0 ? activeColor : inactiveColor, "Welcome");
+                ImGui.SameLine(0, 16);
+                ImGui.TextColored(page == 1 ? activeColor : inactiveColor, "Preview");
+
+                ImGui.EndChild();
+                ImGui.GetWindowDrawList().AddRectFilled(position, position + size, ImGui.GetColorU32(ImGuiCol.TitleBgActive));
+            }
         }
     }
 }

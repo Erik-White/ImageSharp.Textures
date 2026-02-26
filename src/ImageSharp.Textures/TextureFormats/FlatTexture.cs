@@ -1,46 +1,50 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.TextureFormats;
+using System;
+using System.Collections.Generic;
 
-/// <summary>
-/// A flat texture.
-/// </summary>
-/// <seealso cref="SixLabors.ImageSharp.Textures.Texture" />
-public class FlatTexture : Texture
+namespace SixLabors.ImageSharp.Textures.TextureFormats
 {
-    private bool isDisposed;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="FlatTexture"/> class.
+    /// A flat texture.
     /// </summary>
-    public FlatTexture() => this.MipMaps = [];
-
-    /// <summary>
-    /// Gets the list of mip maps of the texture.
-    /// </summary>
-    public List<MipMap> MipMaps { get; }
-
-    /// <inheritdoc/>
-    protected override void Dispose(bool disposing)
+    /// <seealso cref="SixLabors.ImageSharp.Textures.Texture" />
+    public class FlatTexture : Texture
     {
-        if (this.isDisposed)
-        {
-            return;
-        }
+        private bool isDisposed;
 
-        if (disposing)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlatTexture"/> class.
+        /// </summary>
+        public FlatTexture() => this.MipMaps = new List<MipMap>();
+
+        /// <summary>
+        /// Gets the list of mip maps of the texture.
+        /// </summary>
+        public List<MipMap> MipMaps { get; }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
         {
-            foreach (MipMap mipMap in this.MipMaps)
+            if (this.isDisposed)
             {
-                // mipMap.Dispose();
+                return;
             }
+
+            if (disposing)
+            {
+                foreach (MipMap mipMap in this.MipMaps)
+                {
+                    // mipMap.Dispose();
+                }
+            }
+
+            this.isDisposed = true;
         }
 
-        this.isDisposed = true;
+        /// <inheritdoc/>
+        internal override void EnsureNotDisposed()
+            => ObjectDisposedException.ThrowIf(this.isDisposed, "Trying to execute an operation on a disposed image.");
     }
-
-    /// <inheritdoc/>
-    internal override void EnsureNotDisposed()
-        => ObjectDisposedException.ThrowIf(this.isDisposed, "Trying to execute an operation on a disposed image.");
 }

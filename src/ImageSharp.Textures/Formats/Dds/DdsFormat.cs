@@ -1,34 +1,37 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats.Dds;
+using System.Collections.Generic;
 
-/// <summary>
-/// Registers the texture decoders and mime type detectors for the dds format.
-/// </summary>
-public sealed class DdsFormat : ITextureFormat
+namespace SixLabors.ImageSharp.Textures.Formats.Dds
 {
     /// <summary>
-    /// Prevents a default instance of the <see cref="DdsFormat" /> class from being created.
+    /// Registers the texture decoders and mime type detectors for the dds format.
     /// </summary>
-    private DdsFormat()
+    public sealed class DdsFormat : ITextureFormat
     {
+        /// <summary>
+        /// Prevents a default instance of the <see cref="DdsFormat" /> class from being created.
+        /// </summary>
+        private DdsFormat()
+        {
+        }
+
+        /// <summary>
+        /// Gets the current instance.
+        /// </summary>
+        public static DdsFormat Instance { get; } = new DdsFormat();
+
+        /// <inheritdoc/>
+        public string Name => "DDS";
+
+        /// <inheritdoc/>
+        public string DefaultMimeType => "image/vnd.ms-dds";
+
+        /// <inheritdoc/>
+        public IEnumerable<string> MimeTypes => DdsConstants.MimeTypes;
+
+        /// <inheritdoc/>
+        public IEnumerable<string> FileExtensions => DdsConstants.FileExtensions;
     }
-
-    /// <summary>
-    /// Gets the current instance.
-    /// </summary>
-    public static DdsFormat Instance { get; } = new DdsFormat();
-
-    /// <inheritdoc/>
-    public string Name => "DDS";
-
-    /// <inheritdoc/>
-    public string DefaultMimeType => "image/vnd.ms-dds";
-
-    /// <inheritdoc/>
-    public IEnumerable<string> MimeTypes => DdsConstants.MimeTypes;
-
-    /// <inheritdoc/>
-    public IEnumerable<string> FileExtensions => DdsConstants.FileExtensions;
 }

@@ -1,62 +1,70 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
-namespace SixLabors.ImageSharp.Textures.InteractiveTest;
-
-public static class ResourceLoader
+namespace SixLabors.ImageSharp.Textures.InteractiveTest
 {
-    public static bool GetEmbeddedResourceExists(string resourceFileName, Assembly assembly = null)
+    public static class ResourceLoader
     {
-        if (assembly == null)
+        public static bool GetEmbeddedResourceExists(string resourceFileName, Assembly assembly = null)
         {
-            assembly = typeof(ResourceLoader).GetTypeInfo().Assembly;
+            if (assembly == null)
+            {
+                assembly = typeof(ResourceLoader).GetTypeInfo().Assembly;
+            }
+
+            string[] resourceNames = assembly.GetManifestResourceNames();
+
+            string[] resourcePaths = resourceNames
+                .Where(x => x.EndsWith(resourceFileName, StringComparison.CurrentCultureIgnoreCase))
+                .ToArray();
+
+            return resourcePaths.Any() && resourcePaths.Count() <= 1;
         }
 
-        string[] resourceNames = assembly.GetManifestResourceNames();
-
-        string[] resourcePaths = [.. resourceNames.Where(x => x.EndsWith(resourceFileName, StringComparison.CurrentCultureIgnoreCase))];
-
-        return resourcePaths.Any() && resourcePaths.Count() <= 1;
-    }
-
-    public static Stream GetEmbeddedResourceStream(string resourceFileName, Assembly assembly = null)
-    {
-        if (assembly == null)
+        public static Stream GetEmbeddedResourceStream(string resourceFileName, Assembly assembly = null)
         {
-            assembly = typeof(ResourceLoader).GetTypeInfo().Assembly;
+            if (assembly == null)
+            {
+                assembly = typeof(ResourceLoader).GetTypeInfo().Assembly;
+            }
+
+            string[] resourceNames = assembly.GetManifestResourceNames();
+
+            string[] resourcePaths = resourceNames
+                .Where(x => x.EndsWith(resourceFileName, StringComparison.CurrentCultureIgnoreCase))
+                .ToArray();
+
+            if (!resourcePaths.Any())
+            {
+                throw new Exception($"Resource ending with {resourceFileName} not found.");
+            }
+
+            if (resourcePaths.Length > 1)
+            {
+                throw new Exception($"Multiple resources ending with {resourceFileName} found: {System.Environment.NewLine}{string.Join(System.Environment.NewLine, resourcePaths)}");
+            }
+
+            return assembly.GetManifestResourceStream(resourcePaths.Single());
         }
 
-        string[] resourceNames = assembly.GetManifestResourceNames();
-
-        string[] resourcePaths = [.. resourceNames.Where(x => x.EndsWith(resourceFileName, StringComparison.CurrentCultureIgnoreCase))];
-
-        if (!resourcePaths.Any())
+        public static string GetEmbeddedResourceString(string resourceFileName, Assembly assembly = null)
         {
-            throw new Exception($"Resource ending with {resourceFileName} not found.");
+            Stream stream = GetEmbeddedResourceStream(resourceFileName, assembly);
+            using var streamReader = new StreamReader(stream);
+            return streamReader.ReadToEnd();
         }
 
-        if (resourcePaths.Length > 1)
+        public static byte[] GetEmbeddedResourceBytes(string resourceFileName, Assembly assembly = null)
         {
-            throw new Exception($"Multiple resources ending with {resourceFileName} found: {System.Environment.NewLine}{string.Join(System.Environment.NewLine, resourcePaths)}");
+            Stream stream = GetEmbeddedResourceStream(resourceFileName, assembly);
+            using var streamReader = new MemoryStream();
+            stream.CopyTo(streamReader);
+            return streamReader.ToArray();
         }
-
-        return assembly.GetManifestResourceStream(resourcePaths.Single());
-    }
-
-    public static string GetEmbeddedResourceString(string resourceFileName, Assembly assembly = null)
-    {
-        Stream stream = GetEmbeddedResourceStream(resourceFileName, assembly);
-        using StreamReader streamReader = new StreamReader(stream);
-        return streamReader.ReadToEnd();
-    }
-
-    public static byte[] GetEmbeddedResourceBytes(string resourceFileName, Assembly assembly = null)
-    {
-        Stream stream = GetEmbeddedResourceStream(resourceFileName, assembly);
-        using MemoryStream streamReader = new MemoryStream();
-        stream.CopyTo(streamReader);
-        return streamReader.ToArray();
     }
 }

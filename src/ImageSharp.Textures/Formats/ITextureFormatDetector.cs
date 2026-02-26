@@ -1,23 +1,26 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-namespace SixLabors.ImageSharp.Textures.Formats;
+using System;
 
-/// <summary>
-/// Used for detecting mime types from a file header
-/// </summary>
-public interface ITextureFormatDetector
+namespace SixLabors.ImageSharp.Textures.Formats
 {
     /// <summary>
-    /// Gets the size of the header for this image type.
+    /// Used for detecting mime types from a file header
     /// </summary>
-    /// <value>The size of the header.</value>
-    int HeaderSize { get; }
+    public interface ITextureFormatDetector
+    {
+        /// <summary>
+        /// Gets the size of the header for this image type.
+        /// </summary>
+        /// <value>The size of the header.</value>
+        int HeaderSize { get; }
 
-    /// <summary>
-    /// Detect mimetype
-    /// </summary>
-    /// <param name="header">The <see cref="T:byte[]"/> containing the file header.</param>
-    /// <returns>returns the mime type of detected otherwise returns null</returns>
-    ITextureFormat? DetectFormat(ReadOnlySpan<byte> header);
+        /// <summary>
+        /// Detect mimetype
+        /// </summary>
+        /// <param name="header">The <see cref="T:byte[]"/> containing the file header.</param>
+        /// <returns>returns the mime type of detected otherwise returns null</returns>
+        ITextureFormat? DetectFormat(ReadOnlySpan<byte> header);
+    }
 }

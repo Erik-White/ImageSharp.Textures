@@ -12,6 +12,7 @@ using Xunit;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Ktx
 {
+    [GroupOutput("Ktx")]
     [Trait("Format", "Ktx")]
     public class KtxDecoderTests
     {

@@ -31,6 +31,9 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
         {
             ArgumentNullException.ThrowIfNull(testMethod);
 
+            string outputSubfolderName = testMethod.DeclaringType?.GetCustomAttribute<GroupOutputAttribute>()?.Subfolder ?? string.Empty;
+            string testGroupName = testMethod.DeclaringType?.Name ?? string.Empty;
+
             string[] featureLevels = this.textureTool == TestTextureTool.TexConv ? new[] { "9.1", "9.2", "9.3", "10.0", "10.1", "11.0", "11.1", "12.0", "12.1" } : new[] { string.Empty };
 
             foreach (string featureLevel in featureLevels)
@@ -51,7 +54,7 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
                 string file = Path.Combine(basePath, this.inputFile);
                 if (File.Exists(file))
                 {
-                    TestTextureProvider testTextureProvider = new(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, file, false);
+                    TestTextureProvider testTextureProvider = new(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, file, false, testGroupName, outputSubfolderName);
                     yield return new object[] { testTextureProvider };
                     continue;
                 }
@@ -63,7 +66,7 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.Attributes
 
                 if (match is not null)
                 {
-                    TestTextureProvider testTextureProvider = new(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, match, false);
+                    TestTextureProvider testTextureProvider = new(testMethod.Name, this.textureFormat, this.textureType, this.textureTool, match, false, testGroupName, outputSubfolderName);
                     yield return new object[] { testTextureProvider };
                 }
             }

@@ -48,7 +48,9 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders
             TestTextureType textureType,
             TestTextureTool textureTool,
             string inputFile,
-            bool isRegex)
+            bool isRegex,
+            string testGroupName = "",
+            string outputSubfolderName = "")
         {
             this.MethodName = methodName;
             this.TextureFormat = textureFormat;
@@ -59,8 +61,8 @@ namespace SixLabors.ImageSharp.Textures.Tests.TestUtilities.TextureProviders
             this.Utility = new ImagingTestCaseUtility
             {
                 SourceFileOrDescription = inputFile,
-                TestName = methodName
             };
+            this.Utility.Init(testGroupName, methodName, outputSubfolderName);
         }
 
         private void SaveMipMaps(MipMap[] mipMaps, string name)

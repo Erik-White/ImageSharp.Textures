@@ -12,6 +12,7 @@ using SixLabors.ImageSharp.Textures.TextureFormats;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Ktx2;
 
+[GroupOutput("Ktx2")]
 [Trait("Format", "Ktx2")]
 [Trait("Format", "Astc")]
 public class Ktx2AstcDecoderCubemapTests

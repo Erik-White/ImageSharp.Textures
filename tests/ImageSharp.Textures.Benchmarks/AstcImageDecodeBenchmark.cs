@@ -2,8 +2,8 @@
 // Licensed under the Six Labors Split License.
 
 using BenchmarkDotNet.Attributes;
-using SixLabors.ImageSharp.Textures.Astc.IO;
-using SixLabors.ImageSharp.Textures.Astc.TexelBlock;
+using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
+using SixLabors.ImageSharp.Textures.Compression.Astc.TexelBlock;
 
 namespace SixLabors.ImageSharp.Textures.Benchmarks;
 

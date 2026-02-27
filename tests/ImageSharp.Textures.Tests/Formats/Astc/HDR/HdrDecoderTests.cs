@@ -85,8 +85,8 @@ public class HdrDecoderTests
     {
         Rgba32 ldrColor = new(50, 100, 150, 200);
 
-        Rgba64 hdrColor = ldrColor.ToHdr();
-        Rgba32 backToLdr = hdrColor.ToLdr();
+        Rgba64 hdrColor = new(ldrColor);
+        Rgba32 backToLdr = hdrColor.ToRgba32();
 
         Assert.Equal(ldrColor.R, backToLdr.R);
         Assert.Equal(ldrColor.G, backToLdr.G);

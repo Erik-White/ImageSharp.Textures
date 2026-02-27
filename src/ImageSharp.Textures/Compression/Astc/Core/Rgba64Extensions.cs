@@ -12,24 +12,6 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 internal static class Rgba64Extensions
 {
     /// <summary>
-    /// Converts an LDR color (0-255) to HDR range (0-65535).
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rgba64 ToHdr(this Rgba32 ldr)
-        => new((ushort)(ldr.R * 257), (ushort)(ldr.G * 257), (ushort)(ldr.B * 257), (ushort)(ldr.A * 257));
-
-    /// <summary>
-    /// Converts an HDR color (0-65535) to LDR range (0-255).
-    /// </summary>
-    /// <remarks>
-    /// Values are clamped to 0-255 range, so HDR values exceeding
-    /// the standard white point will be clipped.
-    /// </remarks>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Rgba32 ToLdr(this Rgba64 color)
-        => new((byte)(color.R >> 8), (byte)(color.G >> 8), (byte)(color.B >> 8), (byte)(color.A >> 8));
-
-    /// <summary>
     /// Gets the channel value at the specified index: 0=R, 1=G, 2=B, 3=A.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

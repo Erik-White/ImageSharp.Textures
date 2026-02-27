@@ -4,6 +4,9 @@
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
+// Note: ToRgba32() and new Rgba64(Rgba32) are ImageSharp built-ins (IPixel conversions).
+// GetChannel() and IsCloseTo() are ASTC-specific extensions in Rgba64Extensions.
+
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc.HDR;
 
 public class Rgba64ExtensionsTests
@@ -45,7 +48,7 @@ public class Rgba64ExtensionsTests
     {
         Rgba32 ldrColor = new(0, 127, 255, 200);
 
-        Rgba64 hdrColor = ldrColor.ToHdr();
+        Rgba64 hdrColor = new(ldrColor);
 
         Assert.Equal(0, hdrColor.R);        // 0 * 257 = 0
         Assert.Equal(32639, hdrColor.G);    // 127 * 257 = 32639
@@ -58,12 +61,12 @@ public class Rgba64ExtensionsTests
     {
         Rgba64 hdrColor = new(0, 32639, 65535, 51400);
 
-        Rgba32 ldrColor = hdrColor.ToLdr();
+        Rgba32 ldrColor = hdrColor.ToRgba32();
 
-        Assert.Equal(0, ldrColor.R);     // 0 >> 8 = 0
-        Assert.Equal(127, ldrColor.G);   // 32639 >> 8 = 127
-        Assert.Equal(255, ldrColor.B);   // 65535 >> 8 = 255
-        Assert.Equal(200, ldrColor.A);   // 51400 >> 8 = 200
+        Assert.Equal(0, ldrColor.R);
+        Assert.Equal(127, ldrColor.G);
+        Assert.Equal(255, ldrColor.B);
+        Assert.Equal(200, ldrColor.A);
     }
 
     [Fact]
@@ -71,8 +74,8 @@ public class Rgba64ExtensionsTests
     {
         Rgba32 original = new(50, 100, 150, 200);
 
-        Rgba64 hdrColor = original.ToHdr();
-        Rgba32 result = hdrColor.ToLdr();
+        Rgba64 hdrColor = new(original);
+        Rgba32 result = hdrColor.ToRgba32();
 
         Assert.Equal(original.R, result.R);
         Assert.Equal(original.G, result.G);

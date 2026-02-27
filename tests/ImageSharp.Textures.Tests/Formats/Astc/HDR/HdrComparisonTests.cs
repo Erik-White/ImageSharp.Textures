@@ -193,7 +193,7 @@ public class HdrComparisonTests
 
         // Convert LDR bytes to HDR using extension method
         Rgba32 ldrColor = new(ldrBytes[0], ldrBytes[1], ldrBytes[2], ldrBytes[3]);
-        Rgba64 hdrFromLdr = ldrColor.ToHdr();
+        Rgba64 hdrFromLdr = new(ldrColor);
 
         // Decode with HDR API
         Span<float> hdrDirect = AstcDecoder.DecompressHdrImage(

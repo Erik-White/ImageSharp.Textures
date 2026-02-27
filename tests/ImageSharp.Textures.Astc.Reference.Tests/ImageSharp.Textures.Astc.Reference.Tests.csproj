@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ImageSharp.Textures.Astc\ImageSharp.Textures.Astc.csproj" />
+    <ProjectReference Include="..\..\src\ImageSharp.Textures\ImageSharp.Textures.csproj" />
   </ItemGroup>
 
   <ItemGroup>

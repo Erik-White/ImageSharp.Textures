@@ -3,10 +3,10 @@
 
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.Textures.Astc;
-using SixLabors.ImageSharp.Textures.Astc.Core;
-using SixLabors.ImageSharp.Textures.Astc.IO;
-using SixLabors.ImageSharp.Textures.Astc.TexelBlock;
+using SixLabors.ImageSharp.Textures.Compression.Astc;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
+using SixLabors.ImageSharp.Textures.Compression.Astc.TexelBlock;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;

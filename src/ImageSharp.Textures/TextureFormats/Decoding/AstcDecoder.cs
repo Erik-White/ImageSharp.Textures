@@ -1,7 +1,7 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using SixLabors.ImageSharp.Textures.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 
@@ -36,7 +36,7 @@ internal static class AstcDecoder
 
         Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
 
-        Astc.AstcDecoder.DecompressBlock(blockData, footprint, decodedPixels);
+        Compression.Astc.AstcDecoder.DecompressBlock(blockData, footprint, decodedPixels);
     }
 
     /// <summary>

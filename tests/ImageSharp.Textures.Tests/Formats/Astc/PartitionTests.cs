@@ -2,8 +2,8 @@
 // Licensed under the Six Labors Split License.
 
 using System.Globalization;
-using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
-using SixLabors.ImageSharp.Textures.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;
 

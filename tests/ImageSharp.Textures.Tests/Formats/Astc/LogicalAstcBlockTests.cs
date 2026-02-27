@@ -2,9 +2,9 @@
 // Licensed under the Six Labors Split License.
 
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Textures.Astc.ColorEncoding;
-using SixLabors.ImageSharp.Textures.Astc.Core;
-using SixLabors.ImageSharp.Textures.Astc.TexelBlock;
+using SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.TexelBlock;
 using SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;

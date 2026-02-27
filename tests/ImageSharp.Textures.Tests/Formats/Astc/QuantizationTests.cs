@@ -1,8 +1,8 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using SixLabors.ImageSharp.Textures.Astc.BiseEncoding;
-using SixLabors.ImageSharp.Textures.Astc.BiseEncoding.Quantize;
+using SixLabors.ImageSharp.Textures.Compression.Astc.BiseEncoding;
+using SixLabors.ImageSharp.Textures.Compression.Astc.BiseEncoding.Quantize;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;
 

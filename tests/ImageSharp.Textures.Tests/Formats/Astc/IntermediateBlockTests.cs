@@ -410,13 +410,13 @@ public class IntermediateBlockTests
         Assert.False(repacked.IsIllegalEncoding);
 
         // Verify color bits match
-        int repackedColorBitCount = repacked.GetColorBitCount().Value;
+        int repackedColorBitCount = repacked.GetColorBitCount() ?? 0;
         UInt128 repackedColorMask = UInt128Extensions.OnesMask(repackedColorBitCount);
-        UInt128 repackedColorBits = (repacked.BlockBits >> repacked.GetColorStartBit().Value) & repackedColorMask;
+        UInt128 repackedColorBits = (repacked.BlockBits >> (repacked.GetColorStartBit() ?? 0)) & repackedColorMask;
 
-        int originalColorBitCount = original.GetColorBitCount().Value;
+        int originalColorBitCount = original.GetColorBitCount() ?? 0;
         UInt128 originalColorMask = UInt128Extensions.OnesMask(originalColorBitCount);
-        UInt128 originalColorBits = (original.BlockBits >> original.GetColorStartBit().Value) & originalColorMask;
+        UInt128 originalColorBits = (original.BlockBits >> (original.GetColorStartBit() ?? 0)) & originalColorMask;
 
         Assert.Equal(originalColorMask, repackedColorMask);
         Assert.Equal(originalColorBits, repackedColorBits);

@@ -2,10 +2,10 @@
 // Licensed under the Six Labors Split License.
 
 using System.ComponentModel;
+using SixLabors.ImageSharp.Textures.Astc.Reference.Tests.Utils;
 using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
-using SixLabors.ImageSharp.Textures.Astc.Reference.Tests.Utils;
 
 namespace SixLabors.ImageSharp.Textures.Astc.Reference.Tests;
 
@@ -41,7 +41,7 @@ public class ReferenceDecoderHdrTests
     [InlineData("ldr-tile")]
     public void DecompressHdr_WithHdrImage_ShouldMatch(string basename)
     {
-        string filePath = Path.Combine("TestData", "HDR", basename + ".astc");
+        string filePath = Path.Combine(TestEnvironment.InputImagesDirectoryFullPath, "Astc", "HDR", basename + ".astc");
 
         byte[] bytes = File.ReadAllBytes(filePath);
         AstcFile astcFile = AstcFile.FromMemory(bytes);
@@ -62,7 +62,7 @@ public class ReferenceDecoderHdrTests
     [InlineData("atlas_small_8x8")]
     public void DecompressHdr_WithLdrImage_ShouldMatch(string basename)
     {
-        string filePath = Path.Combine("TestData", "Input", basename + ".astc");
+        string filePath = Path.Combine(TestEnvironment.InputImagesDirectoryFullPath, "Astc", basename + ".astc");
         byte[] bytes = File.ReadAllBytes(filePath);
         AstcFile astcFile = AstcFile.FromMemory(bytes);
         (int blockX, int blockY) = ReferenceDecoder.ToBlockDimensions(astcFile.Footprint.Type);

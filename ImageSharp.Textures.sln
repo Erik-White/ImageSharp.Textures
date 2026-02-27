@@ -138,5 +138,6 @@ Global
 		tests\Images\Images.projitems*{18be79b6-6b95-4ed7-a963-ad75f6cb9f3c}*SharedItemsImports = 5
 		tests\Images\Images.projitems*{68a8cc40-6aed-4e96-b524-31b1158fdeea}*SharedItemsImports = 13
 		tests\Images\Images.projitems*{b159ffd1-e646-42d0-892c-4abf69103712}*SharedItemsImports = 5
+		tests\Images\Images.projitems*{e15c2e1a-fcd6-42b1-82d2-2c72cc4dc720}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

@@ -21,13 +21,7 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <!-- Copy test data into the output directory. -->
-  <Target Name="CopyTestData" AfterTargets="Build">
-    <ItemGroup>
-      <_TestData Include="..\Images\Input\Astc\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(_TestData)" DestinationFiles="@(_TestData -> '$(TargetDir)TestData\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-  </Target>
+  <Import Project="..\Images\Images.projitems" Label="Shared" />
 
   <!-- Copy AstcEncoderCSharp native runtimes to the output directory. -->
   <Target Name="CopyAstcEncNativeRuntimes" AfterTargets="Build">

@@ -7,7 +7,6 @@
     <GenerateProgramFile>false</GenerateProgramFile>
     <!--Used to hide test project from dotnet test-->
     <IsTestProject>false</IsTestProject>
-    <AssemblyName>SixLabors.ImageSharp.Textures.Benchmarks</AssemblyName>
     <RootNamespace>SixLabors.ImageSharp.Textures.Benchmarks</RootNamespace>
   </PropertyGroup>
 

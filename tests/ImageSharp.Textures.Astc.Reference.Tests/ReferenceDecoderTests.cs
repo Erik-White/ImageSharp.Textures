@@ -1,8 +1,9 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using SixLabors.ImageSharp.Textures.Astc.Core;
-using SixLabors.ImageSharp.Textures.Astc.IO;
+using SixLabors.ImageSharp.Textures.Compression.Astc;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 using SixLabors.ImageSharp.Textures.Astc.Reference.Tests.Utils;
 
 namespace SixLabors.ImageSharp.Textures.Astc.Reference.Tests;
@@ -94,7 +95,7 @@ public class ReferenceDecoderTests
         int height = blockY;
 
         // Single solid color block
-        byte[] pixels = new byte[width * height * RgbaColor.BytesPerPixel];
+        byte[] pixels = new byte[width * height * 4];
         for (int index = 0; index < width * height; index++)
         {
             pixels[(index * 4) + 0] = 128; // R
@@ -122,7 +123,7 @@ public class ReferenceDecoderTests
         int width = blockX * 2;
         int height = blockY * 2;
 
-        byte[] pixels = new byte[width * height * RgbaColor.BytesPerPixel];
+        byte[] pixels = new byte[width * height * 4];
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
@@ -155,11 +156,11 @@ public class ReferenceDecoderTests
         int height = blockY * 2;
 
         Random rng = new(42); // Fixed seed for reproducibility
-        byte[] pixels = new byte[width * height * RgbaColor.BytesPerPixel];
+        byte[] pixels = new byte[width * height * 4];
         rng.NextBytes(pixels);
 
         // Force alpha to 255 so compression doesn't introduce alpha-related variance
-        for (int index = 3; index < pixels.Length; index += RgbaColor.BytesPerPixel)
+        for (int index = 3; index < pixels.Length; index += 4)
         {
             pixels[index] = byte.MaxValue;
         }
@@ -184,9 +185,9 @@ public class ReferenceDecoderTests
         int height = blockY + (blockY / 2) + 1;
 
         Random rng = new(123);
-        byte[] pixels = new byte[width * height * RgbaColor.BytesPerPixel];
+        byte[] pixels = new byte[width * height * 4];
         rng.NextBytes(pixels);
-        for (int index = 3; index < pixels.Length; index += RgbaColor.BytesPerPixel)
+        for (int index = 3; index < pixels.Length; index += 4)
         {
             pixels[index] = byte.MaxValue;
         }
@@ -233,7 +234,7 @@ public class ReferenceDecoderTests
     /// </summary>
     private static void CompareRgba8(Span<byte> actual, byte[] expected, int width, int height, string label)
     {
-        int pixelCount = width * height * RgbaColor.BytesPerPixel;
+        int pixelCount = width * height * 4;
         Assert.True(actual.Length == pixelCount, $"actual output size should match for {label}");
         Assert.True(expected.Length == pixelCount, $"expected output size should match for {label}");
 
@@ -251,8 +252,8 @@ public class ReferenceDecoderTests
                 if (diff > worstDiff)
                 {
                     worstDiff = diff;
-                    worstPixel = index / RgbaColor.BytesPerPixel;
-                    worstChannel = index % RgbaColor.BytesPerPixel;
+                    worstPixel = index / 4;
+                    worstChannel = index % 4;
                 }
             }
         }

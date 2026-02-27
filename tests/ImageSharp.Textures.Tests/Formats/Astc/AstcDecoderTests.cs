@@ -104,7 +104,7 @@ public class AstcDecoderTests
 
         Span<byte> result = AstcDecoder.DecompressImage(astc);
 
-        Assert.Equal(astc.Width * astc.Height * RgbaColor.BytesPerPixel, result.Length);
+        Assert.Equal(astc.Width * astc.Height * 4, result.Length);
     }
 
     [Theory]

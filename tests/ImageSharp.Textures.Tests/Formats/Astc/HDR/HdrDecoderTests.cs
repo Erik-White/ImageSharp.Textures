@@ -1,6 +1,7 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
@@ -82,10 +83,10 @@ public class HdrDecoderTests
     [Fact]
     public void HdrColor_LdrRoundTrip_ShouldPreserveValues()
     {
-        RgbaColor ldrColor = new(50, 100, 150, 200);
+        Rgba32 ldrColor = new(50, 100, 150, 200);
 
-        RgbaHdrColor hdrColor = RgbaHdrColor.FromRgba(ldrColor);
-        RgbaColor backToLdr = hdrColor.ToLowDynamicRange();
+        Rgba64 hdrColor = ldrColor.ToHdr();
+        Rgba32 backToLdr = hdrColor.ToLdr();
 
         Assert.Equal(ldrColor.R, backToLdr.R);
         Assert.Equal(ldrColor.G, backToLdr.G);

@@ -45,7 +45,7 @@ public class HdrImageTests
             astcFile.Footprint);
 
         // Should produce 1 pixel with 4 values (RGBA)
-        Assert.Equal(RgbaColor.BytesPerPixel, hdrResult.Length);
+        Assert.Equal(4, hdrResult.Length);
 
         // HDR values can exceed 1.0
         // Just verify they're in a reasonable range (0.0 to 10.0)
@@ -71,7 +71,7 @@ public class HdrImageTests
             astcFile.Footprint);
 
         // Should produce Width * Height pixels, each with 4 values
-        Assert.Equal(astcFile.Width * astcFile.Height * RgbaColor.BytesPerPixel, hdrResult.Length);
+        Assert.Equal(astcFile.Width * astcFile.Height * 4, hdrResult.Length);
 
         // Verify at least some HDR values exceed 1.0 (typical for HDR content)
         int valuesGreaterThanOne = 0;
@@ -104,7 +104,7 @@ public class HdrImageTests
         Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
 
         // Should produce 1 pixel with 4 bytes (RGBA)
-        Assert.Equal(RgbaColor.BytesPerPixel, ldrResult.Length);
+        Assert.Equal(4, ldrResult.Length);
 
         // All values should be in LDR range
         foreach (byte value in ldrResult)

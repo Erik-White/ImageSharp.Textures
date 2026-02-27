@@ -176,8 +176,8 @@ public class LogicalAstcBlockTests
     public void SetEndpoints_WithValidColors_ShouldStoreCorrectly()
     {
         LogicalBlock logicalBlock = new(Footprint.Get4x4());
-        RgbaColor color1 = new(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MaxValue);
-        RgbaColor color2 = new(byte.MinValue, byte.MaxValue, byte.MinValue, byte.MaxValue);
+        Rgba32 color1 = new(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MaxValue);
+        Rgba32 color2 = new(byte.MinValue, byte.MaxValue, byte.MinValue, byte.MaxValue);
 
         logicalBlock.SetEndpoints(color1, color2, 0);
 
@@ -185,8 +185,8 @@ public class LogicalAstcBlockTests
         logicalBlock.SetWeightAt(0, 0, 0);
         logicalBlock.SetWeightAt(1, 1, 64);
 
-        RgbaColor colorAtMinWeight = logicalBlock.ColorAt(0, 0);
-        RgbaColor colorAtMaxWeight = logicalBlock.ColorAt(1, 1);
+        Rgba32 colorAtMinWeight = logicalBlock.ColorAt(0, 0);
+        Rgba32 colorAtMaxWeight = logicalBlock.ColorAt(1, 1);
 
         Assert.Equal(color1.R, colorAtMinWeight.R);
         Assert.True(Math.Abs(colorAtMaxWeight.R - color2.R) <= 1);
@@ -213,15 +213,15 @@ public class LogicalAstcBlockTests
             }
         }
 
-        RgbaColor endpointA = new(123, 45, 67, 89);
-        RgbaColor endpointB = new(101, 121, 31, 41);
+        Rgba32 endpointA = new(123, 45, 67, 89);
+        Rgba32 endpointB = new(101, 121, 31, 41);
         logicalBlock.SetEndpoints(endpointA, endpointB, 0);
 
         for (int j = 0; j < 8; ++j)
         {
             for (int i = 0; i < 8; ++i)
             {
-                RgbaColor color = logicalBlock.ColorAt(i, j);
+                Rgba32 color = logicalBlock.ColorAt(i, j);
                 if (((i ^ j) & 1) == 1)
                 {
                     // Weight 0 = first endpoint
@@ -271,9 +271,9 @@ public class LogicalAstcBlockTests
         logicalBlock.SetPartition(newPartition);
 
         // Should be able to set endpoints for both valid partitions (0 and 1)
-        RgbaColor redEndpoint = new(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MaxValue);
-        RgbaColor blackEndpoint = new(byte.MinValue, byte.MinValue, byte.MinValue, byte.MaxValue);
-        RgbaColor greenEndpoint = new(byte.MinValue, byte.MaxValue, byte.MinValue, byte.MaxValue);
+        Rgba32 redEndpoint = new(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MaxValue);
+        Rgba32 blackEndpoint = new(byte.MinValue, byte.MinValue, byte.MinValue, byte.MaxValue);
+        Rgba32 greenEndpoint = new(byte.MinValue, byte.MaxValue, byte.MinValue, byte.MaxValue);
 
         Action setEndpoint0 = () => logicalBlock.SetEndpoints(redEndpoint, blackEndpoint, 0);
         Action setEndpoint1 = () => logicalBlock.SetEndpoints(greenEndpoint, blackEndpoint, 1);
@@ -307,8 +307,8 @@ public class LogicalAstcBlockTests
     public void SetEndpoints_WithInvalidSubset_ShouldThrowArgumentOutOfRangeException(int subset)
     {
         LogicalBlock logicalBlock = new(Footprint.Get4x4());
-        RgbaColor color1 = new(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MaxValue);
-        RgbaColor color2 = new(byte.MinValue, byte.MaxValue, byte.MinValue, byte.MaxValue);
+        Rgba32 color1 = new(byte.MaxValue, byte.MinValue, byte.MinValue, byte.MaxValue);
+        Rgba32 color2 = new(byte.MinValue, byte.MaxValue, byte.MinValue, byte.MaxValue);
 
         Action action = () => logicalBlock.SetEndpoints(color1, color2, subset);
 
@@ -430,8 +430,8 @@ public class LogicalAstcBlockTests
                         continue;
                     }
 
-                    RgbaColor decoded = logicalBlock!.ColorAt(x, y);
-                    image[px, height - 1 - py] = new Rgba32(decoded.R, decoded.G, decoded.B, decoded.A);
+                    Rgba32 decoded = logicalBlock!.ColorAt(x, y);
+                    image[px, height - 1 - py] = decoded;
                 }
             }
         }

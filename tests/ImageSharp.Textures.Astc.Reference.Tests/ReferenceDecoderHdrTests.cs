@@ -2,8 +2,9 @@
 // Licensed under the Six Labors Split License.
 
 using System.ComponentModel;
-using SixLabors.ImageSharp.Textures.Astc.Core;
-using SixLabors.ImageSharp.Textures.Astc.IO;
+using SixLabors.ImageSharp.Textures.Compression.Astc;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 using SixLabors.ImageSharp.Textures.Astc.Reference.Tests.Utils;
 
 namespace SixLabors.ImageSharp.Textures.Astc.Reference.Tests;
@@ -192,7 +193,7 @@ public class ReferenceDecoderHdrTests
     /// </summary>
     private static void CompareF16(Span<float> actual, Half[] expected, int width, int height, string label)
     {
-        int channelCount = width * height * RgbaColor.BytesPerPixel;
+        int channelCount = width * height * 4;
         Assert.True(actual.Length == channelCount, $"actual float output size should match for {label}");
         Assert.True(expected.Length == channelCount, $"expected F16 output size should match for {label}");
 

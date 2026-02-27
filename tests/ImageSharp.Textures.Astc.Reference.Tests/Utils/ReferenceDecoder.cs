@@ -3,7 +3,7 @@
 
 using System.Runtime.InteropServices;
 using AstcEncoder;
-using SixLabors.ImageSharp.Textures.Astc.Core;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Astc.Reference.Tests.Utils;
 

@@ -2,6 +2,7 @@
 // Licensed under the Six Labors Split License.
 
 using System.Buffers.Binary;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.TexelBlock;
@@ -19,8 +20,8 @@ public class EndpointCodecTests
     [InlineData(EndpointEncodingMode.DirectRgba)]
     internal void EncodeColorsForMode_WithVariousRanges_ShouldProduceValidQuantizedValues(EndpointEncodingMode mode)
     {
-        RgbaColor low = new(0, 0, 0, 0);
-        RgbaColor high = new(255, 255, 255, 255);
+        Rgba32 low = new(0, 0, 0, 0);
+        Rgba32 high = new(255, 255, 255, 255);
 
         for (int quantRange = 5; quantRange < 256; quantRange++)
         {
@@ -44,12 +45,12 @@ public class EndpointCodecTests
     [InlineData(EndpointEncodingMode.DirectRgba)]
     internal void EncodeDecodeColors_WithBlackAndWhite_ShouldPreserveColors(EndpointEncodingMode mode)
     {
-        RgbaColor white = new(255, 255, 255, 255);
-        RgbaColor black = new(0, 0, 0, 255);
+        Rgba32 white = new(255, 255, 255, 255);
+        Rgba32 black = new(0, 0, 0, 255);
 
         for (int quantRange = 5; quantRange < 256; ++quantRange)
         {
-            (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(white, black, quantRange, mode);
+            (Rgba32 low, Rgba32 high) = EncodeAndDecodeColors(white, black, quantRange, mode);
 
             Assert.True(low == white);
             Assert.True(high == black);
@@ -92,16 +93,16 @@ public class EndpointCodecTests
     [Fact]
     public void EncodeColorsForMode_WithRgbDirectAndSpecificPairs_ShouldUseBlueContract()
     {
-        (RgbaColor, RgbaColor)[] pairs =
+        (Rgba32, Rgba32)[] pairs =
         [
-            (new RgbaColor(22, 18, 30, 59), new RgbaColor(162, 148, 155, 59)),
-            (new RgbaColor(22, 30, 27, 36), new RgbaColor(228, 221, 207, 36)),
-            (new RgbaColor(54, 60, 55, 255), new RgbaColor(23, 30, 27, 255))
+            (new Rgba32(22, 18, 30, 59), new Rgba32(162, 148, 155, 59)),
+            (new Rgba32(22, 30, 27, 36), new Rgba32(228, 221, 207, 36)),
+            (new Rgba32(54, 60, 55, 255), new Rgba32(23, 30, 27, 255))
         ];
 
         const int endpointRange = 31;
 
-        foreach ((RgbaColor low, RgbaColor high) in pairs)
+        foreach ((Rgba32 low, Rgba32 high) in pairs)
         {
             List<int> values = [];
             EndpointEncoder.EncodeColorsForMode(low, high, endpointRange, EndpointEncodingMode.DirectRbg, out ColorEndpointMode astcMode, values);
@@ -115,41 +116,41 @@ public class EndpointCodecTests
     {
         EndpointEncodingMode mode = EndpointEncodingMode.DirectLuma;
 
-        (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(
-            new RgbaColor(247, 248, 246, 255),
-            new RgbaColor(2, 3, 1, 255),
+        (Rgba32 low, Rgba32 high) = EncodeAndDecodeColors(
+            new Rgba32(247, 248, 246, 255),
+            new Rgba32(2, 3, 1, 255),
             255,
             mode);
 
-        Assert.True(low == new RgbaColor(247, 247, 247, 255));
-        Assert.True(high == new RgbaColor(2, 2, 2, 255));
+        Assert.True(low == new Rgba32(247, 247, 247, 255));
+        Assert.True(high == new Rgba32(2, 2, 2, 255));
 
-        (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(
-            new RgbaColor(80, 80, 50, 255),
-            new RgbaColor(99, 255, 6, 255),
+        (Rgba32 low2, Rgba32 high2) = EncodeAndDecodeColors(
+            new Rgba32(80, 80, 50, 255),
+            new Rgba32(99, 255, 6, 255),
             255,
             mode);
 
-        Assert.True(low2 == new RgbaColor(70, 70, 70, 255));
-        Assert.True(high2 == new RgbaColor(120, 120, 120, 255));
+        Assert.True(low2 == new Rgba32(70, 70, 70, 255));
+        Assert.True(high2 == new Rgba32(120, 120, 120, 255));
 
-        (RgbaColor low3, RgbaColor high3) = EncodeAndDecodeColors(
-            new RgbaColor(247, 248, 246, 255),
-            new RgbaColor(2, 3, 1, 255),
+        (Rgba32 low3, Rgba32 high3) = EncodeAndDecodeColors(
+            new Rgba32(247, 248, 246, 255),
+            new Rgba32(2, 3, 1, 255),
             15,
             mode);
 
-        Assert.True(low3 == new RgbaColor(255, 255, 255, 255));
-        Assert.True(high3 == new RgbaColor(0, 0, 0, 255));
+        Assert.True(low3 == new Rgba32(255, 255, 255, 255));
+        Assert.True(high3 == new Rgba32(0, 0, 0, 255));
 
-        (RgbaColor low4, RgbaColor high4) = EncodeAndDecodeColors(
-            new RgbaColor(64, 127, 192, 255),
-            new RgbaColor(0, 0, 0, 255),
+        (Rgba32 low4, Rgba32 high4) = EncodeAndDecodeColors(
+            new Rgba32(64, 127, 192, 255),
+            new Rgba32(0, 0, 0, 255),
             63,
             mode);
 
-        Assert.True(low4 == new RgbaColor(130, 130, 130, 255));
-        Assert.True(high4 == new RgbaColor(0, 0, 0, 255));
+        Assert.True(low4 == new Rgba32(130, 130, 130, 255));
+        Assert.True(high4 == new Rgba32(0, 0, 0, 255));
     }
 
     [Fact]
@@ -158,26 +159,26 @@ public class EndpointCodecTests
         EndpointEncodingMode mode = EndpointEncodingMode.DirectLumaAlpha;
 
         // Grey with varying alpha
-        (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(
-            new RgbaColor(64, 127, 192, 127),
-            new RgbaColor(0, 0, 0, 20),
+        (Rgba32 low, Rgba32 high) = EncodeAndDecodeColors(
+            new Rgba32(64, 127, 192, 127),
+            new Rgba32(0, 0, 0, 20),
             63,
             mode);
 
-        Assert.True((low == new RgbaColor(130, 130, 130, 125)) ||
-            low.IsCloseTo(new RgbaColor(130, 130, 130, 125), 1));
-        Assert.True((high == new RgbaColor(0, 0, 0, 20)) ||
-            high.IsCloseTo(new RgbaColor(0, 0, 0, 20), 1));
+        Assert.True((low == new Rgba32(130, 130, 130, 125)) ||
+            low.IsCloseTo(new Rgba32(130, 130, 130, 125), 1));
+        Assert.True((high == new Rgba32(0, 0, 0, 20)) ||
+            high.IsCloseTo(new Rgba32(0, 0, 0, 20), 1));
 
         // Different alpha values
-        (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(
-            new RgbaColor(247, 248, 246, 250),
-            new RgbaColor(2, 3, 1, 172),
+        (Rgba32 low2, Rgba32 high2) = EncodeAndDecodeColors(
+            new Rgba32(247, 248, 246, 250),
+            new Rgba32(2, 3, 1, 172),
             255,
             mode);
 
-        Assert.True(low2 == new RgbaColor(247, 247, 247, 250));
-        Assert.True(high2 == new RgbaColor(2, 2, 2, 172));
+        Assert.True(low2 == new Rgba32(247, 247, 247, 250));
+        Assert.True(high2 == new Rgba32(2, 2, 2, 172));
     }
 
     [Fact]
@@ -188,9 +189,9 @@ public class EndpointCodecTests
 
         for (int i = 0; i < 100; ++i)
         {
-            RgbaColor low = new(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256), 255);
-            RgbaColor high = new(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256), 255);
-            (RgbaColor low1, RgbaColor high1) = EncodeAndDecodeColors(low, high, 255, mode);
+            Rgba32 low = new((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256), 255);
+            Rgba32 high = new((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256), 255);
+            (Rgba32 low1, Rgba32 high1) = EncodeAndDecodeColors(low, high, 255, mode);
 
             Assert.True(low1 == low);
             Assert.True(high1 == high);
@@ -202,23 +203,23 @@ public class EndpointCodecTests
     {
         EndpointEncodingMode mode = EndpointEncodingMode.DirectRbg;
 
-        (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(
-            new RgbaColor(64, 127, 192, 255),
-            new RgbaColor(0, 0, 0, 255),
+        (Rgba32 low, Rgba32 high) = EncodeAndDecodeColors(
+            new Rgba32(64, 127, 192, 255),
+            new Rgba32(0, 0, 0, 255),
             63,
             mode);
 
-        Assert.True(low == new RgbaColor(65, 125, 190, 255));
-        Assert.True(high == new RgbaColor(0, 0, 0, 255));
+        Assert.True(low == new Rgba32(65, 125, 190, 255));
+        Assert.True(high == new Rgba32(0, 0, 0, 255));
 
-        (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(
-            new RgbaColor(0, 0, 0, 255),
-            new RgbaColor(64, 127, 192, 255),
+        (Rgba32 low2, Rgba32 high2) = EncodeAndDecodeColors(
+            new Rgba32(0, 0, 0, 255),
+            new Rgba32(64, 127, 192, 255),
             63,
             mode);
 
-        Assert.True(low2 == new RgbaColor(0, 0, 0, 255));
-        Assert.True(high2 == new RgbaColor(65, 125, 190, 255));
+        Assert.True(low2 == new Rgba32(0, 0, 0, 255));
+        Assert.True(high2 == new Rgba32(65, 125, 190, 255));
     }
 
     [Fact]
@@ -229,8 +230,8 @@ public class EndpointCodecTests
 
         for (int i = 0; i < 100; ++i)
         {
-            RgbaColor color = new(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256), 255);
-            (RgbaColor low, RgbaColor high) = EncodeAndDecodeColors(color, color, 255, mode);
+            Rgba32 color = new((byte)random.Next(0, 256), (byte)random.Next(0, 256), (byte)random.Next(0, 256), 255);
+            (Rgba32 low, Rgba32 high) = EncodeAndDecodeColors(color, color, 255, mode);
 
             Assert.True(low.IsCloseTo(color, 1));
             Assert.True(high.IsCloseTo(color, 1));
@@ -241,34 +242,34 @@ public class EndpointCodecTests
     public void EncodeDecodeColors_WithRgbBaseScaleAndDifferentColors_ShouldMatchExpected()
     {
         EndpointEncodingMode mode = EndpointEncodingMode.BaseScaleRgb;
-        RgbaColor low = new(20, 4, 40, 255);
-        RgbaColor high = new(80, 16, 160, 255);
+        Rgba32 low = new(20, 4, 40, 255);
+        Rgba32 high = new(80, 16, 160, 255);
 
-        (RgbaColor decodedLow, RgbaColor decodedHigh) = EncodeAndDecodeColors(low, high, 255, mode);
+        (Rgba32 decodedLow, Rgba32 decodedHigh) = EncodeAndDecodeColors(low, high, 255, mode);
         Assert.True(decodedLow.IsCloseTo(low, 0));
         Assert.True(decodedHigh.IsCloseTo(high, 0));
 
-        (RgbaColor low2, RgbaColor high2) = EncodeAndDecodeColors(low, high, 127, mode);
+        (Rgba32 low2, Rgba32 high2) = EncodeAndDecodeColors(low, high, 127, mode);
         Assert.True(low2.IsCloseTo(low, 1));
         Assert.True(high2.IsCloseTo(high, 1));
     }
 
-    internal static TheoryData<RgbaColor, RgbaColor> RgbBaseOffsetColorPairs() => new()
+    internal static TheoryData<Rgba32, Rgba32> RgbBaseOffsetColorPairs() => new()
     {
-        { new RgbaColor(80, 16, 112, 255), new RgbaColor(87, 18, 132, 255) },
-        { new RgbaColor(80, 74, 82, 255), new RgbaColor(90, 92, 110, 255) },
-        { new RgbaColor(0, 0, 0, 255), new RgbaColor(2, 2, 2, 255) },
+        { new Rgba32(80, 16, 112, 255), new Rgba32(87, 18, 132, 255) },
+        { new Rgba32(80, 74, 82, 255), new Rgba32(90, 92, 110, 255) },
+        { new Rgba32(0, 0, 0, 255), new Rgba32(2, 2, 2, 255) },
     };
 
     [Theory]
-#pragma warning disable xUnit1016 // MemberData is internal because RgbaColor is internal
+#pragma warning disable xUnit1016 // MemberData is internal because Rgba32Extensions are internal
     [MemberData(nameof(RgbBaseOffsetColorPairs))]
 #pragma warning restore xUnit1016
     internal void DecodeColorsForMode_WithRgbBaseOffset_AndSpecificColorPairs_ShouldDecodeCorrectly(
-        RgbaColor expectedLow, RgbaColor expectedHigh)
+        Rgba32 expectedLow, Rgba32 expectedHigh)
     {
         int[] values = EncodeRgbBaseOffset(expectedLow, expectedHigh);
-        (RgbaColor decLow, RgbaColor decHigh) = EndpointCodec.DecodeColorsForMode(values, 255, ColorEndpointMode.LdrRgbBaseOffset);
+        (Rgba32 decLow, Rgba32 decHigh) = EndpointCodec.DecodeColorsForMode(values, 255, ColorEndpointMode.LdrRgbBaseOffset);
 
         Assert.True(decLow == expectedLow);
         Assert.True(decHigh == expectedHigh);
@@ -291,23 +292,23 @@ public class EndpointCodecTests
                 continue;
             }
 
-            RgbaColor color = new(r, g, b, 255);
+            Rgba32 color = new((byte)r, (byte)g, (byte)b, 255);
             int[] values = EncodeRgbBaseOffset(color, color);
-            (RgbaColor decLow, RgbaColor decHigh) = EndpointCodec.DecodeColorsForMode(values, 255, ColorEndpointMode.LdrRgbBaseOffset);
+            (Rgba32 decLow, Rgba32 decHigh) = EndpointCodec.DecodeColorsForMode(values, 255, ColorEndpointMode.LdrRgbBaseOffset);
 
             Assert.True(decLow == color);
             Assert.True(decHigh == color);
         }
     }
 
-    private static int[] EncodeRgbBaseOffset(RgbaColor low, RgbaColor high)
+    private static int[] EncodeRgbBaseOffset(Rgba32 low, Rgba32 high)
     {
         List<int> values = [];
         for (int i = 0; i < 3; ++i)
         {
-            bool isLarge = low[i] >= 128;
-            values.Add((low[i] * 2) & 0xFF);
-            int diff = (high[i] - low[i]) * 2;
+            bool isLarge = low.GetChannel(i) >= 128;
+            values.Add((low.GetChannel(i) * 2) & 0xFF);
+            int diff = (high.GetChannel(i) - low.GetChannel(i)) * 2;
             if (isLarge)
             {
                 diff |= 0x80;
@@ -349,7 +350,7 @@ public class EndpointCodecTests
             {
                 IntermediateBlock.IntermediateEndpointData endpoints = ib.Endpoints[ep];
                 ReadOnlySpan<int> colorSpan = ((ReadOnlySpan<int>)endpoints.Colors)[..endpoints.ColorCount];
-                (RgbaColor low, RgbaColor high) = EndpointCodec.DecodeColorsForMode(
+                (Rgba32 low, Rgba32 high) = EndpointCodec.DecodeColorsForMode(
                     colorSpan,
                     colorRange,
                     endpoints.Mode);
@@ -368,15 +369,15 @@ public class EndpointCodecTests
         Assert.True(blocksDecoded > 0);
     }
 
-    private static (RgbaColor Low, RgbaColor High) EncodeAndDecodeColors(
-        RgbaColor low,
-        RgbaColor high,
+    private static (Rgba32 Low, Rgba32 High) EncodeAndDecodeColors(
+        Rgba32 low,
+        Rgba32 high,
         int quantRange,
         EndpointEncodingMode mode)
     {
         List<int> values = [];
         bool needsSwap = EndpointEncoder.EncodeColorsForMode(low, high, quantRange, mode, out ColorEndpointMode astcMode, values);
-        (RgbaColor decLow, RgbaColor decHigh) = EndpointCodec.DecodeColorsForMode(values.ToArray(), quantRange, astcMode);
+        (Rgba32 decLow, Rgba32 decHigh) = EndpointCodec.DecodeColorsForMode(values.ToArray(), quantRange, astcMode);
 
         return needsSwap ? (decHigh, decLow) : (decLow, decHigh);
     }

@@ -1,6 +1,7 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
@@ -190,9 +191,9 @@ public class HdrComparisonTests
         // Decode with LDR API to get byte values
         Span<byte> ldrBytes = AstcDecoder.DecompressImage(astcFile);
 
-        // Convert LDR bytes to HDR using HdrColor
-        RgbaColor ldrColor = new(ldrBytes[0], ldrBytes[1], ldrBytes[2], ldrBytes[3]);
-        RgbaHdrColor hdrFromLdr = RgbaHdrColor.FromRgba(ldrColor);
+        // Convert LDR bytes to HDR using extension method
+        Rgba32 ldrColor = new(ldrBytes[0], ldrBytes[1], ldrBytes[2], ldrBytes[3]);
+        Rgba64 hdrFromLdr = ldrColor.ToHdr();
 
         // Decode with HDR API
         Span<float> hdrDirect = AstcDecoder.DecompressHdrImage(
@@ -201,7 +202,7 @@ public class HdrComparisonTests
         // Compare: UNORM16 normalized values should match HDR API output
         for (int i = 0; i < 4; i++)
         {
-            float fromConversion = hdrFromLdr[i] / 65535.0f;
+            float fromConversion = hdrFromLdr.GetChannel(i) / 65535.0f;
             float fromDirect = hdrDirect[i];
 
             Assert.True(Math.Abs(fromConversion - fromDirect) < 0.0001f);

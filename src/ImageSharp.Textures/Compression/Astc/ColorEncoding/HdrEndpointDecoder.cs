@@ -1,8 +1,8 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.Compression.Astc.BiseEncoding.Quantize;
-using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
 
@@ -15,7 +15,7 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
 /// </remarks>
 internal static class HdrEndpointDecoder
 {
-    public static (RgbaHdrColor Low, RgbaHdrColor High) DecodeHdrMode(ReadOnlySpan<int> values, int maxValue, ColorEndpointMode mode)
+    public static (Rgba64 Low, Rgba64 High) DecodeHdrMode(ReadOnlySpan<int> values, int maxValue, ColorEndpointMode mode)
     {
         int count = mode.GetColorValuesCount();
         Span<int> unquantizedValues = stackalloc int[count];
@@ -33,7 +33,7 @@ internal static class HdrEndpointDecoder
     /// Called from the fused decode path where BISE decode + batch unquantize
     /// have already been performed.
     /// </summary>
-    public static (RgbaHdrColor Low, RgbaHdrColor High) DecodeHdrModeUnquantized(ReadOnlySpan<int> value, ColorEndpointMode mode) => mode switch
+    public static (Rgba64 Low, Rgba64 High) DecodeHdrModeUnquantized(ReadOnlySpan<int> value, ColorEndpointMode mode) => mode switch
     {
         ColorEndpointMode.HdrLumaLargeRange => UnpackHdrLuminanceLargeRangeCore(value[0], value[1]),
         ColorEndpointMode.HdrLumaSmallRange => UnpackHdrLuminanceSmallRangeCore(value[0], value[1]),
@@ -50,7 +50,7 @@ internal static class HdrEndpointDecoder
     /// </summary>
     private static int SafeSignedLeftShift(int value, int shift) => (int)((uint)value << shift);
 
-    private static (RgbaHdrColor Low, RgbaHdrColor High) UnpackHdrLuminanceLargeRangeCore(int v0, int v1)
+    private static (Rgba64 Low, Rgba64 High) UnpackHdrLuminanceLargeRangeCore(int v0, int v1)
     {
         int y0, y1;
         if (v1 >= v0)
@@ -64,12 +64,12 @@ internal static class HdrEndpointDecoder
             y1 = (v0 << 4) - 8;
         }
 
-        RgbaHdrColor low = new((ushort)(y0 << 4), (ushort)(y0 << 4), (ushort)(y0 << 4), 0x7800);
-        RgbaHdrColor high = new((ushort)(y1 << 4), (ushort)(y1 << 4), (ushort)(y1 << 4), 0x7800);
+        Rgba64 low = new((ushort)(y0 << 4), (ushort)(y0 << 4), (ushort)(y0 << 4), 0x7800);
+        Rgba64 high = new((ushort)(y1 << 4), (ushort)(y1 << 4), (ushort)(y1 << 4), 0x7800);
         return (low, high);
     }
 
-    private static (RgbaHdrColor Low, RgbaHdrColor High) UnpackHdrLuminanceSmallRangeCore(int v0, int v1)
+    private static (Rgba64 Low, Rgba64 High) UnpackHdrLuminanceSmallRangeCore(int v0, int v1)
     {
         int y0, y1;
         if ((v0 & 0x80) != 0)
@@ -89,12 +89,12 @@ internal static class HdrEndpointDecoder
             y1 = 0xFFF;
         }
 
-        RgbaHdrColor low = new((ushort)(y0 << 4), (ushort)(y0 << 4), (ushort)(y0 << 4), 0x7800);
-        RgbaHdrColor high = new((ushort)(y1 << 4), (ushort)(y1 << 4), (ushort)(y1 << 4), 0x7800);
+        Rgba64 low = new((ushort)(y0 << 4), (ushort)(y0 << 4), (ushort)(y0 << 4), 0x7800);
+        Rgba64 high = new((ushort)(y1 << 4), (ushort)(y1 << 4), (ushort)(y1 << 4), 0x7800);
         return (low, high);
     }
 
-    private static (RgbaHdrColor Low, RgbaHdrColor High) UnpackHdrRgbBaseScaleCore(int v0, int v1, int v2, int v3)
+    private static (Rgba64 Low, Rgba64 High) UnpackHdrRgbBaseScaleCore(int v0, int v1, int v2, int v3)
     {
         int modeValue = ((v0 & 0xC0) >> 6) | (((v1 & 0x80) >> 7) << 2) | (((v2 & 0x80) >> 7) << 3);
 
@@ -244,12 +244,12 @@ internal static class HdrEndpointDecoder
         green0 = Math.Max(green0, 0);
         blue0 = Math.Max(blue0, 0);
 
-        RgbaHdrColor low = new((ushort)(red0 << 4), (ushort)(green0 << 4), (ushort)(blue0 << 4), 0x7800);
-        RgbaHdrColor high = new((ushort)(red << 4), (ushort)(green << 4), (ushort)(blue << 4), 0x7800);
+        Rgba64 low = new((ushort)(red0 << 4), (ushort)(green0 << 4), (ushort)(blue0 << 4), 0x7800);
+        Rgba64 high = new((ushort)(red << 4), (ushort)(green << 4), (ushort)(blue << 4), 0x7800);
         return (low, high);
     }
 
-    private static (RgbaHdrColor Low, RgbaHdrColor High) UnpackHdrRgbDirectCore(int v0, int v1, int v2, int v3, int v4, int v5)
+    private static (Rgba64 Low, Rgba64 High) UnpackHdrRgbDirectCore(int v0, int v1, int v2, int v3, int v4, int v5)
     {
         int modeValue = ((v1 & 0x80) >> 7) | (((v2 & 0x80) >> 7) << 1) | (((v3 & 0x80) >> 7) << 2);
         int majorComponent = ((v4 & 0x80) >> 7) | (((v5 & 0x80) >> 7) << 1);
@@ -257,12 +257,12 @@ internal static class HdrEndpointDecoder
         // Special case: majorComponent == 3 (direct passthrough)
         if (majorComponent == 3)
         {
-            RgbaHdrColor low = new(
+            Rgba64 low = new(
                 (ushort)(v0 << 8),
                 (ushort)(v2 << 8),
                 (ushort)((v4 & 0x7F) << 9),
                 0x7800);
-            RgbaHdrColor high = new(
+            Rgba64 high = new(
                 (ushort)(v1 << 8),
                 (ushort)(v3 << 8),
                 (ushort)((v5 & 0x7F) << 9),
@@ -401,31 +401,31 @@ internal static class HdrEndpointDecoder
             _ => (red0, green0, blue0, red1, green1, blue1)
         };
 
-        RgbaHdrColor lowResult = new((ushort)(red0 << 4), (ushort)(green0 << 4), (ushort)(blue0 << 4), 0x7800);
-        RgbaHdrColor highResult = new((ushort)(red1 << 4), (ushort)(green1 << 4), (ushort)(blue1 << 4), 0x7800);
+        Rgba64 lowResult = new((ushort)(red0 << 4), (ushort)(green0 << 4), (ushort)(blue0 << 4), 0x7800);
+        Rgba64 highResult = new((ushort)(red1 << 4), (ushort)(green1 << 4), (ushort)(blue1 << 4), 0x7800);
         return (lowResult, highResult);
     }
 
-    private static (RgbaHdrColor Low, RgbaHdrColor High) UnpackHdrRgbDirectLdrAlphaCore(ReadOnlySpan<int> unquantizedValues)
+    private static (Rgba64 Low, Rgba64 High) UnpackHdrRgbDirectLdrAlphaCore(ReadOnlySpan<int> unquantizedValues)
     {
-        (RgbaHdrColor rgbLow, RgbaHdrColor rgbHigh) = UnpackHdrRgbDirectCore(unquantizedValues[0], unquantizedValues[1], unquantizedValues[2], unquantizedValues[3], unquantizedValues[4], unquantizedValues[5]);
+        (Rgba64 rgbLow, Rgba64 rgbHigh) = UnpackHdrRgbDirectCore(unquantizedValues[0], unquantizedValues[1], unquantizedValues[2], unquantizedValues[3], unquantizedValues[4], unquantizedValues[5]);
 
         ushort alpha0 = (ushort)(unquantizedValues[6] * 257);
         ushort alpha1 = (ushort)(unquantizedValues[7] * 257);
 
-        RgbaHdrColor low = new(rgbLow.R, rgbLow.G, rgbLow.B, alpha0);
-        RgbaHdrColor high = new(rgbHigh.R, rgbHigh.G, rgbHigh.B, alpha1);
+        Rgba64 low = new(rgbLow.R, rgbLow.G, rgbLow.B, alpha0);
+        Rgba64 high = new(rgbHigh.R, rgbHigh.G, rgbHigh.B, alpha1);
         return (low, high);
     }
 
-    private static (RgbaHdrColor Low, RgbaHdrColor High) UnpackHdrRgbDirectHdrAlphaCore(ReadOnlySpan<int> unquantizedValues)
+    private static (Rgba64 Low, Rgba64 High) UnpackHdrRgbDirectHdrAlphaCore(ReadOnlySpan<int> unquantizedValues)
     {
-        (RgbaHdrColor rgbLow, RgbaHdrColor rgbHigh) = UnpackHdrRgbDirectCore(unquantizedValues[0], unquantizedValues[1], unquantizedValues[2], unquantizedValues[3], unquantizedValues[4], unquantizedValues[5]);
+        (Rgba64 rgbLow, Rgba64 rgbHigh) = UnpackHdrRgbDirectCore(unquantizedValues[0], unquantizedValues[1], unquantizedValues[2], unquantizedValues[3], unquantizedValues[4], unquantizedValues[5]);
 
         (ushort alpha0, ushort alpha1) = UnpackHdrAlpha(unquantizedValues[6], unquantizedValues[7]);
 
-        RgbaHdrColor low = new(rgbLow.R, rgbLow.G, rgbLow.B, alpha0);
-        RgbaHdrColor high = new(rgbHigh.R, rgbHigh.G, rgbHigh.B, alpha1);
+        Rgba64 low = new(rgbLow.R, rgbLow.G, rgbLow.B, alpha0);
+        Rgba64 high = new(rgbHigh.R, rgbHigh.G, rgbHigh.B, alpha1);
         return (low, high);
     }
 

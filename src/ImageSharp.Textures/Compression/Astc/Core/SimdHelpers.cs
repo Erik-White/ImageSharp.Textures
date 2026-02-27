@@ -3,6 +3,8 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
+using SixLabors.ImageSharp.PixelFormats;
+using static SixLabors.ImageSharp.Textures.Compression.Astc.Core.Rgba32Extensions;
 
 namespace SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
@@ -69,7 +71,7 @@ internal static class SimdHelpers
 
     /// <summary>
     /// Scalar single-pixel LDR interpolation, writing directly to buffer.
-    /// No RgbaColor allocation.
+    /// No Rgba32 allocation.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteSinglePixelLdr(
@@ -130,21 +132,21 @@ internal static class SimdHelpers
 
     // Keep the old API for ColorAt() (used by tests and non-hot paths)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RgbaColor InterpolateColorLdr(RgbaColor low, RgbaColor high, int weight)
-        => new(
+    public static Rgba32 InterpolateColorLdr(Rgba32 low, Rgba32 high, int weight)
+        => ClampedRgba32(
             r: InterpolateChannelScalar(low.R, high.R, weight),
             g: InterpolateChannelScalar(low.G, high.G, weight),
             b: InterpolateChannelScalar(low.B, high.B, weight),
             a: InterpolateChannelScalar(low.A, high.A, weight));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RgbaColor InterpolateColorLdrDualPlane(
-        RgbaColor low,
-        RgbaColor high,
+    public static Rgba32 InterpolateColorLdrDualPlane(
+        Rgba32 low,
+        Rgba32 high,
         int weight,
         int dualPlaneChannel,
         int dualPlaneWeight)
-        => new(
+        => ClampedRgba32(
             r: InterpolateChannelScalar(
                 low.R,
                 high.R,

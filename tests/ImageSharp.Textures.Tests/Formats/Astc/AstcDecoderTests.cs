@@ -12,10 +12,10 @@ using SixLabors.ImageSharp.Textures.Tests.TestUtilities.ImageComparison;
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc;
 
 #nullable enable
-public class CodecTests
+public class AstcDecoderTests
 {
     [Fact]
-    public void ASTCDecompressToRGBA_WithZeroWidth_ShouldReturnEmpty()
+    public void DecompressImage_WithZeroWidth_ShouldReturnEmpty()
     {
         byte[] data = new byte[256];
         const int height = 16;
@@ -26,7 +26,7 @@ public class CodecTests
     }
 
     [Fact]
-    public void ASTCDecompressToRGBA_WithZeroHeight_ShouldReturnEmpty()
+    public void DecompressImage_WithZeroHeight_ShouldReturnEmpty()
     {
         byte[] data = new byte[256];
         const int width = 16;
@@ -37,7 +37,7 @@ public class CodecTests
     }
 
     [Fact]
-    public void ASTCDecompressToRGBA_WithDataSizeNotMultipleOfBlockSize_ShouldReturnEmpty()
+    public void DecompressImage_WithDataSizeNotMultipleOfBlockSize_ShouldReturnEmpty()
     {
         byte[] data = new byte[256];
         const int width = 16;
@@ -50,7 +50,7 @@ public class CodecTests
     }
 
     [Fact]
-    public void ASTCDecompressToRGBA_WithMismatchedBlockCount_ShouldReturnEmpty()
+    public void DecompressImage_WithMismatchedBlockCount_ShouldReturnEmpty()
     {
         byte[] data = new byte[256];
         const int width = 16;
@@ -63,13 +63,57 @@ public class CodecTests
     }
 
     [Theory]
-    [InlineData(TestImages.Astc.Atlas_Small_4x4, TestImages.Astc.Expected.Atlas_Small_4x4, FootprintType.Footprint4x4, 256, 256)]
-    [InlineData(TestImages.Astc.Atlas_Small_5x5, TestImages.Astc.Expected.Atlas_Small_5x5, FootprintType.Footprint5x5, 256, 256)]
-    [InlineData(TestImages.Astc.Atlas_Small_6x6, TestImages.Astc.Expected.Atlas_Small_6x6, FootprintType.Footprint6x6, 256, 256)]
-    [InlineData(TestImages.Astc.Atlas_Small_8x8, TestImages.Astc.Expected.Atlas_Small_8x8, FootprintType.Footprint8x8, 256, 256)]
-    public void ASTCDecompressToRGBA_WithValidData_ShouldMatchExpected(
+    [InlineData(TestImages.Astc.Atlas_Small_4x4)]
+    [InlineData(TestImages.Astc.Atlas_Small_5x5)]
+    [InlineData(TestImages.Astc.Atlas_Small_6x6)]
+    [InlineData(TestImages.Astc.Atlas_Small_8x8)]
+    [InlineData(TestImages.Astc.Checkerboard)]
+    [InlineData(TestImages.Astc.Checkered_4)]
+    [InlineData(TestImages.Astc.Checkered_5)]
+    [InlineData(TestImages.Astc.Checkered_6)]
+    [InlineData(TestImages.Astc.Checkered_7)]
+    [InlineData(TestImages.Astc.Checkered_8)]
+    [InlineData(TestImages.Astc.Checkered_9)]
+    [InlineData(TestImages.Astc.Checkered_10)]
+    [InlineData(TestImages.Astc.Checkered_11)]
+    [InlineData(TestImages.Astc.Checkered_12)]
+    [InlineData(TestImages.Astc.Footprint_4x4)]
+    [InlineData(TestImages.Astc.Footprint_5x4)]
+    [InlineData(TestImages.Astc.Footprint_5x5)]
+    [InlineData(TestImages.Astc.Footprint_6x5)]
+    [InlineData(TestImages.Astc.Footprint_6x6)]
+    [InlineData(TestImages.Astc.Footprint_8x5)]
+    [InlineData(TestImages.Astc.Footprint_8x6)]
+    [InlineData(TestImages.Astc.Footprint_8x8)]
+    [InlineData(TestImages.Astc.Footprint_10x5)]
+    [InlineData(TestImages.Astc.Footprint_10x6)]
+    [InlineData(TestImages.Astc.Footprint_10x8)]
+    [InlineData(TestImages.Astc.Footprint_10x10)]
+    [InlineData(TestImages.Astc.Footprint_12x10)]
+    [InlineData(TestImages.Astc.Footprint_12x12)]
+    [InlineData(TestImages.Astc.Rgb_4x4)]
+    [InlineData(TestImages.Astc.Rgb_5x4)]
+    [InlineData(TestImages.Astc.Rgb_6x6)]
+    [InlineData(TestImages.Astc.Rgb_8x8)]
+    [InlineData(TestImages.Astc.Rgb_12x12)]
+    public void DecompressImage_WithTestdataFile_ShouldReturnExpectedByteCount(string inputFile)
+    {
+        string filePath = TestFile.GetInputFileFullPath(inputFile);
+        byte[] bytes = File.ReadAllBytes(filePath);
+        AstcFile astc = AstcFile.FromMemory(bytes);
+
+        Span<byte> result = AstcDecoder.DecompressImage(astc);
+
+        Assert.Equal(astc.Width * astc.Height * RgbaColor.BytesPerPixel, result.Length);
+    }
+
+    [Theory]
+    [InlineData(TestImages.Astc.Atlas_Small_4x4, FootprintType.Footprint4x4, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_5x5, FootprintType.Footprint5x5, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_6x6, FootprintType.Footprint6x6, 256, 256)]
+    [InlineData(TestImages.Astc.Atlas_Small_8x8, FootprintType.Footprint8x8, 256, 256)]
+    public void DecompressImage_WithValidData_ShouldDecodeAllBlocks(
         string inputFile,
-        string expectedFile,
         FootprintType footprintType,
         int width,
         int height)
@@ -96,14 +140,6 @@ public class CodecTests
 
             Assert.NotNull(logicalBlock);
         }
-
-        byte[] decodedPixels = AstcDecoder.DecompressImage(astcData, width, height, footprintType).ToArray();
-        using Image<Rgba32> actualImage = Image.LoadPixelData<Rgba32>(decodedPixels, width, height);
-        actualImage.Mutate(x => x.Flip(FlipMode.Vertical));
-
-        string expectedImagePath = TestFile.GetInputFileFullPath(expectedFile);
-        using Image<Rgba32> expectedImage = Image.Load<Rgba32>(expectedImagePath);
-        ImageComparer.TolerantPercentage(0.1f).VerifySimilarity(expectedImage, actualImage);
     }
 
     [Theory]
@@ -111,7 +147,7 @@ public class CodecTests
     [InlineData(TestImages.Astc.Atlas_Small_5x5, TestImages.Astc.Expected.Atlas_Small_5x5, FootprintType.Footprint5x5, 256, 256)]
     [InlineData(TestImages.Astc.Atlas_Small_6x6, TestImages.Astc.Expected.Atlas_Small_6x6, FootprintType.Footprint6x6, 256, 256)]
     [InlineData(TestImages.Astc.Atlas_Small_8x8, TestImages.Astc.Expected.Atlas_Small_8x8, FootprintType.Footprint8x8, 256, 256)]
-    public void DecompressToImage_WithAstcFile_ShouldMatchExpected(
+    public void DecompressImage_WithAstcFile_ShouldMatchExpected(
         string inputFile,
         string expectedFile,
         FootprintType footprint,

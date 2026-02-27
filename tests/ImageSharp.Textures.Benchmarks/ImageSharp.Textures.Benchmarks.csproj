@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net8.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
     <!--Used to hide test project from dotnet test-->
@@ -11,9 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.10.3" />
     <PackageReference Include="BenchmarkDotNet" />
-    <PackageReference Include="System.Drawing.Common" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -88,8 +88,9 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                 throw new NotSupportedException("SupercompressionSchemes are not yet supported");
             }
 
-            var ktxProcessor = new Ktx2Processor(this.ktxHeader);
+            Ktx2Processor ktxProcessor = new(this.ktxHeader);
 
+            Texture texture;
             if (this.ktxHeader.FaceCount == 6)
             {
                 texture = ktxProcessor.DecodeCubeMap(stream, width, height, levelIndices);

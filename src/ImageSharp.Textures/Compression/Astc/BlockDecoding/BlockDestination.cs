@@ -9,4 +9,4 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc.BlockDecoding;
 /// for right/bottom edge blocks), and a flag set when the block's full footprint fits in
 /// the image and the fused direct-to-image fast path is usable.
 /// </summary>
-internal readonly record struct BlockDestination(int DstBaseX, int DstBaseY, int CopyWidth, int CopyHeight, bool IsFullInteriorBlock);
+internal readonly record struct BlockDestination(int DstBaseX, int DstBaseY, int CopyWidth, int CopyHeight, bool IsFullInterior);

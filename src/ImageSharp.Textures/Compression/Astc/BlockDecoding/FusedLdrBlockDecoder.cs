@@ -14,6 +14,8 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc.BlockDecoding;
 /// </summary>
 internal static class FusedLdrBlockDecoder
 {
+    private const int SimdLaneCount = 4;
+
     /// <summary>
     /// Fused LDR decode to a contiguous buffer.
     /// Only handles single-partition, non-dual-plane, LDR blocks.
@@ -96,8 +98,8 @@ internal static class FusedLdrBlockDecoder
 
             if (Vector128.IsHardwareAccelerated)
             {
-                int limit = footprintWidth - 3;
-                for (; pixelX < limit; pixelX += 4)
+                int limit = footprintWidth - (SimdLaneCount - 1);
+                for (; pixelX < limit; pixelX += SimdLaneCount)
                 {
                     int texelIndex = srcRowBase + pixelX;
                     Vector128<int> weights = Vector128.Create(

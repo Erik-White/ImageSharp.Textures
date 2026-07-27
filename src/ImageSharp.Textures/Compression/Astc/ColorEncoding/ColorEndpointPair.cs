@@ -10,19 +10,23 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
 /// A value-type discriminated union representing either an LDR or HDR color endpoint pair.
 /// </summary>
 [StructLayout(LayoutKind.Auto)]
-internal struct ColorEndpointPair
+internal readonly struct ColorEndpointPair
 {
-    public bool IsHdr;
+    public bool IsHdr { get; private init; }
 
     // LDR fields (used when IsHdr == false)
-    public Rgba32 LdrLow;
-    public Rgba32 LdrHigh;
+    public Rgba32 LdrLow { get; private init; }
+
+    public Rgba32 LdrHigh { get; private init; }
 
     // HDR fields (used when IsHdr == true)
-    public Rgba64 HdrLow;
-    public Rgba64 HdrHigh;
-    public bool AlphaIsLdr;
-    public bool ValuesAreLns;
+    public Rgba64 HdrLow { get; private init; }
+
+    public Rgba64 HdrHigh { get; private init; }
+
+    public bool AlphaIsLdr { get; private init; }
+
+    public bool ValuesAreLns { get; private init; }
 
     public static ColorEndpointPair Ldr(Rgba32 low, Rgba32 high)
         => new() { IsHdr = false, LdrLow = low, LdrHigh = high };

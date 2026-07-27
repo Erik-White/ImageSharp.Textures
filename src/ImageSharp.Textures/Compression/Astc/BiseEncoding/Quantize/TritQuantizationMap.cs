@@ -1,6 +1,8 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using System.Numerics;
+
 namespace SixLabors.ImageSharp.Textures.Compression.Astc.BiseEncoding.Quantize;
 
 /// <summary>
@@ -19,7 +21,7 @@ internal static class TritQuantizationMap
         Guard.IsTrue((range + 1) % 3 == 0, nameof(range), "range + 1 must be a multiple of 3.");
 
         int bitsPowerOfTwo = (range + 1) / 3;
-        int bitCount = bitsPowerOfTwo == 0 ? 0 : QuantizationMap.Log2Floor(bitsPowerOfTwo);
+        int bitCount = BitOperations.Log2((uint)bitsPowerOfTwo);
 
         int[] unquantization = new int[3 * (1 << bitCount)];
         int idx = 0;

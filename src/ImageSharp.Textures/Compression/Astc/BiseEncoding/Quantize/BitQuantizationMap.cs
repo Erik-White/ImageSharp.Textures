@@ -1,6 +1,8 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using System.Numerics;
+
 namespace SixLabors.ImageSharp.Textures.Compression.Astc.BiseEncoding.Quantize;
 
 /// <summary>
@@ -17,9 +19,9 @@ internal static class BitQuantizationMap
     /// values, 6 for weights.</param>
     public static QuantizationMap Create(int range, int totalUnquantizedBits)
     {
-        Guard.IsTrue(CountOnes(range + 1) == 1, nameof(range), "range + 1 must be a power of two.");
+        Guard.IsTrue(int.IsPow2(range + 1), nameof(range), "range + 1 must be a power of two.");
 
-        int bitCount = QuantizationMap.Log2Floor(range + 1);
+        int bitCount = BitOperations.Log2((uint)(range + 1));
         List<int> unquantization = [];
         List<int> quantization = [];
 
@@ -59,17 +61,5 @@ internal static class BitQuantizationMap
         }
 
         return new QuantizationMap([.. quantization], [.. unquantization]);
-    }
-
-    private static int CountOnes(int value)
-    {
-        int count = 0;
-        while (value != 0)
-        {
-            count += value & 1;
-            value >>= 1;
-        }
-
-        return count;
     }
 }

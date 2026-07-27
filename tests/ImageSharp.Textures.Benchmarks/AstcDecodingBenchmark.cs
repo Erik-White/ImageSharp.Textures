@@ -9,6 +9,7 @@ using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 namespace SixLabors.ImageSharp.Textures.Benchmarks;
 
 [MemoryDiagnoser]
+[Config(typeof(InProcessConfig))]
 public class AstcDecodingBenchmark
 {
     private AstcFile? astcFile;

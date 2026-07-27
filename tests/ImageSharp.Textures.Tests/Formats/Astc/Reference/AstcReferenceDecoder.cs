@@ -266,6 +266,14 @@ internal static class AstcReferenceDecoder
     public static void FreeContext(AstcencContext context) => Astcenc.AstcencContextFree(context);
 
     /// <summary>
+    /// Resets a decode context between successive decodes on the same context, as required
+    /// when a single context is reused across multiple <see cref="DecompressLdrInto"/> /
+    /// <see cref="DecompressHdrInto"/> calls.
+    /// </summary>
+    public static void ResetDecode(AstcencContext context)
+        => ThrowOnError(Astcenc.AstcencDecompressReset(context), "DecompressReset");
+
+    /// <summary>
     /// Decompress LDR ASTC blocks into a caller-supplied <paramref name="output"/> buffer using
     /// a pre-allocated <paramref name="context"/>. The block buffer is passed straight through
     /// to the underlying decoder, and the output must be sized to <c>w * h * 4</c> bytes (RGBA32).

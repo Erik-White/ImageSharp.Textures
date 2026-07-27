@@ -169,6 +169,5 @@ public static class TestImages
                 public const string Rgba64_Sfloat_10x5 = "Cubemap/Hdr/rgba64-sfloat-10x5.ktx2";
             }
         }
-
     }
 }

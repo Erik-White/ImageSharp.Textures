@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using System.ComponentModel;
-using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
@@ -40,7 +39,7 @@ public class HdrImageTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks,
             astcFile.Width,
             astcFile.Height,
@@ -62,7 +61,7 @@ public class HdrImageTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks,
             astcFile.Width,
             astcFile.Height,
@@ -92,7 +91,7 @@ public class HdrImageTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
+        byte[] ldrResult = AstcStreamCodec.DecodeLdr(astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Spec §C.2.19 error colour: opaque magenta (0xFF, 0x00, 0xFF, 0xFF) per texel.
         for (int i = 0; i < ldrResult.Length; i += 4)
@@ -112,7 +111,7 @@ public class HdrImageTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // HDR values exceed 1.0; R < G < B ordering is preserved.
@@ -123,7 +122,7 @@ public class HdrImageTests
         Assert.True(hdrResult[1] < hdrResult[2]);
 
         // LDR API emits the spec-mandated error colour for the same HDR content.
-        Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
+        byte[] ldrResult = AstcStreamCodec.DecodeLdr(astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
         Assert.Equal(0xFF, ldrResult[0]);
         Assert.Equal(0x00, ldrResult[1]);
         Assert.Equal(0xFF, ldrResult[2]);

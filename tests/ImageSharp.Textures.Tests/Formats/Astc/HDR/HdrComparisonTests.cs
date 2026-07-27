@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.ColorEncoding;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
@@ -25,7 +24,7 @@ public class HdrComparisonTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         Assert.Equal(4, hdrResult.Length);
@@ -44,7 +43,7 @@ public class HdrComparisonTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         Assert.Equal(4, hdrResult.Length);
@@ -65,7 +64,7 @@ public class HdrComparisonTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
+        byte[] ldrResult = AstcStreamCodec.DecodeLdr(astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
         Assert.Equal(0xFF, ldrResult[0]);
         Assert.Equal(0x00, ldrResult[1]);
         Assert.Equal(0xFF, ldrResult[2]);
@@ -79,8 +78,8 @@ public class HdrComparisonTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        byte[] ldrResult = AstcStreamCodec.DecodeLdr(astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // LDR: exact byte values.
@@ -103,7 +102,7 @@ public class HdrComparisonTests
         byte[] astcData = File.ReadAllBytes(provider.InputFile);
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Should produce Width * Height * 4 values
@@ -124,8 +123,8 @@ public class HdrComparisonTests
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
         // Decode with both APIs
-        Span<byte> ldrResult = AstcDecoder.DecompressImage(astcFile);
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(
+        byte[] ldrResult = AstcStreamCodec.DecodeLdr(astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Both should produce correct output sizes
@@ -150,9 +149,9 @@ public class HdrComparisonTests
         Assert.Equal(FootprintType.Footprint6x6, hdrFile.Footprint.Type);
         Assert.Equal(hdrFile.Footprint.Type, ldrFile.Footprint.Type);
 
-        Span<float> hdrDecoded = AstcDecoder.DecompressHdrImage(
+        float[] hdrDecoded = AstcStreamCodec.DecodeHdr(
             hdrFile.Blocks, hdrFile.Width, hdrFile.Height, hdrFile.Footprint);
-        Span<float> ldrDecoded = AstcDecoder.DecompressHdrImage(
+        float[] ldrDecoded = AstcStreamCodec.DecodeHdr(
             ldrFile.Blocks, ldrFile.Width, ldrFile.Height, ldrFile.Footprint);
 
         // HDR file has values > 1.0; LDR file stays in 0-1.
@@ -168,14 +167,14 @@ public class HdrComparisonTests
         AstcFile astcFile = AstcFile.FromMemory(astcData);
 
         // Decode with LDR API to get byte values
-        Span<byte> ldrBytes = AstcDecoder.DecompressImage(astcFile);
+        byte[] ldrBytes = AstcStreamCodec.DecodeLdr(astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Convert LDR bytes to HDR using extension method
         Rgba32 ldrColor = new(ldrBytes[0], ldrBytes[1], ldrBytes[2], ldrBytes[3]);
         Rgba64 hdrFromLdr = new(ldrColor);
 
         // Decode with HDR API
-        Span<float> hdrDirect = AstcDecoder.DecompressHdrImage(
+        float[] hdrDirect = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         // Compare: UNORM16 normalized values should match HDR API output

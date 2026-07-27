@@ -7,14 +7,15 @@ using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Textures.Compression.Astc.BlockDecoding;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
-using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 
 namespace SixLabors.ImageSharp.Textures.Compression.Astc;
 
 /// <summary>
-/// Provides methods to decode ASTC-compressed texture data into uncompressed pixel formats.
+/// Decodes ASTC-compressed texture data into uncompressed pixel formats.
 /// </summary>
 /// <remarks>
+/// Image data is streamed from a source of ASTC blocks to a destination <see cref="Stream"/> of pixels, one
+/// block-row band at a time, so peak memory is independent of the image height.
 /// The decoder returns raw decoded values and does not apply any gamma or color-space
 /// transform. Callers loading ASTC data from an sRGB-tagged container (e.g. a KTX file
 /// with an *_SRGB_BLOCK format) are responsible for applying sRGB-to-linear conversion
@@ -23,169 +24,173 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc;
 public static class AstcDecoder
 {
     /// <summary>
-    /// Decompresses ASTC-compressed data to uncompressed RGBA32 format (4 bytes per pixel).
+    /// Serialises a decoded pixel band of element type <typeparamref name="TElement"/> into a
+    /// destination byte buffer. Used by the stream-to-stream decode paths to choose the output
+    /// byte layout (raw bytes or little-endian float) while the band loop stays generic.
     /// </summary>
-    /// <param name="astcData">The ASTC-compressed texture data</param>
-    /// <param name="width">Image width in pixels</param>
-    /// <param name="height">Image height in pixels</param>
-    /// <param name="footprint">The ASTC block footprint (e.g., 4x4, 5x5)</param>
-    /// <returns>
-    /// Array of bytes in RGBA32 format (width * height * 4 bytes total), or an empty span if the
-    /// input is structurally invalid. Individual malformed blocks are skipped and leave zeros in the output.
-    /// </returns>
-    public static Span<byte> DecompressImage(ReadOnlySpan<byte> astcData, int width, int height, Footprint footprint)
+    /// <typeparam name="TElement">Decoded pixel element type — <see cref="byte"/> for LDR, <see cref="float"/> for HDR.</typeparam>
+    private interface IBandSerializer<TElement>
+        where TElement : unmanaged
     {
-        Guard.MustBeGreaterThan(width, 0, nameof(width));
-        Guard.MustBeGreaterThan(height, 0, nameof(height));
+        /// <summary>
+        /// Gets the number of bytes emitted per decoded element (RGBA channel).
+        /// </summary>
+        public int BytesPerElement { get; }
 
-        long totalPixels = (long)width * height;
-        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / BlockInfo.ChannelsPerPixel, nameof(totalPixels));
-
-        int totalBytes = (int)(totalPixels * BlockInfo.ChannelsPerPixel);
-        byte[] imageBuffer = new byte[totalBytes];
-
-        return DecompressImage(astcData, width, height, footprint, imageBuffer)
-            ? imageBuffer
-            : [];
+        /// <summary>
+        /// Writes <paramref name="source"/> (<paramref name="elementCount"/> decoded elements)
+        /// into <paramref name="destination"/> as little-endian bytes.
+        /// </summary>
+        /// <param name="source">The decoded pixel band.</param>
+        /// <param name="elementCount">The number of valid elements at the start of <paramref name="source"/>.</param>
+        /// <param name="destination">The byte buffer to write the serialised elements to.</param>
+        public void Serialize(ReadOnlySpan<TElement> source, int elementCount, Span<byte> destination);
     }
 
     /// <summary>
-    /// Decompresses ASTC-compressed data to uncompressed RGBA32 format into a caller-provided buffer.
+    /// Decodes ASTC blocks read from <paramref name="source"/> and writes the RGBA32 result to
+    /// <paramref name="destination"/>, one block-row band at a time. Only a single band of
+    /// compressed blocks and decoded pixels is held in memory, so peak usage is independent of
+    /// the image height.
     /// </summary>
-    /// <param name="astcData">The ASTC-compressed texture data</param>
-    /// <param name="width">Image width in pixels</param>
-    /// <param name="height">Image height in pixels</param>
-    /// <param name="footprint">The ASTC block footprint (e.g., 4x4, 5x5)</param>
-    /// <param name="imageBuffer">Output buffer. Must be at least width * height * 4 bytes.</param>
-    /// <returns>
-    /// True if the input was structurally valid and decoding ran, false if it was rejected
-    /// up front. Individual malformed blocks are skipped and leave zeros in the output.
-    /// </returns>
-    public static bool DecompressImage(ReadOnlySpan<byte> astcData, int width, int height, Footprint footprint, Span<byte> imageBuffer)
-    {
-        ValidateImageArgs(width, height, imageBuffer.Length, BlockInfo.ChannelsPerPixel);
-
-        if (!TryGetBlockLayout(astcData, width, height, footprint, out int blocksWide, out int blocksHigh))
-        {
-            return false;
-        }
-
-        using IMemoryOwner<byte> decodedBlock = MemoryAllocator.Default.Allocate<byte>(footprint.PixelCount * BlockInfo.ChannelsPerPixel);
-        DecodeAllBlocks<LdrPipeline, byte>(astcData, width, height, footprint, blocksWide, blocksHigh, imageBuffer, decodedBlock.Memory.Span);
-        return true;
-    }
-
-    /// <summary>
-    /// Decompresses ASTC-compressed data read from a stream to uncompressed RGBA32 format.
-    /// Reads exactly the bytes implied by <paramref name="width"/>, <paramref name="height"/>,
-    /// and <paramref name="footprint"/>.
-    /// </summary>
-    /// <param name="stream">The stream containing ASTC-compressed block data.</param>
-    /// <param name="width">Image width in pixels.</param>
-    /// <param name="height">Image height in pixels.</param>
-    /// <param name="footprint">The ASTC block footprint (e.g., 4x4, 5x5).</param>
-    /// <returns>
-    /// Array of bytes in RGBA32 format (width * height * 4 bytes total). The stream's read
-    /// position advances by the consumed block bytes.
-    /// </returns>
-    /// <exception cref="EndOfStreamException">
-    /// Thrown if the stream contains fewer bytes than the footprint requires.
-    /// </exception>
-    public static Span<byte> DecompressImage(Stream stream, int width, int height, Footprint footprint)
-    {
-        Guard.NotNull(stream);
-        Guard.MustBeGreaterThan(width, 0, nameof(width));
-        Guard.MustBeGreaterThan(height, 0, nameof(height));
-
-        long totalPixels = (long)width * height;
-        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / BlockInfo.ChannelsPerPixel, nameof(totalPixels));
-
-        byte[] imageBuffer = new byte[(int)(totalPixels * BlockInfo.ChannelsPerPixel)];
-        return DecompressImage(stream, width, height, footprint, imageBuffer)
-            ? imageBuffer
-            : [];
-    }
-
-    /// <summary>
-    /// Decompresses ASTC-compressed data read from a stream into a caller-provided buffer.
-    /// </summary>
-    /// <param name="stream">The stream containing ASTC-compressed block data.</param>
+    /// <param name="source">The stream containing ASTC-compressed block data.</param>
+    /// <param name="destination">The stream to write RGBA32 pixels to, row-major.</param>
     /// <param name="width">Image width in pixels.</param>
     /// <param name="height">Image height in pixels.</param>
     /// <param name="footprint">The ASTC block footprint.</param>
-    /// <param name="imageBuffer">Output buffer. Must be at least <c>width * height * 4</c> bytes.</param>
-    /// <returns>
-    /// True if the stream contained the expected block count and decoding ran. The stream's
-    /// read position advances by the consumed block bytes.
-    /// </returns>
     /// <exception cref="EndOfStreamException">
-    /// Thrown if the stream contains fewer bytes than the footprint requires.
+    /// Thrown if <paramref name="source"/> contains fewer bytes than the footprint requires.
     /// </exception>
-    public static bool DecompressImage(Stream stream, int width, int height, Footprint footprint, Span<byte> imageBuffer)
+    public static void DecompressImage(Stream source, Stream destination, int width, int height, Footprint footprint)
     {
-        Guard.NotNull(stream);
-        ValidateImageArgs(width, height, imageBuffer.Length, BlockInfo.ChannelsPerPixel);
+        Guard.NotNull(source);
+        Guard.NotNull(destination);
+        ValidateStreamDecodeArgs(width, height);
 
-        int expectedBytes = ComputeExpectedBlockStreamSize(width, height, footprint);
-        using IMemoryOwner<byte> blocks = MemoryAllocator.Default.Allocate<byte>(expectedBytes);
-        Span<byte> blockSpan = blocks.Memory.Span[..expectedBytes];
-        stream.ReadExactly(blockSpan);
-
-        return DecompressImage((ReadOnlySpan<byte>)blockSpan, width, height, footprint, imageBuffer);
+        DecodeToStream<LdrPipeline, byte, ByteBandSerializer>(source, destination, width, height, footprint);
     }
 
     /// <summary>
-    /// Shared image-decode loop for both LDR and HDR profiles (ASTC spec §C.2.7 decode
-    /// procedure, §C.2.5 LDR/HDR modes). Iterates
-    /// the compressed block array in raster order, parses each block via
-    /// <see cref="BlockModeDecoder.Decode"/>, runs the pipeline's profile check, and dispatches to
-    /// the appropriate per-block decoder.
+    /// Asynchronously decodes ASTC blocks read from <paramref name="source"/> and writes the
+    /// RGBA32 result to <paramref name="destination"/>, one block-row band at a time. Only a
+    /// single band is held in memory; <see cref="Stream.ReadAsync(Memory{byte}, CancellationToken)"/>
+    /// and <see cref="Stream.WriteAsync(ReadOnlyMemory{byte}, CancellationToken)"/> drive the I/O.
+    /// </summary>
+    /// <param name="source">The stream containing ASTC-compressed block data.</param>
+    /// <param name="destination">The stream to write RGBA32 pixels to, row-major.</param>
+    /// <param name="width">Image width in pixels.</param>
+    /// <param name="height">Image height in pixels.</param>
+    /// <param name="footprint">The ASTC block footprint.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>A task that completes when the decode has finished.</returns>
+    /// <exception cref="EndOfStreamException">
+    /// Thrown if <paramref name="source"/> contains fewer bytes than the footprint requires.
+    /// </exception>
+    public static Task DecompressImageAsync(
+        Stream source, Stream destination, int width, int height, Footprint footprint, CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(source);
+        Guard.NotNull(destination);
+        ValidateStreamDecodeArgs(width, height);
+
+        return DecodeToStreamAsync<LdrPipeline, byte, ByteBandSerializer>(source, destination, width, height, footprint, cancellationToken);
+    }
+
+    /// <summary>
+    /// Decodes ASTC blocks read from <paramref name="source"/> and writes the RGBA float result
+    /// to <paramref name="destination"/> as little-endian IEEE-754 values, one block-row band at
+    /// a time. Only a single band of compressed blocks and decoded pixels is held in memory, so
+    /// peak usage is independent of the image height. For HDR content, values may exceed 1.0.
+    /// </summary>
+    /// <param name="source">The stream containing ASTC-compressed block data.</param>
+    /// <param name="destination">The stream to write little-endian RGBA float pixels to, row-major.</param>
+    /// <param name="width">Image width in pixels.</param>
+    /// <param name="height">Image height in pixels.</param>
+    /// <param name="footprint">The ASTC block footprint.</param>
+    /// <exception cref="EndOfStreamException">
+    /// Thrown if <paramref name="source"/> contains fewer bytes than the footprint requires.
+    /// </exception>
+    public static void DecompressHdrImage(Stream source, Stream destination, int width, int height, Footprint footprint)
+    {
+        Guard.NotNull(source);
+        Guard.NotNull(destination);
+        ValidateStreamDecodeArgs(width, height);
+
+        DecodeToStream<HdrPipeline, float, FloatBandSerializer>(source, destination, width, height, footprint);
+    }
+
+    /// <summary>
+    /// Asynchronously decodes ASTC blocks read from <paramref name="source"/> and writes the RGBA
+    /// float result to <paramref name="destination"/> as little-endian IEEE-754 values, one
+    /// block-row band at a time. Only a single band is held in memory.
+    /// </summary>
+    /// <param name="source">The stream containing ASTC-compressed block data.</param>
+    /// <param name="destination">The stream to write little-endian RGBA float pixels to, row-major.</param>
+    /// <param name="width">Image width in pixels.</param>
+    /// <param name="height">Image height in pixels.</param>
+    /// <param name="footprint">The ASTC block footprint.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>A task that completes when the decode has finished.</returns>
+    /// <exception cref="EndOfStreamException">
+    /// Thrown if <paramref name="source"/> contains fewer bytes than the footprint requires.
+    /// </exception>
+    public static Task DecompressHdrImageAsync(
+        Stream source, Stream destination, int width, int height, Footprint footprint, CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(source);
+        Guard.NotNull(destination);
+        ValidateStreamDecodeArgs(width, height);
+
+        return DecodeToStreamAsync<HdrPipeline, float, FloatBandSerializer>(source, destination, width, height, footprint, cancellationToken);
+    }
+
+    /// <summary>
+    /// Decodes one block-row (a horizontal band of <paramref name="blocksWide"/> blocks) into
+    /// <paramref name="destination"/>, a single-band pixel buffer whose first
+    /// <paramref name="destinationHeight"/> rows are valid (the band is clipped to the image
+    /// height at the bottom edge). <paramref name="bandBlocks"/> holds exactly the band's blocks,
+    /// indexed from 0; the per-block decode writes through <paramref name="decodedPixels"/> scratch
+    /// for blocks the fused fast path cannot place directly.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void DecodeAllBlocks<TPipeline, T>(
-        ReadOnlySpan<byte> astcData,
-        int width,
-        int height,
-        Footprint footprint,
+    private static void DecodeBlockRow<TPipeline, T>(
+        ReadOnlySpan<byte> bandBlocks,
         int blocksWide,
-        int blocksHigh,
-        Span<T> imageBuffer,
+        Footprint footprint,
+        int destinationWidth,
+        int destinationHeight,
+        Span<T> destination,
         Span<T> decodedPixels)
         where TPipeline : struct, IBlockPipeline<T>
         where T : unmanaged
     {
         TPipeline pipeline = default;
-        int blockIndex = 0;
 
-        for (int blockY = 0; blockY < blocksHigh; blockY++)
+        for (int blockX = 0; blockX < blocksWide; blockX++)
         {
-            for (int blockX = 0; blockX < blocksWide; blockX++)
+            UInt128 blockBits = ReadBlockBits(bandBlocks, blockX);
+
+            BlockInfo info = BlockModeDecoder.Decode(blockBits);
+            BlockDestination dest = ComputeBlockDestination(blockX, 0, footprint, destinationWidth, destinationHeight);
+
+            // Spec §C.2.19, §C.2.24, §C.2.25: illegal block encodings, and HDR endpoint modes
+            // in the LDR profile, must produce the error colour (magenta) for every texel.
+            if (!info.IsValid || !pipeline.IsBlockLegal(in info))
             {
-                int index = blockIndex++;
-                UInt128 blockBits = ReadBlockBits(astcData, index);
-
-                BlockInfo info = BlockModeDecoder.Decode(blockBits);
-                BlockDestination dest = ComputeBlockDestination(blockX, blockY, footprint, width, height);
-
-                // Spec §C.2.19, §C.2.24, §C.2.25: illegal block encodings, and HDR endpoint modes
-                // in the LDR profile, must produce the error colour (magenta) for every texel.
-                if (!info.IsValid || !pipeline.IsBlockLegal(in info))
-                {
-                    pipeline.WriteErrorColorClipped(
-                        footprint, dest.DstBaseX, dest.DstBaseY, dest.CopyWidth, dest.CopyHeight, width, imageBuffer);
-                    continue;
-                }
-
-                DecodeBlock<TPipeline, T>(blockBits, in info, footprint, dest, width, imageBuffer, decodedPixels);
+                pipeline.WriteErrorColorClipped(
+                    footprint, dest.DstBaseX, dest.DstBaseY, dest.CopyWidth, dest.CopyHeight, destinationWidth, destination);
+                continue;
             }
+
+            DecodeBlock<TPipeline, T>(blockBits, in info, footprint, dest, destinationWidth, destination, decodedPixels);
         }
     }
 
     /// <summary>
     /// Routes a single block to the best available path. Single-partition, single-plane,
     /// non-void-extent blocks (the common shape per ASTC spec §C.2.10, §C.2.20, §C.2.23) take
-    /// the fused fast path — directly to the image buffer when the block fits entirely inside
-    /// the image, or to a scratch buffer at image edges that need cropping. Everything else
+    /// the fused fast path — directly to the band buffer when the block fits entirely inside
+    /// the band, or to a scratch buffer at edges that need cropping. Everything else
     /// (void-extent, multi-partition, dual-plane) falls through to the general
     /// <see cref="LogicalBlock"/> pipeline.
     /// </summary>
@@ -222,273 +227,111 @@ public static class AstcDecoder
     }
 
     /// <summary>
-    /// Shared single-block decode path for the public <c>DecompressBlock</c> entry points.
-    /// Runs the pipeline's profile check (LDR rejects HDR content per ASTC spec §C.2.19),
-    /// then dispatches to the fused fast path for the common shape (single-partition,
-    /// single-plane, non-void-extent — spec §C.2.10, §C.2.20, §C.2.23) or the general
-    /// <see cref="LogicalBlock"/> pipeline otherwise. The caller's <paramref name="buffer"/>
-    /// is sized for exactly one block, so there's no interior/edge distinction.
+    /// Validates that <paramref name="width"/> and <paramref name="height"/> are positive and
+    /// that <c>width × height × 4</c> does not overflow <see cref="int.MaxValue"/>. The
+    /// stream-to-stream paths never materialise the whole image, but the per-band buffer offsets
+    /// are computed with <see cref="int"/> arithmetic, so the total element count must still fit.
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void DecodeSingleBlock<TPipeline, T>(ReadOnlySpan<byte> blockData, Footprint footprint, Span<T> buffer)
-        where TPipeline : struct, IBlockPipeline<T>
-        where T : unmanaged
+    private static void ValidateStreamDecodeArgs(int width, int height)
     {
-        UInt128 blockBits = BinaryPrimitives.ReadUInt128LittleEndian(blockData);
-        BlockInfo info = BlockModeDecoder.Decode(blockBits);
-        TPipeline pipeline = default;
-
-        // Spec §C.2.19, §C.2.24, §C.2.25: illegal blocks and HDR-in-LDR emit magenta.
-        if (!info.IsValid || !pipeline.IsBlockLegal(in info))
-        {
-            pipeline.WriteErrorColor(footprint, buffer);
-            return;
-        }
-
-        if (info.IsFusable)
-        {
-            pipeline.FusedToScratch(blockBits, in info, footprint, buffer);
-            return;
-        }
-
-        pipeline.LogicalWrite(blockBits, in info, footprint, buffer);
-    }
-
-    /// <summary>
-    /// Decompresses a single ASTC block to RGBA32 pixel data
-    /// </summary>
-    /// <param name="blockData">The data to decode</param>
-    /// <param name="footprint">The type of ASTC block footprint e.g. 4x4, 5x5, etc.</param>
-    /// <param name="buffer">The buffer to write the decoded pixels into</param>
-    public static void DecompressBlock(ReadOnlySpan<byte> blockData, Footprint footprint, Span<byte> buffer)
-    {
-        Guard.MustBeSizedAtLeast(blockData, BlockInfo.SizeInBytes, nameof(blockData));
-        Guard.MustBeSizedAtLeast(buffer, footprint.PixelCount * BlockInfo.ChannelsPerPixel, nameof(buffer));
-
-        DecodeSingleBlock<LdrPipeline, byte>(blockData, footprint, buffer);
-    }
-
-    /// <summary>
-    /// Decompresses ASTC-compressed data to RGBA values.
-    /// </summary>
-    /// <param name="astcData">The ASTC-compressed texture data</param>
-    /// <param name="width">Image width in pixels</param>
-    /// <param name="height">Image height in pixels</param>
-    /// <param name="footprint">The ASTC block footprint (e.g., 4x4, 5x5)</param>
-    /// <returns>
-    /// Values in RGBA order. For HDR content, values may exceed 1.0.
-    /// </returns>
-    public static Span<float> DecompressHdrImage(ReadOnlySpan<byte> astcData, int width, int height, Footprint footprint)
-    {
-        Guard.MustBeGreaterThan(width, 0, nameof(width));
-        Guard.MustBeGreaterThan(height, 0, nameof(height));
-
-        long totalPixels = (long)width * height;
-        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / 4, nameof(totalPixels));
-
-        int totalFloats = (int)(totalPixels * 4);
-        float[] imageBuffer = new float[totalFloats];
-        if (!DecompressHdrImage(astcData, width, height, footprint, imageBuffer))
-        {
-            return [];
-        }
-
-        return imageBuffer;
-    }
-
-    /// <summary>
-    /// Decompresses ASTC-compressed data to RGBA float values into a caller-provided buffer.
-    /// </summary>
-    /// <param name="astcData">The ASTC-compressed texture data</param>
-    /// <param name="width">Image width in pixels</param>
-    /// <param name="height">Image height in pixels</param>
-    /// <param name="footprint">The ASTC block footprint (e.g., 4x4, 5x5)</param>
-    /// <param name="imageBuffer">Output buffer. Must be at least width * height * 4 floats.</param>
-    /// <returns>
-    /// True if the input was structurally valid and decoding ran, false if it was rejected
-    /// up front. Individual malformed blocks are skipped and leave zeros in the output.
-    /// </returns>
-    public static bool DecompressHdrImage(ReadOnlySpan<byte> astcData, int width, int height, Footprint footprint, Span<float> imageBuffer)
-    {
-        ValidateImageArgs(width, height, imageBuffer.Length, BlockInfo.ChannelsPerPixel);
-
-        if (!TryGetBlockLayout(astcData, width, height, footprint, out int blocksWide, out int blocksHigh))
-        {
-            return false;
-        }
-
-        using IMemoryOwner<float> decodedBlock = MemoryAllocator.Default.Allocate<float>(footprint.PixelCount * BlockInfo.ChannelsPerPixel);
-        DecodeAllBlocks<HdrPipeline, float>(
-            astcData, width, height, footprint, blocksWide, blocksHigh, imageBuffer, decodedBlock.Memory.Span);
-        return true;
-    }
-
-    /// <summary>
-    /// Decompresses ASTC-compressed data read from a stream to RGBA float values.
-    /// </summary>
-    /// <param name="stream">The stream containing ASTC-compressed block data.</param>
-    /// <param name="width">Image width in pixels.</param>
-    /// <param name="height">Image height in pixels.</param>
-    /// <param name="footprint">The ASTC block footprint.</param>
-    /// <returns>
-    /// Values in RGBA order. For HDR content, values may exceed 1.0. The stream's read position
-    /// advances by the consumed block bytes.
-    /// </returns>
-    /// <exception cref="EndOfStreamException">
-    /// Thrown if the stream contains fewer bytes than the footprint requires.
-    /// </exception>
-    public static Span<float> DecompressHdrImage(Stream stream, int width, int height, Footprint footprint)
-    {
-        Guard.NotNull(stream);
         Guard.MustBeGreaterThan(width, 0, nameof(width));
         Guard.MustBeGreaterThan(height, 0, nameof(height));
 
         long totalPixels = (long)width * height;
         Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / BlockInfo.ChannelsPerPixel, nameof(totalPixels));
-
-        float[] imageBuffer = new float[(int)(totalPixels * BlockInfo.ChannelsPerPixel)];
-        return DecompressHdrImage(stream, width, height, footprint, imageBuffer)
-            ? imageBuffer
-            : [];
     }
 
     /// <summary>
-    /// Decompresses ASTC-compressed data read from a stream into a caller-provided HDR buffer.
+    /// Streams a decode from <paramref name="source"/> to <paramref name="destination"/> one
+    /// block-row band at a time, serialising each band with <typeparamref name="TSerializer"/>.
+    /// Peak memory is one band of compressed blocks, one band of decoded pixels, one per-block
+    /// scratch buffer, and one band of serialised output — all independent of the image height.
     /// </summary>
-    /// <param name="stream">The stream containing ASTC-compressed block data.</param>
-    /// <param name="width">Image width in pixels.</param>
-    /// <param name="height">Image height in pixels.</param>
-    /// <param name="footprint">The ASTC block footprint.</param>
-    /// <param name="imageBuffer">Output buffer. Must be at least <c>width * height * 4</c> floats.</param>
-    /// <returns>
-    /// True if the stream contained the expected block count and decoding ran. The stream's
-    /// read position advances by the consumed block bytes.
-    /// </returns>
-    /// <exception cref="EndOfStreamException">
-    /// Thrown if the stream contains fewer bytes than the footprint requires.
-    /// </exception>
-    public static bool DecompressHdrImage(Stream stream, int width, int height, Footprint footprint, Span<float> imageBuffer)
+    private static void DecodeToStream<TPipeline, TElement, TSerializer>(
+        Stream source, Stream destination, int width, int height, Footprint footprint)
+        where TPipeline : struct, IBlockPipeline<TElement>
+        where TElement : unmanaged
+        where TSerializer : struct, IBandSerializer<TElement>
     {
-        Guard.NotNull(stream);
-        ValidateImageArgs(width, height, imageBuffer.Length, BlockInfo.ChannelsPerPixel);
+        int blocksWide = footprint.BlocksWide(width);
+        int blocksHigh = footprint.BlocksHigh(height);
+        int bandBlockBytes = blocksWide * BlockInfo.SizeInBytes;
+        int bandPixelElements = footprint.Height * width * BlockInfo.ChannelsPerPixel;
+        int scratchSize = footprint.PixelCount * BlockInfo.ChannelsPerPixel;
 
-        int expectedBytes = ComputeExpectedBlockStreamSize(width, height, footprint);
-        using IMemoryOwner<byte> blocks = MemoryAllocator.Default.Allocate<byte>(expectedBytes);
-        Span<byte> blockSpan = blocks.Memory.Span[..expectedBytes];
-        stream.ReadExactly(blockSpan);
+        TSerializer serializer = default;
+        using IMemoryOwner<byte> bandBlocks = MemoryAllocator.Default.Allocate<byte>(bandBlockBytes);
+        using IMemoryOwner<TElement> bandPixels = MemoryAllocator.Default.Allocate<TElement>(bandPixelElements);
+        using IMemoryOwner<TElement> scratch = MemoryAllocator.Default.Allocate<TElement>(scratchSize);
+        using IMemoryOwner<byte> outputBand = MemoryAllocator.Default.Allocate<byte>(bandPixelElements * serializer.BytesPerElement);
 
-        return DecompressHdrImage((ReadOnlySpan<byte>)blockSpan, width, height, footprint, imageBuffer);
-    }
+        Span<byte> bandSpan = bandBlocks.Memory.Span;
+        Span<TElement> bandPixelSpan = bandPixels.Memory.Span;
+        Span<TElement> scratchSpan = scratch.Memory.Span;
+        Span<byte> outputSpan = outputBand.Memory.Span;
 
-    /// <summary>
-    /// Decompresses ASTC-compressed data to RGBA values.
-    /// </summary>
-    /// <param name="astcData">The ASTC-compressed texture data</param>
-    /// <param name="width">Image width in pixels</param>
-    /// <param name="height">Image height in pixels</param>
-    /// <param name="footprint">The ASTC block footprint type</param>
-    /// <returns>
-    /// Values in RGBA order. For HDR content, values may exceed 1.0.
-    /// </returns>
-    public static Span<float> DecompressHdrImage(ReadOnlySpan<byte> astcData, int width, int height, FootprintType footprint)
-    {
-        Footprint requestedFootprint = Footprint.FromFootprintType(footprint);
-        return DecompressHdrImage(astcData, width, height, requestedFootprint);
-    }
-
-    /// <summary>
-    /// Decompresses a single ASTC block to float RGBA values.
-    /// </summary>
-    /// <param name="blockData">The 16-byte ASTC block to decode</param>
-    /// <param name="footprint">The ASTC block footprint</param>
-    /// <param name="buffer">The buffer to write decoded values into (must be at least footprint.Width * footprint.Height * 4 elements)</param>
-    public static void DecompressHdrBlock(ReadOnlySpan<byte> blockData, Footprint footprint, Span<float> buffer)
-    {
-        Guard.MustBeSizedAtLeast(blockData, BlockInfo.SizeInBytes, nameof(blockData));
-        Guard.MustBeSizedAtLeast(buffer, footprint.PixelCount * BlockInfo.ChannelsPerPixel, nameof(buffer));
-
-        DecodeSingleBlock<HdrPipeline, float>(blockData, footprint, buffer);
-    }
-
-    internal static Span<byte> DecompressImage(AstcFile file)
-    {
-        Guard.NotNull(file);
-
-        return DecompressImage(file.Blocks, file.Width, file.Height, file.Footprint);
-    }
-
-    internal static Span<byte> DecompressImage(ReadOnlySpan<byte> astcData, int width, int height, FootprintType footprint)
-    {
-        Footprint requestedFootprint = Footprint.FromFootprintType(footprint);
-
-        return DecompressImage(astcData, width, height, requestedFootprint);
-    }
-
-    private static bool TryGetBlockLayout(
-        ReadOnlySpan<byte> astcData,
-        int width,
-        int height,
-        Footprint footprint,
-        out int blocksWide,
-        out int blocksHigh)
-    {
-        int blockWidth = footprint.Width;
-        int blockHeight = footprint.Height;
-        blocksWide = 0;
-        blocksHigh = 0;
-
-        if (blockWidth <= 0 || blockHeight <= 0 || width <= 0 || height <= 0)
+        for (int blockY = 0; blockY < blocksHigh; blockY++)
         {
-            return false;
+            source.ReadExactly(bandSpan);
+            int bandHeight = Math.Min(footprint.Height, height - (blockY * footprint.Height));
+            DecodeBlockRow<TPipeline, TElement>(bandSpan, blocksWide, footprint, width, bandHeight, bandPixelSpan, scratchSpan);
+
+            int validElements = bandHeight * width * BlockInfo.ChannelsPerPixel;
+            int outputBytes = validElements * serializer.BytesPerElement;
+            serializer.Serialize(bandPixelSpan, validElements, outputSpan);
+            destination.Write(outputSpan[..outputBytes]);
         }
+    }
 
-        blocksWide = (width + blockWidth - 1) / blockWidth;
-        blocksHigh = (height + blockHeight - 1) / blockHeight;
+    /// <summary>
+    /// Asynchronous counterpart to <see cref="DecodeToStream{TPipeline, TElement, TSerializer}"/>.
+    /// The block decode itself is synchronous (CPU-bound, span-based); only the source read and
+    /// destination write are awaited, so the buffers must persist across awaits — hence the
+    /// <see cref="IMemoryOwner{T}"/>-backed <see cref="Memory{T}"/> rather than spans.
+    /// </summary>
+    private static async Task DecodeToStreamAsync<TPipeline, TElement, TSerializer>(
+        Stream source, Stream destination, int width, int height, Footprint footprint, CancellationToken cancellationToken)
+        where TPipeline : struct, IBlockPipeline<TElement>
+        where TElement : unmanaged
+        where TSerializer : struct, IBandSerializer<TElement>
+    {
+        int blocksWide = footprint.BlocksWide(width);
+        int blocksHigh = footprint.BlocksHigh(height);
+        int bandBlockBytes = blocksWide * BlockInfo.SizeInBytes;
+        int bandPixelElements = footprint.Height * width * BlockInfo.ChannelsPerPixel;
+        int scratchSize = footprint.PixelCount * BlockInfo.ChannelsPerPixel;
 
-        // Guard against integer overflow in block count calculation
-        long expectedBlockCount = (long)blocksWide * blocksHigh;
-        if (astcData.Length % BlockInfo.SizeInBytes != 0 || astcData.Length / BlockInfo.SizeInBytes != expectedBlockCount)
+        TSerializer serializer = default;
+        using IMemoryOwner<byte> bandBlocks = MemoryAllocator.Default.Allocate<byte>(bandBlockBytes);
+        using IMemoryOwner<TElement> bandPixels = MemoryAllocator.Default.Allocate<TElement>(bandPixelElements);
+        using IMemoryOwner<TElement> scratch = MemoryAllocator.Default.Allocate<TElement>(scratchSize);
+        using IMemoryOwner<byte> outputBand = MemoryAllocator.Default.Allocate<byte>(bandPixelElements * serializer.BytesPerElement);
+
+        for (int blockY = 0; blockY < blocksHigh; blockY++)
         {
-            return false;
+            await source.ReadExactlyAsync(bandBlocks.Memory, cancellationToken).ConfigureAwait(false);
+
+            int bandHeight = Math.Min(footprint.Height, height - (blockY * footprint.Height));
+            DecodeBlockRow<TPipeline, TElement>(
+                bandBlocks.Memory.Span,
+                blocksWide,
+                footprint,
+                width,
+                bandHeight,
+                bandPixels.Memory.Span,
+                scratch.Memory.Span);
+
+            int validElements = bandHeight * width * BlockInfo.ChannelsPerPixel;
+            int outputBytes = validElements * serializer.BytesPerElement;
+            serializer.Serialize(bandPixels.Memory.Span, validElements, outputBand.Memory.Span);
+            await destination.WriteAsync(outputBand.Memory[..outputBytes], cancellationToken).ConfigureAwait(false);
         }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Validates that <paramref name="width"/> and <paramref name="height"/> are positive,
-    /// that width × height × <paramref name="bytesPerPixel"/> does not overflow
-    /// <see cref="int.MaxValue"/>, and that <paramref name="bufferLength"/> has room for
-    /// the decoded output.
-    /// </summary>
-    private static void ValidateImageArgs(int width, int height, int bufferLength, int bytesPerPixel)
-    {
-        Guard.MustBeGreaterThan(width, 0, nameof(width));
-        Guard.MustBeGreaterThan(height, 0, nameof(height));
-
-        long totalPixels = (long)width * height;
-        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / bytesPerPixel, nameof(totalPixels));
-
-        long totalElements = totalPixels * bytesPerPixel;
-        Guard.MustBeGreaterThanOrEqualTo(bufferLength, totalElements, nameof(bufferLength));
-    }
-
-    /// <summary>
-    /// Returns the total ASTC block-stream byte size for the given image dimensions and
-    /// footprint: <c>ceil(width / blockWidth) * ceil(height / blockHeight) * 16</c>.
-    /// </summary>
-    private static int ComputeExpectedBlockStreamSize(int width, int height, Footprint footprint)
-    {
-        int blocksWide = (width + footprint.Width - 1) / footprint.Width;
-        int blocksHigh = (height + footprint.Height - 1) / footprint.Height;
-        return blocksWide * blocksHigh * BlockInfo.SizeInBytes;
     }
 
     /// <summary>
     /// Reads the 16 bytes of the ASTC block at <paramref name="blockIndex"/> into a
-    /// <see cref="UInt128"/> (little-endian). The caller is responsible for ensuring the
-    /// stream contains the requested block — <see cref="TryGetBlockLayout"/> verifies
-    /// <c>astcData.Length</c> matches the expected block count before iteration begins.
+    /// <see cref="UInt128"/> (little-endian). The caller is responsible for ensuring
+    /// <paramref name="astcData"/> contains the requested block.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static UInt128 ReadBlockBits(ReadOnlySpan<byte> astcData, int blockIndex)
@@ -516,8 +359,7 @@ public static class AstcDecoder
     /// <summary>
     /// Copies a decoded block from its scratch buffer into the image at the block's pixel
     /// offset, row by row, clamped to the image bounds on right/bottom edges. The
-    /// <c>channels-per-pixel</c> factor is fixed at <see cref="BlockInfo.ChannelsPerPixel"/>
-    /// (RGBA) so the multiplies fold into constants at JIT time.
+    /// <c>channels-per-pixel</c> factor is fixed at <see cref="BlockInfo.ChannelsPerPixel"/> (RGBA).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void CopyBlockRect<T>(
@@ -536,6 +378,27 @@ public static class AstcDecoder
             int srcOffset = pixelY * blockWidth * BlockInfo.ChannelsPerPixel;
             int dstOffset = (((dstBaseY + pixelY) * imageWidth) + dstBaseX) * BlockInfo.ChannelsPerPixel;
             source.Slice(srcOffset, copyElements).CopyTo(destination.Slice(dstOffset, copyElements));
+        }
+    }
+
+    private readonly struct ByteBandSerializer : IBandSerializer<byte>
+    {
+        public int BytesPerElement => sizeof(byte);
+
+        public void Serialize(ReadOnlySpan<byte> source, int elementCount, Span<byte> destination)
+            => source[..elementCount].CopyTo(destination);
+    }
+
+    private readonly struct FloatBandSerializer : IBandSerializer<float>
+    {
+        public int BytesPerElement => sizeof(float);
+
+        public void Serialize(ReadOnlySpan<float> source, int elementCount, Span<byte> destination)
+        {
+            for (int i = 0; i < elementCount; i++)
+            {
+                BinaryPrimitives.WriteSingleLittleEndian(destination.Slice(i * sizeof(float), sizeof(float)), source[i]);
+            }
         }
     }
 }

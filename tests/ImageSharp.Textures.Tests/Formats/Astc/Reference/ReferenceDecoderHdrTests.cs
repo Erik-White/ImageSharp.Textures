@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using System.ComponentModel;
-using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
@@ -52,7 +51,7 @@ public class ReferenceDecoderHdrTests
 
         Half[] expected = AstcReferenceDecoder.DecompressHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, blockX, blockY);
-        Span<float> actual = AstcDecoder.DecompressHdrImage(
+        float[] actual = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         CompareF16(actual, expected, astcFile.Width, astcFile.Height, basename);
@@ -72,7 +71,7 @@ public class ReferenceDecoderHdrTests
 
         Half[] expected = AstcReferenceDecoder.DecompressHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, blockX, blockY);
-        Span<float> actual = AstcDecoder.DecompressHdrImage(
+        float[] actual = AstcStreamCodec.DecodeHdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         CompareF16(actual, expected, astcFile.Width, astcFile.Height, basename);
@@ -100,7 +99,7 @@ public class ReferenceDecoderHdrTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         Half[] expected = AstcReferenceDecoder.DecompressHdr(compressed, width, height, blockX, blockY);
-        Span<float> actual = AstcDecoder.DecompressHdrImage(compressed, width, height, footprint);
+        float[] actual = AstcStreamCodec.DecodeHdr(compressed, width, height, footprint);
 
         CompareF16(actual, expected, width, height, $"BrightSolid_{footprintType}");
     }
@@ -135,7 +134,7 @@ public class ReferenceDecoderHdrTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         Half[] expected = AstcReferenceDecoder.DecompressHdr(compressed, width, height, blockX, blockY);
-        Span<float> actual = AstcDecoder.DecompressHdrImage(compressed, width, height, footprint);
+        float[] actual = AstcStreamCodec.DecodeHdr(compressed, width, height, footprint);
 
         CompareF16(actual, expected, width, height, $"HdrGradient_{footprintType}");
     }
@@ -184,7 +183,7 @@ public class ReferenceDecoderHdrTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         Half[] expected = AstcReferenceDecoder.DecompressHdr(compressed, width, height, blockX, blockY);
-        Span<float> actual = AstcDecoder.DecompressHdrImage(compressed, width, height, footprint);
+        float[] actual = AstcStreamCodec.DecodeHdr(compressed, width, height, footprint);
 
         CompareF16(actual, expected, width, height, $"MixedLdrHdr_{footprintType}");
     }

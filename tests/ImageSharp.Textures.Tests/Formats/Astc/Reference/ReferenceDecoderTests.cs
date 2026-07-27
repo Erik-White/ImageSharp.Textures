@@ -1,7 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 using SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 using SixLabors.ImageSharp.Textures.Tests.Enums;
@@ -79,7 +78,7 @@ public class ReferenceDecoderTests
 
         byte[] expected = AstcReferenceDecoder.DecompressLdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, blockX, blockY);
-        Span<byte> actual = AstcDecoder.DecompressImage(
+        byte[] actual = AstcStreamCodec.DecodeLdr(
             astcFile.Blocks, astcFile.Width, astcFile.Height, astcFile.Footprint);
 
         CompareRgba8(actual, expected, astcFile.Width, astcFile.Height, basename);
@@ -107,7 +106,7 @@ public class ReferenceDecoderTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         byte[] expected = AstcReferenceDecoder.DecompressLdr(compressed, width, height, blockX, blockY);
-        Span<byte> actual = AstcDecoder.DecompressImage(compressed, width, height, footprint);
+        byte[] actual = AstcStreamCodec.DecodeLdr(compressed, width, height, footprint);
 
         CompareRgba8(actual, expected, width, height, $"SolidColor_{footprintType}");
     }
@@ -139,7 +138,7 @@ public class ReferenceDecoderTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         byte[] expected = AstcReferenceDecoder.DecompressLdr(compressed, width, height, blockX, blockY);
-        Span<byte> actual = AstcDecoder.DecompressImage(compressed, width, height, footprint);
+        byte[] actual = AstcStreamCodec.DecodeLdr(compressed, width, height, footprint);
 
         CompareRgba8(actual, expected, width, height, $"Gradient_{footprintType}");
     }
@@ -168,7 +167,7 @@ public class ReferenceDecoderTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         byte[] expected = AstcReferenceDecoder.DecompressLdr(compressed, width, height, blockX, blockY);
-        Span<byte> actual = AstcDecoder.DecompressImage(compressed, width, height, footprint);
+        byte[] actual = AstcStreamCodec.DecodeLdr(compressed, width, height, footprint);
 
         CompareRgba8(actual, expected, width, height, $"RandomNoise_{footprintType}");
     }
@@ -195,7 +194,7 @@ public class ReferenceDecoderTests
         Footprint footprint = Footprint.FromFootprintType(footprintType);
 
         byte[] expected = AstcReferenceDecoder.DecompressLdr(compressed, width, height, blockX, blockY);
-        Span<byte> actual = AstcDecoder.DecompressImage(compressed, width, height, footprint);
+        byte[] actual = AstcStreamCodec.DecodeLdr(compressed, width, height, footprint);
 
         CompareRgba8(actual, expected, width, height, $"NonAligned_{footprintType}");
     }
@@ -223,7 +222,7 @@ public class ReferenceDecoderTests
         Footprint footprint = Footprint.FromFootprintType(FootprintType.Footprint4x4);
 
         byte[] expected = AstcReferenceDecoder.DecompressLdr(block, blockX, blockY, blockX, blockY);
-        Span<byte> actual = AstcDecoder.DecompressImage(block, blockX, blockY, footprint);
+        byte[] actual = AstcStreamCodec.DecodeLdr(block, blockX, blockY, footprint);
 
         CompareRgba8(actual, expected, blockX, blockY, "VoidExtent");
     }

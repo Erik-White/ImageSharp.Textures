@@ -1,9 +1,6 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
-using System.Buffers;
-using System.Runtime.InteropServices;
-using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
@@ -58,9 +55,10 @@ internal static class AstcDecoder
         Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
         byte[] decompressedData = new byte[totalPixels * RgbaPixelDepthBytes];
 
-        // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the real decoder expects
-        ReadOnlySpan<byte> exact = blockData.AsSpan(0, (int)expectedDataLength);
-        _ = Compression.Astc.AstcDecoder.DecompressImage(exact, width, height, footprint, decompressedData);
+        // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the real decoder expects.
+        using MemoryStream source = new(blockData, 0, (int)expectedDataLength, writable: false);
+        using MemoryStream destination = new(decompressedData, writable: true);
+        Compression.Astc.AstcDecoder.DecompressImage(source, destination, width, height, footprint);
 
         return decompressedData;
     }
@@ -106,17 +104,13 @@ internal static class AstcDecoder
             totalPixels);
 
         Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
-
-        int floatCount = (int)(totalPixels * 4);
-        using IMemoryOwner<float> floatBuffer = MemoryAllocator.Default.Allocate<float>(floatCount);
-        Span<float> floatSpan = floatBuffer.Memory.Span[..floatCount];
+        byte[] bytes = new byte[totalPixels * RgbaHdrPixelDepthBytes];
 
         // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the real decoder expects.
-        ReadOnlySpan<byte> exact = blockData.AsSpan(0, (int)expectedDataLength);
-        _ = Compression.Astc.AstcDecoder.DecompressHdrImage(exact, width, height, footprint, floatSpan);
-
-        byte[] bytes = new byte[totalPixels * RgbaHdrPixelDepthBytes];
-        MemoryMarshal.AsBytes(floatSpan).CopyTo(bytes);
+        // The decoder writes little-endian IEEE-754 floats directly, matching the Rgba128Float pixel layout.
+        using MemoryStream source = new(blockData, 0, (int)expectedDataLength, writable: false);
+        using MemoryStream destination = new(bytes, writable: true);
+        Compression.Astc.AstcDecoder.DecompressHdrImage(source, destination, width, height, footprint);
 
         return bytes;
     }

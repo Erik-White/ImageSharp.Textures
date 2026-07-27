@@ -2,7 +2,6 @@
 // Licensed under the Six Labors Split License.
 
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Tests.Formats.Astc.Hdr;
@@ -18,7 +17,7 @@ public class HdrDecoderTests
         Footprint footprint = Footprint.FromFootprintType(FootprintType.Footprint4x4);
 
         // Decompress using HDR API
-        Span<float> hdrResult = AstcDecoder.DecompressHdrImage(astcData, 4, 4, footprint);
+        float[] hdrResult = AstcStreamCodec.DecodeHdr(astcData, 4, 4, footprint);
 
         // Verify output size: 4x4 pixels, 4 Half values (RGBA) per pixel
         Assert.Equal(4 * 4 * 4, hdrResult.Length); // 64 Half values total
@@ -52,7 +51,7 @@ public class HdrDecoderTests
             Footprint fp = Footprint.FromFootprintType(footprint);
             byte[] astcData = new byte[16]; // One ASTC block (all zeros = void extent block)
 
-            Span<float> result = AstcDecoder.DecompressHdrImage(astcData, fp.Width, fp.Height, footprint);
+            float[] result = AstcStreamCodec.DecodeHdr(astcData, fp.Width, fp.Height, footprint);
 
             // Should produce footprint.Width * footprint.Height pixels, each with 4 Half values
             Assert.Equal(fp.Width * fp.Height * 4, result.Length);
@@ -60,13 +59,12 @@ public class HdrDecoderTests
     }
 
     [Fact]
-    public void ASTCDecompressToFloat16_WithInvalidData_ShouldReturnEmpty()
+    public void ASTCDecompressToFloat16_WithTruncatedData_ShouldThrow()
     {
         byte[] emptyData = [];
 
-        Span<float> result = AstcDecoder.DecompressHdrImage(emptyData, 64, 64, FootprintType.Footprint4x4);
-
-        Assert.Equal(0, result.Length);
+        Assert.Throws<EndOfStreamException>(() =>
+            AstcStreamCodec.DecodeHdr(emptyData, 64, 64, FootprintType.Footprint4x4));
     }
 
     [Fact]
@@ -76,7 +74,7 @@ public class HdrDecoderTests
         Footprint footprint = Footprint.FromFootprintType(FootprintType.Footprint4x4);
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            AstcDecoder.DecompressHdrImage(astcData, 0, 0, footprint).ToArray());
+            AstcStreamCodec.DecodeHdr(astcData, 0, 0, footprint));
     }
 
     [Fact]

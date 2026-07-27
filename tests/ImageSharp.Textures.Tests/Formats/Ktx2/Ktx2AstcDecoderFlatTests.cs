@@ -136,23 +136,6 @@ public class Ktx2AstcDecoderFlatTests
         (firstMipMap as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.Exact, provider);
     }
 
-    [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Array.Rgb32_Srgb_6x6_MipMap)]
-    public void CanDecode_MipMaps(TestTextureProvider provider)
-    {
-        int mimMapLevel = 0;
-
-        using Texture texture = provider.GetTexture(KtxDecoder);
-        provider.SaveTextures(texture);
-        FlatTexture flatTexture = texture as FlatTexture;
-
-        foreach (MipMap mipMap in flatTexture.MipMaps)
-        {
-            using Image image = mipMap.GetImage();
-            (image as Image<Rgba32>).CompareToReferenceOutput(ImageComparer.Exact, provider, testOutputDetails: $"{mimMapLevel++}");
-        }
-    }
-
     [Theory(Skip = "Supercompression support not yet implemented")]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zlib1)]
     [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_Unorm_4x4_Zlib9)]

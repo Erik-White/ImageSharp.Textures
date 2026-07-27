@@ -40,8 +40,8 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
             DebugGuard.MustBeGreaterThan(height, 0, nameof(height));
             DebugGuard.MustBeGreaterThan(levelIndices.Length, 0, nameof(levelIndices.Length));
 
-            var allMipMapBytes = ReadAllMipMapBytes(stream, levelIndices);
-            using var memoryStream = new MemoryStream(allMipMapBytes);
+            byte[] allMipMapBytes = ReadAllMipMapBytes(stream, levelIndices);
+            using MemoryStream memoryStream = new(allMipMapBytes);
 
             switch (this.KtxHeader.VkFormat)
             {

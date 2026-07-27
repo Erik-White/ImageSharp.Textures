@@ -93,7 +93,15 @@ public class EndianHandlerTests
     {
         // Native path skips the length check entirely since no swap happens.
         byte[] data = new byte[dataLength];
+        for (int i = 0; i < data.Length; i++)
+        {
+            data[i] = (byte)(0x10 + i);
+        }
+
+        byte[] original = [.. data];
 
         Native().ConvertPixelData(data, 2);
+
+        Assert.Equal(original, data);
     }
 }

@@ -3,9 +3,9 @@
 
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 
-internal readonly struct RgbaAstcHdr4X4 : IBlock<RgbaAstcHdr4X4>
+internal readonly struct RgbaAstcHdr8X6 : IBlock<RgbaAstcHdr8X6>
 {
-    public static Size BlockSize => new(4, 4);
+    public static Size BlockSize => new(8, 6);
 
     public int BitsPerPixel => 128 / (BlockSize.Width * BlockSize.Height);
 

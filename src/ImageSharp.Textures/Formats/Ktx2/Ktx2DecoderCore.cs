@@ -103,9 +103,9 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                 texture = flatTexture;
             }
 
-            // Seek to the end of the file to ensure the entire stream is consumed.
-            // KTX2 files use byte offsets for mipmap data, so the stream position may not
-            // be at the end after reading. We need to find the furthest point read.
+            // Advance the stream past the furthest mip level the file declares so that
+            // callers (e.g. test infrastructure) checking position == length don't fail
+            // when later mip levels were skipped or the level array was sparse.
             long maxEndPosition = 0;
             for (int i = 0; i < levelIndices.Length; i++)
             {
@@ -116,7 +116,7 @@ namespace SixLabors.ImageSharp.Textures.Formats.Ktx2
                 }
             }
 
-            if (stream.Position < maxEndPosition)
+            if (stream.CanSeek && stream.Position < maxEndPosition)
             {
                 stream.Position = maxEndPosition;
             }

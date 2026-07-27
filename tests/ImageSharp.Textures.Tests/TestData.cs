@@ -4,7 +4,7 @@
 namespace SixLabors.ImageSharp.Textures.Tests;
 
 /// <summary>
-/// Class that contains relative test data paths under the Images/Input/Formats directory
+/// Relative test data paths under the Images/Input/Formats directory
 /// for non-image inputs (e.g. compressed block streams).
 /// </summary>
 public static class TestData

@@ -11,12 +11,6 @@ namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 /// <summary>
 /// ASTC (Adaptive scalable texture compression) decoder for all valid block footprints.
 /// </summary>
-/// <remarks>
-/// This path produces 8-bit RGBA output only. ASTC blocks that use HDR endpoint modes
-/// (2, 3, 7, 11, 14, 15) are clamped and will not render correctly. For HDR content,
-/// call <see cref="Compression.Astc.AstcDecoder.DecompressHdrImage(ReadOnlySpan{byte}, int, int, Footprint)"/>
-/// directly to receive float RGBA output, or use the HDR block types that route through this helper.
-/// </remarks>
 internal static class AstcDecoder
 {
     internal const int AstcBlockSize = 16;
@@ -24,77 +18,23 @@ internal static class AstcDecoder
     internal const int RgbaHdrPixelDepthBytes = 16;
 
     /// <summary>
-    /// Decompresses ASTC-compressed image data to float-RGBA pixels, returned as a raw byte buffer
-    /// of length <c>width * height * 16</c> suitable for <c>Image.LoadPixelData&lt;Rgba128Float&gt;</c>.
+    /// Decompresses ASTC-compressed image data to UNORM8 RGBA pixels (4 bytes per pixel).
+    /// Blocks that use HDR endpoint modes (spec §C.2.25) are reserved in the LDR profile and produce
+    /// the spec-mandated magenta error colour (§C.2.19); call <see cref="DecompressHdrImage"/> for HDR content.
     /// </summary>
-    public static byte[] DecompressHdrImage(
-        byte[] blockData,
-        int width,
-        int height,
-        int blockWidth,
-        int blockHeight,
-        byte compressedBytesPerBlock)
-    {
-        Guard.NotNull(blockData);
-        Guard.MustBeGreaterThan(width, 0, nameof(width));
-        Guard.MustBeGreaterThan(height, 0, nameof(height));
-        Guard.IsTrue(compressedBytesPerBlock == AstcBlockSize, nameof(compressedBytesPerBlock), $"ASTC blocks must be {AstcBlockSize} bytes.");
-
-        Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
-
-        // Guard: total pixel count fits in int after multiplying by 16 bytes/pixel.
-        long totalPixels = (long)width * height;
-        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / RgbaHdrPixelDepthBytes, nameof(totalPixels));
-
-        int floatCount = (int)(totalPixels * 4);
-        using IMemoryOwner<float> floatBuffer = MemoryAllocator.Default.Allocate<float>(floatCount);
-        Span<float> floatSpan = floatBuffer.Memory.Span[..floatCount];
-        if (!Compression.Astc.AstcDecoder.DecompressHdrImage(blockData, width, height, footprint, floatSpan))
-        {
-            // Structural validation failed; return zero-filled output so the caller gets a usable image.
-            return new byte[totalPixels * RgbaHdrPixelDepthBytes];
-        }
-
-        byte[] bytes = new byte[totalPixels * RgbaHdrPixelDepthBytes];
-        MemoryMarshal.AsBytes(floatSpan).CopyTo(bytes);
-        return bytes;
-    }
-
-    /// <summary>
-    /// Decodes an ASTC block into RGBA pixels.
-    /// </summary>
-    /// <param name="blockData">The 16-byte ASTC block data.</param>
-    /// <param name="blockWidth">The width of the block footprint (4-12).</param>
-    /// <param name="blockHeight">The height of the block footprint (4-12).</param>
-    /// <param name="decodedPixels">The output span for decoded RGBA pixels.</param>
-    /// <exception cref="ArgumentException">Thrown if blockData is not 16 bytes or decodedPixels is the wrong size.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown if the block dimensions are invalid.</exception>
-    /// <remarks>
-    /// If the block uses HDR endpoint modes (2, 3, 7, 11, 14, 15), the decoded colors may be incorrect.
-    /// </remarks>
-    public static void DecodeBlock(ReadOnlySpan<byte> blockData, int blockWidth, int blockHeight, Span<byte> decodedPixels)
-    {
-        Guard.IsTrue(blockData.Length == AstcBlockSize, nameof(blockData), $"ASTC blocks must be {AstcBlockSize} bytes.");
-        Guard.MustBeSizedAtLeast(decodedPixels, blockWidth * blockHeight * RgbaPixelDepthBytes, nameof(decodedPixels));
-
-        Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
-
-        Compression.Astc.AstcDecoder.DecompressBlock(blockData, footprint, decodedPixels);
-    }
-
-    /// <summary>
-    /// Decompresses ASTC-compressed image data to RGBA pixels.
-    /// </summary>
-    /// <param name="blockData">The compressed block data.</param>
-    /// <param name="width">The width of the texture.</param>
-    /// <param name="height">The height of the texture.</param>
+    /// <param name="blockData">The compressed block data. May be over-sized — only the bytes implied by
+    /// the image and footprint dimensions are read.</param>
+    /// <param name="width">The width of the texture, in pixels.</param>
+    /// <param name="height">The height of the texture, in pixels.</param>
     /// <param name="blockWidth">The width of the block footprint.</param>
     /// <param name="blockHeight">The height of the block footprint.</param>
-    /// <param name="compressedBytesPerBlock">The number of compressed bytes per block.</param>
-    /// <returns>The decompressed RGBA pixel data.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if blockData is null.</exception>
+    /// <param name="compressedBytesPerBlock">The number of compressed bytes per block. Must equal
+    /// <see cref="AstcBlockSize"/> (16).</param>
+    /// <returns>The decompressed UNORM8 RGBA pixel data.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="blockData"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if dimensions or block parameters are invalid.</exception>
-    /// <exception cref="ArgumentException">Thrown if blockData length is invalid.</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="blockData"/> is shorter than the
+    /// length implied by the image and footprint dimensions.</exception>
     public static byte[] DecompressImage(
         byte[] blockData,
         int width,
@@ -103,29 +43,113 @@ internal static class AstcDecoder
         int blockHeight,
         byte compressedBytesPerBlock)
     {
+        long expectedDataLength = GetExpectedBlockStreamLength(width, height, blockWidth, blockHeight, compressedBytesPerBlock);
+        long totalPixels = (long)width * height;
+
+        ValidateBlockStream(
+            blockData,
+            width,
+            height,
+            compressedBytesPerBlock,
+            bytesPerPixel: RgbaPixelDepthBytes,
+            expectedDataLength,
+            totalPixels);
+
+        Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
+        byte[] decompressedData = new byte[totalPixels * RgbaPixelDepthBytes];
+
+        // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the real decoder expects
+        ReadOnlySpan<byte> exact = blockData.AsSpan(0, (int)expectedDataLength);
+        _ = Compression.Astc.AstcDecoder.DecompressImage(exact, width, height, footprint, decompressedData);
+
+        return decompressedData;
+    }
+
+    /// <summary>
+    /// Decompresses ASTC-compressed image data to float-RGBA pixels, returned as a raw byte buffer
+    /// suitable for <c>Image.LoadPixelData&lt;Rgba128Float&gt;</c>. Each pixel is four IEEE-754 single-precision
+    /// floats (R, G, B, A) for a total of <c>width * height * 16</c> bytes. HDR endpoint modes (2, 3, 7,
+    /// 11, 14, 15 per ASTC spec §C.2.14) decode to their full unclamped float range; LDR endpoint modes
+    /// widen to <c>[0, 1]</c>.
+    /// </summary>
+    /// <param name="blockData">The compressed block data. May be over-sized — only the bytes implied by
+    /// the image and footprint dimensions are read.</param>
+    /// <param name="width">The width of the texture, in pixels.</param>
+    /// <param name="height">The height of the texture, in pixels.</param>
+    /// <param name="blockWidth">The width of the block footprint.</param>
+    /// <param name="blockHeight">The height of the block footprint.</param>
+    /// <param name="compressedBytesPerBlock">The number of compressed bytes per block. Must equal
+    /// <see cref="AstcBlockSize"/> (16).</param>
+    /// <returns>The decompressed RGBA-float pixel data as a raw byte buffer.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="blockData"/> is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if dimensions or block parameters are invalid.</exception>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="blockData"/> is shorter than the
+    /// length implied by the image and footprint dimensions.</exception>
+    public static byte[] DecompressHdrImage(
+        byte[] blockData,
+        int width,
+        int height,
+        int blockWidth,
+        int blockHeight,
+        byte compressedBytesPerBlock)
+    {
+        long expectedDataLength = GetExpectedBlockStreamLength(width, height, blockWidth, blockHeight, compressedBytesPerBlock);
+        long totalPixels = (long)width * height;
+
+        ValidateBlockStream(
+            blockData,
+            width,
+            height,
+            compressedBytesPerBlock,
+            bytesPerPixel: RgbaHdrPixelDepthBytes,
+            expectedDataLength,
+            totalPixels);
+
+        Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
+
+        int floatCount = (int)(totalPixels * 4);
+        using IMemoryOwner<float> floatBuffer = MemoryAllocator.Default.Allocate<float>(floatCount);
+        Span<float> floatSpan = floatBuffer.Memory.Span[..floatCount];
+
+        // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the real decoder expects.
+        ReadOnlySpan<byte> exact = blockData.AsSpan(0, (int)expectedDataLength);
+        _ = Compression.Astc.AstcDecoder.DecompressHdrImage(exact, width, height, footprint, floatSpan);
+
+        byte[] bytes = new byte[totalPixels * RgbaHdrPixelDepthBytes];
+        MemoryMarshal.AsBytes(floatSpan).CopyTo(bytes);
+
+        return bytes;
+    }
+
+    /// <summary>
+    /// Returns the exact compressed byte length implied by the image dimensions and ASTCb lock footprint
+    /// </summary>
+    private static long GetExpectedBlockStreamLength(int width, int height, int blockWidth, int blockHeight, byte compressedBytesPerBlock)
+    {
+        Guard.MustBeGreaterThan(blockWidth, 0, nameof(blockWidth));
+        Guard.MustBeGreaterThan(blockHeight, 0, nameof(blockHeight));
+
+        int blocksWide = (width + blockWidth - 1) / blockWidth;
+        int blocksHigh = (height + blockHeight - 1) / blockHeight;
+
+        return (long)blocksWide * blocksHigh * compressedBytesPerBlock;
+    }
+
+    private static void ValidateBlockStream(
+        byte[] blockData,
+        int width,
+        int height,
+        byte compressedBytesPerBlock,
+        int bytesPerPixel,
+        long expectedDataLength,
+        long totalPixels)
+    {
         Guard.NotNull(blockData);
         Guard.MustBeGreaterThan(width, 0, nameof(width));
         Guard.MustBeGreaterThan(height, 0, nameof(height));
         Guard.IsTrue(compressedBytesPerBlock == AstcBlockSize, nameof(compressedBytesPerBlock), $"ASTC blocks must be {AstcBlockSize} bytes.");
-
-        Footprint footprint = Footprint.FromFootprintType(FootprintFromDimensions(blockWidth, blockHeight));
-
-        int blocksWide = (width + blockWidth - 1) / blockWidth;
-        int blocksHigh = (height + blockHeight - 1) / blockHeight;
-        long expectedDataLength = (long)blocksWide * blocksHigh * compressedBytesPerBlock;
         Guard.MustBeGreaterThanOrEqualTo(blockData.Length, expectedDataLength, nameof(blockData));
-
-        long totalPixels = (long)width * height;
-        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / RgbaPixelDepthBytes, nameof(totalPixels));
-
-        byte[] decompressedData = new byte[totalPixels * RgbaPixelDepthBytes];
-
-        // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the
-        // real decoder expects. The slice length is now what TryGetBlockLayout requires, so
-        // the bool return is always true — no need to check.
-        ReadOnlySpan<byte> exact = blockData.AsSpan(0, (int)expectedDataLength);
-        _ = Compression.Astc.AstcDecoder.DecompressImage(exact, width, height, footprint, decompressedData);
-        return decompressedData;
+        Guard.MustBeLessThanOrEqualTo(totalPixels, (long)int.MaxValue / bytesPerPixel, nameof(totalPixels));
     }
 
     private static FootprintType FootprintFromDimensions(int width, int height)

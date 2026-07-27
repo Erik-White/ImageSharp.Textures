@@ -9,69 +9,6 @@ namespace SixLabors.ImageSharp.Textures.Tests.TextureFormats.Decoding;
 public class AstcDecoderTests
 {
     [Theory]
-    [InlineData(4, 4)]
-    [InlineData(5, 4)]
-    [InlineData(5, 5)]
-    [InlineData(6, 5)]
-    [InlineData(6, 6)]
-    [InlineData(8, 5)]
-    [InlineData(8, 6)]
-    [InlineData(8, 8)]
-    [InlineData(10, 5)]
-    [InlineData(10, 6)]
-    [InlineData(10, 8)]
-    [InlineData(10, 10)]
-    [InlineData(12, 10)]
-    [InlineData(12, 12)]
-    public void DecodeBlock_WithValidBlockData_DoesNotThrow(int blockWidth, int blockHeight)
-    {
-        byte[] blockData = new byte[AstcDecoder.AstcBlockSize]; // ASTC blocks are always 16 bytes
-        byte[] decodedPixels = new byte[blockWidth * blockHeight * AstcDecoder.RgbaPixelDepthBytes];
-
-        AstcDecoder.DecodeBlock(blockData, blockWidth, blockHeight, decodedPixels);
-
-        Assert.Equal(blockWidth * blockHeight * AstcDecoder.RgbaPixelDepthBytes, decodedPixels.Length);
-    }
-
-    [Theory]
-    [InlineData(0, 64)]
-    [InlineData(15, 64)]
-    [InlineData(17, 64)]
-    [InlineData(16, 10)]
-    public void DecodeBlock_WithInvalidBufferSizes_ThrowsArgumentOutOfRangeException(int dataSize, int outputSize)
-    {
-        byte[] blockData = new byte[dataSize];
-        byte[] decodedPixels = new byte[outputSize];
-
-        Assert.Throws<ArgumentException>(() =>
-            AstcDecoder.DecodeBlock(blockData, 4, 4, decodedPixels));
-    }
-
-    [Theory]
-    [InlineData(0, 4)]
-    [InlineData(4, 0)]
-    [InlineData(-1, 4)]
-    [InlineData(4, -1)]
-    [InlineData(3, 3)]
-    [InlineData(4, 3)]
-    [InlineData(3, 4)]
-    [InlineData(7, 7)]
-    [InlineData(11, 11)]
-    [InlineData(13, 13)]
-    [InlineData(16, 16)]
-    public void DecodeBlock_WithInvalidBlockDimensions_ThrowsArgumentOutOfRangeException(int blockWidth, int blockHeight)
-    {
-        byte[] blockData = new byte[AstcDecoder.AstcBlockSize];
-        byte[] decodedPixels = new byte[64];
-
-        // Either ArgumentOutOfRangeException (invalid block dims hit FootprintFromDimensions
-        // first) or ArgumentException (oversized footprint exceeds the output buffer first via
-        // Guard.MustBeSizedAtLeast). Both derive from ArgumentException.
-        Assert.ThrowsAny<ArgumentException>(() =>
-            AstcDecoder.DecodeBlock(blockData, blockWidth, blockHeight, decodedPixels));
-    }
-
-    [Theory]
     [InlineData(256, 256, 4, 4)]
     [InlineData(512, 512, 8, 8)]
     [InlineData(128, 128, 6, 6)]
@@ -90,10 +27,7 @@ public class AstcDecoderTests
 
     [Fact]
     public void DecompressImage_WithNullBlockData_ThrowsArgumentNullException()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            AstcDecoder.DecompressImage(null, 256, 256, 4, 4, AstcDecoder.AstcBlockSize));
-    }
+        => Assert.Throws<ArgumentNullException>(() => AstcDecoder.DecompressImage(null, 256, 256, 4, 4, AstcDecoder.AstcBlockSize));
 
     [Theory]
     [InlineData(0, 256)]

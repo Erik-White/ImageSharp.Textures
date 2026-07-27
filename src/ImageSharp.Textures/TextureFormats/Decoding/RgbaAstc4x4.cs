@@ -8,8 +8,6 @@ namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 /// </summary>
 internal readonly struct RgbaAstc4X4 : IBlock<RgbaAstc4X4>
 {
-    // See https://developer.nvidia.com/astc-texture-compression-for-game-assets
-    // https://chromium.googlesource.com/external/github.com/ARM-software/astc-encoder/+/HEAD/Docs/FormatOverview.md
     public static Size BlockSize => new(4, 4);
 
     /// <inheritdoc/>

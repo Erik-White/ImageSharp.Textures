@@ -10,7 +10,7 @@ public static class TestImages
 {
     public static class Ktx
     {
-        public const string Rgba = "Flat/rgba8888.ktx";
+        public const string Rgba32UnormMipMap = "Flat/rgba32-unorm-mipmap.ktx";
 
         public static class Astc
         {

@@ -3,15 +3,15 @@
 
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
 
-internal readonly struct RgbaAstcHdr4X4 : IBlock<RgbaAstcHdr4X4>
+internal readonly struct RgbaAstcHdr12X10 : IBlock<RgbaAstcHdr12X10>
 {
-    public static Size BlockSize => new(4, 4);
+    public static Size BlockSize => new(12, 10);
 
     public int BitsPerPixel => 128 / (BlockSize.Width * BlockSize.Height);
 
     public byte PixelDepthBytes => AstcDecoder.RgbaHdrPixelDepthBytes;
 
-    public byte DivSize => 4;
+    public byte DivSize => 10;
 
     public byte CompressedBytesPerBlock => AstcDecoder.AstcBlockSize;
 

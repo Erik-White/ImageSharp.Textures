@@ -2,6 +2,7 @@
 // Licensed under the Six Labors Split License.
 
 using System.Buffers.Binary;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 
@@ -10,11 +11,9 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc.IO;
 /// </summary>
 /// <remarks>
 /// ASTC block and decoded image dimensions in texels.
-///
-/// For 2D images the Z dimension must be set to 1.
-///
 /// Note that the image is not required to be an exact multiple of the compressed block
-/// size; the compressed data may include padding that is discarded during decompression.
+/// size, the compressed data may include padding that is discarded during decompression.
+/// See https://github.com/ARM-software/astc-encoder/blob/main/Docs/FileFormat.md
 /// </remarks>
 internal readonly record struct AstcFileHeader(byte BlockWidth, byte BlockHeight, byte BlockDepth, int ImageWidth, int ImageHeight, int ImageDepth)
 {
@@ -64,10 +63,8 @@ internal readonly record struct AstcFileHeader(byte BlockWidth, byte BlockHeight
         Guard.MustBeGreaterThan(imageHeight, 0, nameof(imageHeight));
         Guard.MustBeGreaterThan(imageDepth, 0, nameof(imageDepth));
 
-        // Guard against callers that compute a 4-byte-per-pixel RGBA32 output buffer.
-        const int bytesPerPixel = 4;
         long totalPixels = (long)imageWidth * imageHeight;
-        if (totalPixels > int.MaxValue / bytesPerPixel)
+        if (totalPixels > int.MaxValue / BlockInfo.ChannelsPerPixel)
         {
             throw new ArgumentOutOfRangeException(nameof(data), "ASTC image dimensions exceed the maximum supported size");
         }

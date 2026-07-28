@@ -15,7 +15,7 @@ internal readonly struct HdrPixelWriter : IPixelWriter<float>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WritePixel(Span<float> buffer, int offset, in ColorEndpointPair endpoint, int weight)
-        => WriteChannels(buffer.Slice(offset, 4), in endpoint, weight, dualPlane: null);
+        => WriteChannels(buffer.Slice(offset, BlockInfo.ChannelsPerPixel), in endpoint, weight, dualPlane: null);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WritePixelDualPlane(
@@ -26,7 +26,7 @@ internal readonly struct HdrPixelWriter : IPixelWriter<float>
         int dualPlaneChannel,
         int dualPlaneWeight)
         => WriteChannels(
-            buffer.Slice(offset, 4),
+            buffer.Slice(offset, BlockInfo.ChannelsPerPixel),
             in endpoint,
             primaryWeight,
             dualPlane: new DualPlanePixel(dualPlaneChannel, dualPlaneWeight));
@@ -62,7 +62,7 @@ internal readonly struct HdrPixelWriter : IPixelWriter<float>
     {
         bool alphaIsLdr = endpoint.AlphaIsLdr;
         bool valuesAreLns = endpoint.ValuesAreLns;
-        for (int channel = 0; channel < 4; ++channel)
+        for (int channel = 0; channel < BlockInfo.ChannelsPerPixel; ++channel)
         {
             int channelWeight = ChannelWeight(channel, weight, dualPlane);
             ushort interpolated = Interpolation.BlendWeightedAsUnorm16(
@@ -70,10 +70,10 @@ internal readonly struct HdrPixelWriter : IPixelWriter<float>
                 endpoint.HdrHigh.GetChannel(channel),
                 channelWeight);
 
-            if (channel == 3 && alphaIsLdr)
+            if (channel == BlockInfo.ChannelsPerPixel - 1 && alphaIsLdr)
             {
                 // Mode 14 (spec §C.2.14): alpha is UNORM16, normalise directly.
-                pixel[channel] = interpolated / 65535.0f;
+                pixel[channel] = Interpolation.Unorm16ToFloat(interpolated);
             }
             else if (valuesAreLns)
             {
@@ -98,14 +98,14 @@ internal readonly struct HdrPixelWriter : IPixelWriter<float>
         int weight,
         DualPlanePixel? dualPlane)
     {
-        for (int channel = 0; channel < 4; ++channel)
+        for (int channel = 0; channel < BlockInfo.ChannelsPerPixel; ++channel)
         {
             int channelWeight = ChannelWeight(channel, weight, dualPlane);
             ushort unorm16 = Interpolation.BlendLdrReplicatedAsUnorm16(
                 endpoint.LdrLow.GetChannel(channel),
                 endpoint.LdrHigh.GetChannel(channel),
                 channelWeight);
-            pixel[channel] = unorm16 / 65535.0f;
+            pixel[channel] = Interpolation.Unorm16ToFloat(unorm16);
         }
     }
 

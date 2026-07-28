@@ -49,9 +49,7 @@ public static class AstcDecoder
 
     /// <summary>
     /// Decodes ASTC blocks read from <paramref name="source"/> and writes the RGBA32 result to
-    /// <paramref name="destination"/>, one block-row band at a time. Only a single band of
-    /// compressed blocks and decoded pixels is held in memory, so peak usage is independent of
-    /// the image height.
+    /// <paramref name="destination"/>, one block-row band at a time.
     /// </summary>
     /// <param name="source">The stream containing ASTC-compressed block data.</param>
     /// <param name="destination">The stream to write RGBA32 pixels to, row-major.</param>
@@ -72,9 +70,7 @@ public static class AstcDecoder
 
     /// <summary>
     /// Asynchronously decodes ASTC blocks read from <paramref name="source"/> and writes the
-    /// RGBA32 result to <paramref name="destination"/>, one block-row band at a time. Only a
-    /// single band is held in memory; <see cref="Stream.ReadAsync(Memory{byte}, CancellationToken)"/>
-    /// and <see cref="Stream.WriteAsync(ReadOnlyMemory{byte}, CancellationToken)"/> drive the I/O.
+    /// RGBA32 result to <paramref name="destination"/>, one block-row band at a time.
     /// </summary>
     /// <param name="source">The stream containing ASTC-compressed block data.</param>
     /// <param name="destination">The stream to write RGBA32 pixels to, row-major.</param>
@@ -99,8 +95,7 @@ public static class AstcDecoder
     /// <summary>
     /// Decodes ASTC blocks read from <paramref name="source"/> and writes the RGBA float result
     /// to <paramref name="destination"/> as little-endian IEEE-754 values, one block-row band at
-    /// a time. Only a single band of compressed blocks and decoded pixels is held in memory, so
-    /// peak usage is independent of the image height. For HDR content, values may exceed 1.0.
+    /// a time. For HDR content, values may exceed 1.0.
     /// </summary>
     /// <param name="source">The stream containing ASTC-compressed block data.</param>
     /// <param name="destination">The stream to write little-endian RGBA float pixels to, row-major.</param>
@@ -122,7 +117,7 @@ public static class AstcDecoder
     /// <summary>
     /// Asynchronously decodes ASTC blocks read from <paramref name="source"/> and writes the RGBA
     /// float result to <paramref name="destination"/> as little-endian IEEE-754 values, one
-    /// block-row band at a time. Only a single band is held in memory.
+    /// block-row band at a time.
     /// </summary>
     /// <param name="source">The stream containing ASTC-compressed block data.</param>
     /// <param name="destination">The stream to write little-endian RGBA float pixels to, row-major.</param>
@@ -177,8 +172,7 @@ public static class AstcDecoder
             // in the LDR profile, must produce the error colour (magenta) for every texel.
             if (!info.IsValid || !pipeline.IsBlockLegal(in info))
             {
-                pipeline.WriteErrorColorClipped(
-                    footprint, dest.DstBaseX, dest.DstBaseY, dest.CopyWidth, dest.CopyHeight, destinationWidth, destination);
+                pipeline.WriteErrorColorClipped(footprint, dest.DstBaseX, dest.DstBaseY, dest.CopyWidth, dest.CopyHeight, destinationWidth, destination);
                 continue;
             }
 
@@ -191,8 +185,7 @@ public static class AstcDecoder
     /// non-void-extent blocks (the common shape per ASTC spec §C.2.10, §C.2.20, §C.2.23) take
     /// the fused fast path — directly to the band buffer when the block fits entirely inside
     /// the band, or to a scratch buffer at edges that need cropping. Everything else
-    /// (void-extent, multi-partition, dual-plane) falls through to the general
-    /// <see cref="LogicalBlock"/> pipeline.
+    /// (void-extent, multi-partition, dual-plane) falls through to the general <see cref="LogicalBlock"/> pipeline.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void DecodeBlock<TPipeline, T>(
@@ -245,7 +238,7 @@ public static class AstcDecoder
     /// Streams a decode from <paramref name="source"/> to <paramref name="destination"/> one
     /// block-row band at a time, serialising each band with <typeparamref name="TSerializer"/>.
     /// Peak memory is one band of compressed blocks, one band of decoded pixels, one per-block
-    /// scratch buffer, and one band of serialised output — all independent of the image height.
+    /// scratch buffer, and one band of serialised output - all independent of the image height.
     /// </summary>
     private static void DecodeToStream<TPipeline, TElement, TSerializer>(
         Stream source, Stream destination, int width, int height, Footprint footprint)
@@ -353,6 +346,7 @@ public static class AstcDecoder
         int copyWidth = Math.Min(footprint.Width, width - dstBaseX);
         int copyHeight = Math.Min(footprint.Height, height - dstBaseY);
         bool isFullInterior = copyWidth == footprint.Width && copyHeight == footprint.Height;
+
         return new BlockDestination(dstBaseX, dstBaseY, copyWidth, copyHeight, isFullInterior);
     }
 

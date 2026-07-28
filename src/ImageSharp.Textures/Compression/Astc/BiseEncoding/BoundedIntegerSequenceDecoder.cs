@@ -2,6 +2,7 @@
 // Licensed under the Six Labors Split License.
 
 using System.Runtime.CompilerServices;
+using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.Compression.Astc.BiseEncoding;
 
@@ -26,7 +27,7 @@ internal static class BoundedIntegerSequenceDecoder
     {
         int totalBitCount = BoundedIntegerSequenceCodec.GetBitCount(encoding, valuesCount, bitCount);
         int bitsPerBlock = BoundedIntegerSequenceCodec.GetEncodedBlockSize(encoding, bitCount);
-        Guard.MustBeLessThan(bitsPerBlock, 64, nameof(bitsPerBlock));
+        Guard.MustBeLessThan(bitsPerBlock, UInt128Extensions.HalfBits, nameof(bitsPerBlock));
 
         // Fixed 5 ints (20 bytes) — one BISE block holds at most 5 trits or 3 quints (spec §C.2.12).
         Span<int> blockResult = stackalloc int[5];

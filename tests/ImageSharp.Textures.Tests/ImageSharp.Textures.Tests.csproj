@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
     <DebugSymbols>True</DebugSymbols>
-    <Platforms>AnyCPU;x64;x86</Platforms>
     <AssemblyName>SixLabors.ImageSharp.Textures.Tests</AssemblyName>
     <RootNamespace>SixLabors.ImageSharp.Textures.Tests</RootNamespace>
     <IsTestProject>true</IsTestProject>
@@ -13,6 +12,7 @@
     <PackageReference Include="Magick.NET-Q16-AnyCPU" />
     <PackageReference Include="System.Drawing.Common" />
     <PackageReference Include="Moq" />
+    <PackageReference Include="AstcEncoderCSharp" />
   </ItemGroup>
 
   <ItemGroup>

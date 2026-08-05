@@ -227,6 +227,89 @@ public class ReferenceDecoderTests
         CompareRgba8(actual, expected, blockX, blockY, "VoidExtent");
     }
 
+    [Theory]
+    [MemberData(nameof(AllFootprintTypes))]
+    public void DecompressLdrSrgb_SolidColor_ShouldMatch(FootprintType footprintType)
+    {
+        (int blockX, int blockY) = AstcReferenceDecoder.ToBlockDimensions(footprintType);
+        int width = blockX;
+        int height = blockY;
+
+        byte[] pixels = new byte[width * height * 4];
+        for (int index = 0; index < width * height; index++)
+        {
+            pixels[(index * 4) + 0] = 128; // R
+            pixels[(index * 4) + 1] = 64; // G
+            pixels[(index * 4) + 2] = 200; // B
+            pixels[(index * 4) + 3] = 255; // A
+        }
+
+        byte[] compressed = AstcReferenceDecoder.CompressLdr(pixels, width, height, blockX, blockY);
+        Footprint footprint = Footprint.FromFootprintType(footprintType);
+
+        byte[] expected = AstcReferenceDecoder.DecompressLdrSrgb(compressed, width, height, blockX, blockY);
+        byte[] actual = AstcStreamCodec.DecodeLdrSrgb(compressed, width, height, footprint);
+
+        CompareRgba8(actual, expected, width, height, $"Srgb_SolidColor_{footprintType}");
+    }
+
+    [Theory]
+    [MemberData(nameof(AllFootprintTypes))]
+    public void DecompressLdrSrgb_Gradient_ShouldMatch(FootprintType footprintType)
+    {
+        (int blockX, int blockY) = AstcReferenceDecoder.ToBlockDimensions(footprintType);
+
+        int width = blockX * 2;
+        int height = blockY * 2;
+
+        byte[] pixels = new byte[width * height * 4];
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                int idx = ((row * width) + col) * 4;
+                pixels[idx + 0] = (byte)(255 * col / (width - 1));
+                pixels[idx + 1] = (byte)(255 * row / (height - 1));
+                pixels[idx + 2] = (byte)(255 - (255 * col / (width - 1)));
+                pixels[idx + 3] = 255;
+            }
+        }
+
+        byte[] compressed = AstcReferenceDecoder.CompressLdr(pixels, width, height, blockX, blockY);
+        Footprint footprint = Footprint.FromFootprintType(footprintType);
+
+        byte[] expected = AstcReferenceDecoder.DecompressLdrSrgb(compressed, width, height, blockX, blockY);
+        byte[] actual = AstcStreamCodec.DecodeLdrSrgb(compressed, width, height, footprint);
+
+        CompareRgba8(actual, expected, width, height, $"Srgb_Gradient_{footprintType}");
+    }
+
+    [Theory]
+    [MemberData(nameof(AllFootprintTypes))]
+    public void DecompressLdrSrgb_RandomNoise_ShouldMatch(FootprintType footprintType)
+    {
+        (int blockX, int blockY) = AstcReferenceDecoder.ToBlockDimensions(footprintType);
+
+        int width = blockX * 2;
+        int height = blockY * 2;
+
+        Random rng = new(42);
+        byte[] pixels = new byte[width * height * 4];
+        rng.NextBytes(pixels);
+        for (int index = 3; index < pixels.Length; index += 4)
+        {
+            pixels[index] = byte.MaxValue;
+        }
+
+        byte[] compressed = AstcReferenceDecoder.CompressLdr(pixels, width, height, blockX, blockY);
+        Footprint footprint = Footprint.FromFootprintType(footprintType);
+
+        byte[] expected = AstcReferenceDecoder.DecompressLdrSrgb(compressed, width, height, blockX, blockY);
+        byte[] actual = AstcStreamCodec.DecodeLdrSrgb(compressed, width, height, footprint);
+
+        CompareRgba8(actual, expected, width, height, $"Srgb_RandomNoise_{footprintType}");
+    }
+
     /// <summary>
     /// Compare RGBA32 output from both decoders. The ASTC spec (Khronos Data Format
     /// §C.2.18–§C.2.19) defines the entire LDR pipeline bit-exactly — endpoint and

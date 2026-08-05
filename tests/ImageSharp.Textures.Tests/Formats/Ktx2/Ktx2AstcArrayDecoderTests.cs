@@ -35,7 +35,7 @@ public class Ktx2AstcArrayDecoderTests
     /// array-layer support lands.
     /// </summary>
     [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Array, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Array.Rgb32_Srgb_6x6_MipMap)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Array, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Array.Rgb32_sRgb_6x6_MipMap)]
     public void CanDecode_MipMaps(TestTextureProvider provider)
     {
         int mipMapLevel = 0;

@@ -1,6 +1,7 @@
 // Copyright (c) Six Labors.
 // Licensed under the Six Labors Split License.
 
+using SixLabors.ImageSharp.Textures.Compression.Astc;
 using SixLabors.ImageSharp.Textures.Compression.Astc.Core;
 
 namespace SixLabors.ImageSharp.Textures.TextureFormats.Decoding;
@@ -27,6 +28,7 @@ internal static class AstcDecoder
     /// <param name="blockHeight">The height of the block footprint.</param>
     /// <param name="compressedBytesPerBlock">The number of compressed bytes per block. Must equal
     /// <see cref="AstcBlockSize"/> (16).</param>
+    /// <param name="mode">LDR decode mode — linear or sRGB endpoint expansion</param>
     /// <returns>The decompressed UNORM8 RGBA pixel data.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="blockData"/> is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if dimensions or block parameters are invalid.</exception>
@@ -38,7 +40,8 @@ internal static class AstcDecoder
         int height,
         int blockWidth,
         int blockHeight,
-        byte compressedBytesPerBlock)
+        byte compressedBytesPerBlock,
+        LdrDecodeMode mode = LdrDecodeMode.Linear)
     {
         long expectedDataLength = GetExpectedBlockStreamLength(width, height, blockWidth, blockHeight, compressedBytesPerBlock);
         long totalPixels = (long)width * height;
@@ -58,7 +61,7 @@ internal static class AstcDecoder
         // KTX/KTX2 mip-level slices may be over-sized; trim to the exact block stream the real decoder expects.
         using MemoryStream source = new(blockData, 0, (int)expectedDataLength, writable: false);
         using MemoryStream destination = new(decompressedData, writable: true);
-        Compression.Astc.AstcDecoder.DecompressImage(source, destination, width, height, footprint);
+        Compression.Astc.AstcDecoder.DecompressImage(source, destination, width, height, footprint, mode);
 
         return decompressedData;
     }

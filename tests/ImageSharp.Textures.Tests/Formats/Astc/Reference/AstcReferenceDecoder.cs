@@ -66,6 +66,55 @@ internal static class AstcReferenceDecoder
     }
 
     /// <summary>
+    /// Decompress ASTC blocks to sRGB RGBA32 (LDR sRGB profile) using the ARM reference decoder.
+    /// </summary>
+    /// <remarks>
+    /// The RGB channels are expanded via the sRGB rule (fixed <c>0x80</c> low byte, ASTC spec
+    /// §C.2.19); alpha stays linear. The output is the sRGB-encoded 8-bit values, no
+    /// sRGB-to-linear transform is applied.
+    /// </remarks>
+    public static byte[] DecompressLdrSrgb(ReadOnlySpan<byte> blocks, int w, int h, int blockX, int blockY)
+    {
+        AstcencError error = Astcenc.AstcencConfigInit(
+            AstcencProfile.AstcencPrfLdrSrgb,
+            (uint)blockX,
+            (uint)blockY,
+            1,
+            Astcenc.AstcencPreFastest,
+            AstcencFlags.DecompressOnly,
+            out AstcencConfig config);
+        ThrowOnError(error, "ConfigInit(LDR_SRGB)");
+
+        error = Astcenc.AstcencContextAlloc(ref config, 1, out AstcencContext context);
+        ThrowOnError(error, "ContextAlloc(LDR_SRGB)");
+
+        try
+        {
+            int pixelCount = w * h;
+            byte[] outputBytes = new byte[pixelCount * 4]; // RGBA32
+
+            AstcencImage image = new()
+            {
+                dimX = (uint)w,
+                dimY = (uint)h,
+                dimZ = 1,
+                dataType = AstcencType.AstcencTypeU8,
+                data = outputBytes,
+            };
+
+            byte[] blocksCopy = blocks.ToArray();
+            error = Astcenc.AstcencDecompressImage(context, blocksCopy, ref image, IdentitySwizzle, 0);
+            ThrowOnError(error, "DecompressImage(LDR_SRGB)");
+
+            return outputBytes;
+        }
+        finally
+        {
+            Astcenc.AstcencContextFree(context);
+        }
+    }
+
+    /// <summary>
     /// Decompress ASTC blocks to FP16 RGBA (HDR) using the ARM reference decoder.
     /// </summary>
     public static Half[] DecompressHdr(ReadOnlySpan<byte> blocks, int w, int h, int blockX, int blockY)

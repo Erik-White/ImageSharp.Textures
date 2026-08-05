@@ -24,6 +24,18 @@ internal static class AstcStreamCodec
     public static byte[] DecodeLdr(ReadOnlySpan<byte> astcData, int width, int height, FootprintType footprint)
         => DecodeLdr(astcData, width, height, Footprint.FromFootprintType(footprint));
 
+    public static byte[] DecodeLdrSrgb(ReadOnlySpan<byte> astcData, int width, int height, Footprint footprint)
+    {
+        using MemoryStream source = new(astcData.ToArray());
+        using MemoryStream destination = new();
+        AstcDecoder.DecompressImage(source, destination, width, height, footprint, LdrDecodeMode.Srgb);
+
+        return destination.ToArray();
+    }
+
+    public static byte[] DecodeLdrSrgb(ReadOnlySpan<byte> astcData, int width, int height, FootprintType footprint)
+        => DecodeLdrSrgb(astcData, width, height, Footprint.FromFootprintType(footprint));
+
     public static float[] DecodeHdr(ReadOnlySpan<byte> astcData, int width, int height, Footprint footprint)
     {
         using MemoryStream source = new(astcData.ToArray());

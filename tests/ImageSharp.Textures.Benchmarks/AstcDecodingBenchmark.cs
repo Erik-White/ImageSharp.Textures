@@ -49,7 +49,7 @@ public class AstcDecodingBenchmark
         BlockInfo info = BlockModeDecoder.Decode(bits);
         Footprint footprint = Footprint.FromFootprintType(FootprintType.Footprint4x4);
         Span<byte> pixels = stackalloc byte[footprint.PixelCount * 4];
-        LogicalBlock.DecodeToBytes(bits, in info, footprint, pixels);
+        LogicalBlock.DecodeToBytes<LinearMode>(bits, in info, footprint, pixels);
         return pixels[0];
     }
 }

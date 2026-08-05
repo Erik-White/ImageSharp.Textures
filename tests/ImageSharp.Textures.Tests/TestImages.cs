@@ -14,7 +14,7 @@ public static class TestImages
 
         public static class Astc
         {
-            public const string Rgb32_8x8 = "Flat/Astc/rgba32-srgb-8x8.ktx";
+            public const string Rgba32_8x8 = "Flat/Astc/rgba32-srgb-8x8.ktx";
 
             public const string Rgb32_sRgb_4x4 = "Flat/Astc/rgba32-srgb-4x4-valid.ktx";
             public const string Rgb32_sRgb_5x4 = "Flat/Astc/rgba32-srgb-5x4-valid.ktx";
@@ -67,20 +67,20 @@ public static class TestImages
         public static class Astc
         {
             // Flat textures with various block sizes
-            public const string Rgba32_4x4 = "Flat/Astc/rgba32-srgb-4x4.ktx2";
-            public const string Rgba32_5x4 = "Flat/Astc/rgba32-srgb-5x4.ktx2";
-            public const string Rgba32_5x5 = "Flat/Astc/rgba32-srgb-5x5.ktx2";
-            public const string Rgba32_6x5 = "Flat/Astc/rgba32-srgb-6x5.ktx2";
-            public const string Rgba32_6x6 = "Flat/Astc/rgba32-srgb-6x6.ktx2";
-            public const string Rgba32_8x5 = "Flat/Astc/rgba32-srgb-8x5.ktx2";
-            public const string Rgba32_8x6 = "Flat/Astc/rgba32-srgb-8x6.ktx2";
-            public const string Rgba32_8x8 = "Flat/Astc/rgba32-srgb-8x8.ktx2";
-            public const string Rgba32_10x5 = "Flat/Astc/rgba32-srgb-10x5.ktx2";
-            public const string Rgba32_10x6 = "Flat/Astc/rgba32-srgb-10x6.ktx2";
-            public const string Rgba32_10x8 = "Flat/Astc/rgba32-srgb-10x8.ktx2";
-            public const string Rgba32_10x10 = "Flat/Astc/rgba32-srgb-10x10.ktx2";
-            public const string Rgba32_12x10 = "Flat/Astc/rgba32-srgb-12x10.ktx2";
-            public const string Rgba32_12x12 = "Flat/Astc/rgba32-srgb-12x12.ktx2";
+            public const string Rgba32_sRgb_4x4 = "Flat/Astc/rgba32-srgb-4x4.ktx2";
+            public const string Rgba32_sRgb_5x4 = "Flat/Astc/rgba32-srgb-5x4.ktx2";
+            public const string Rgba32_sRgb_5x5 = "Flat/Astc/rgba32-srgb-5x5.ktx2";
+            public const string Rgba32_sRgb_6x5 = "Flat/Astc/rgba32-srgb-6x5.ktx2";
+            public const string Rgba32_sRgb_6x6 = "Flat/Astc/rgba32-srgb-6x6.ktx2";
+            public const string Rgba32_sRgb_8x5 = "Flat/Astc/rgba32-srgb-8x5.ktx2";
+            public const string Rgba32_sRgb_8x6 = "Flat/Astc/rgba32-srgb-8x6.ktx2";
+            public const string Rgba32_sRgb_8x8 = "Flat/Astc/rgba32-srgb-8x8.ktx2";
+            public const string Rgba32_sRgb_10x5 = "Flat/Astc/rgba32-srgb-10x5.ktx2";
+            public const string Rgba32_sRgb_10x6 = "Flat/Astc/rgba32-srgb-10x6.ktx2";
+            public const string Rgba32_sRgb_10x8 = "Flat/Astc/rgba32-srgb-10x8.ktx2";
+            public const string Rgba32_sRgb_10x10 = "Flat/Astc/rgba32-srgb-10x10.ktx2";
+            public const string Rgba32_sRgb_12x10 = "Flat/Astc/rgba32-srgb-12x10.ktx2";
+            public const string Rgba32_sRgb_12x12 = "Flat/Astc/rgba32-srgb-12x12.ktx2";
 
             public const string Rgb32_sRgb_4x4 = "Flat/Astc/rgba32-srgb-4x4-valid.ktx2";
             public const string Rgb32_sRgb_5x4 = "Flat/Astc/rgba32-srgb-5x4-valid.ktx2";
@@ -112,7 +112,7 @@ public static class TestImages
             public const string Rgb32_Unorm_12x10 = "Flat/Astc/rgba32-unorm-12x10-valid.ktx2";
             public const string Rgb32_Unorm_12x12 = "Flat/Astc/rgba32-unorm-12x12-valid.ktx2";
 
-            public const string Rgb32_Srgb_Large = "Flat/Astc/rgba32-10x5-flighthelmet-basecolor.ktx2";
+            public const string Rgb32_sRgb_10x5_Large = "Flat/Astc/rgba32-10x5-flighthelmet-basecolor.ktx2";
 
             // Supercompressed textures (ZLIB)
             public const string Rgb32_Unorm_4x4_Zlib1 = "Flat/Astc/Supercompressed/rgba32-unorm-4x4-zlib-1-valid.ktx2";
@@ -149,7 +149,7 @@ public static class TestImages
             public static class Array
             {
                 // LDR sRGB ASTC array texture with mipmaps
-                public const string Rgb32_Srgb_6x6_MipMap = "Array/Astc/rgba32-6x6-mipmap.ktx2";
+                public const string Rgb32_sRgb_6x6_MipMap = "Array/Astc/rgba32-6x6-mipmap.ktx2";
             }
 
             public static class Cubemap

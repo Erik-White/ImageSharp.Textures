@@ -20,8 +20,8 @@ public class KtxAstcDecoderFlatTests
     private static readonly KtxDecoder KtxDecoder = new();
 
     [Theory]
-    [WithFile(TestTextureFormat.Ktx, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx.Astc.Rgb32_8x8)]
-    public void CanDecode_Rgba32_Blocksizes(TestTextureProvider provider)
+    [WithFile(TestTextureFormat.Ktx, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx.Astc.Rgba32_8x8)]
+    public void CanDecode_Rgba32_Srgb(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(KtxDecoder);
         provider.SaveTextures(texture);
@@ -88,7 +88,7 @@ public class KtxAstcDecoderFlatTests
     [WithFile(TestTextureFormat.Ktx, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx.Astc.Rgb32_sRgb_10x10)]
     [WithFile(TestTextureFormat.Ktx, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx.Astc.Rgb32_sRgb_12x10)]
     [WithFile(TestTextureFormat.Ktx, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx.Astc.Rgb32_sRgb_12x12)]
-    public void CanDecode_Rgba32_Srgb(TestTextureProvider provider)
+    public void CanDecode_Rgb32_Srgb(TestTextureProvider provider)
     {
         string blockSize = BlockSizeExtractor.FromFileName(provider.InputFile);
         using Texture texture = provider.GetTexture(KtxDecoder);

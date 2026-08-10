@@ -112,7 +112,7 @@ public static class TestImages
             public const string Rgb32_Unorm_12x10 = "Flat/Astc/rgba32-unorm-12x10-valid.ktx2";
             public const string Rgb32_Unorm_12x12 = "Flat/Astc/rgba32-unorm-12x12-valid.ktx2";
 
-            public const string Rgb32_sRgb_10x5_Large = "Flat/Astc/rgba32-10x5-flighthelmet-basecolor.ktx2";
+            public const string Rgba32_sRgb_10x5_Large = "Flat/Astc/rgba32-10x5-flighthelmet-basecolor.ktx2";
 
             // Supercompressed textures (ZLIB)
             public const string Rgb32_Unorm_4x4_Zlib1 = "Flat/Astc/Supercompressed/rgba32-unorm-4x4-zlib-1-valid.ktx2";
@@ -144,18 +144,18 @@ public static class TestImages
 
             // ASTC blocks encoded with HDR endpoint modes but wrapped in a UNORM container.
             // Spec allows this; the decoder should clamp HDR output to UNORM8 range.
-            public const string Astc4x4_HdrInUnorm = "Flat/Astc/Hdr/rgba32-4x4-hdr-in-unorm.ktx2";
+            public const string Rgba32_4x4_HdrInUnorm = "Flat/Astc/Hdr/rgba32-4x4-hdr-in-unorm.ktx2";
 
             public static class Array
             {
                 // LDR sRGB ASTC array texture with mipmaps
-                public const string Rgb32_sRgb_6x6_MipMap = "Array/Astc/rgba32-6x6-mipmap.ktx2";
+                public const string Rgba32_sRgb_6x6_MipMap = "Array/Astc/rgba32-6x6-mipmap.ktx2";
             }
 
             public static class Cubemap
             {
                 // LDR sRGB ASTC cubemap
-                public const string Rgb32_Srgb_6x6 = "Cubemap/Astc/rgba32-6x6.ktx2";
+                public const string Rgba32_sRgb_6x6 = "Cubemap/Astc/rgba32-6x6.ktx2";
 
                 // HDR uncompressed cubemaps
                 public const string R32_Sfloat = "Cubemap/Hdr/r32-sfloat.ktx2";

@@ -121,7 +121,7 @@ public class Ktx2AstcDecoderFlatTests
     }
 
     [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgb32_sRgb_10x5_Large)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgba32_sRgb_10x5_Large)]
     public void CanDecode_Rgba32_Srgb_Large(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(KtxDecoder);

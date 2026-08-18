@@ -95,47 +95,61 @@ internal class KtxProcessor
                         case GlInternalPixelFormat.CompressedRgb8Etc2:
                             return this.AllocateMipMaps<Etc2>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc4x4Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc4x4Khr:
                             return this.AllocateMipMaps<RgbaAstc4X4>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc4x4Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb4X4>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc5x4Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x4Khr:
                             return this.AllocateMipMaps<RgbaAstc5X4>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x4Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb5X4>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc5x5Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x5Khr:
                             return this.AllocateMipMaps<RgbaAstc5X5>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x5Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb5X5>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc6x5Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x5Khr:
                             return this.AllocateMipMaps<RgbaAstc6X5>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x5Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb6X5>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc6x6Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x6Khr:
                             return this.AllocateMipMaps<RgbaAstc6X6>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x6Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb6X6>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc8x5Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x5Khr:
                             return this.AllocateMipMaps<RgbaAstc8X5>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x5Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb8X5>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc8x6Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x6Khr:
                             return this.AllocateMipMaps<RgbaAstc8X6>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x6Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb8X6>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc8x8Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x8Khr:
                             return this.AllocateMipMaps<RgbaAstc8X8>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x8Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb8X8>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc10x5Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x5Khr:
                             return this.AllocateMipMaps<RgbaAstc10X5>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x5Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb10X5>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc10x6Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x6Khr:
                             return this.AllocateMipMaps<RgbaAstc10X6>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x6Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb10X6>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc10x8Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x8Khr:
                             return this.AllocateMipMaps<RgbaAstc10X8>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x8Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb10X8>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc10x10Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x10Khr:
                             return this.AllocateMipMaps<RgbaAstc10X10>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x10Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb10X10>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc12x10Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x10Khr:
                             return this.AllocateMipMaps<RgbaAstc12X10>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x10Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb12X10>(stream, width, height, count);
                         case GlInternalPixelFormat.CompressedRgbaAstc12x12Khr:
-                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x12Khr:
                             return this.AllocateMipMaps<RgbaAstc12X12>(stream, width, height, count);
+                        case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x12Khr:
+                            return this.AllocateMipMaps<RgbaAstcSrgb12X12>(stream, width, height, count);
                     }
 
                     break;
@@ -234,47 +248,61 @@ internal class KtxProcessor
                     case GlInternalPixelFormat.CompressedRgb8Etc2:
                         return this.AllocateCubeMap<Etc2>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc4x4Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc4x4Khr:
                         return this.AllocateCubeMap<RgbaAstc4X4>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc4x4Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb4X4>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc5x4Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x4Khr:
                         return this.AllocateCubeMap<RgbaAstc5X4>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x4Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb5X4>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc5x5Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x5Khr:
                         return this.AllocateCubeMap<RgbaAstc5X5>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc5x5Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb5X5>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc6x5Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x5Khr:
                         return this.AllocateCubeMap<RgbaAstc6X5>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x5Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb6X5>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc6x6Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x6Khr:
                         return this.AllocateCubeMap<RgbaAstc6X6>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc6x6Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb6X6>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc8x5Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x5Khr:
                         return this.AllocateCubeMap<RgbaAstc8X5>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x5Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb8X5>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc8x6Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x6Khr:
                         return this.AllocateCubeMap<RgbaAstc8X6>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x6Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb8X6>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc8x8Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x8Khr:
                         return this.AllocateCubeMap<RgbaAstc8X8>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc8x8Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb8X8>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc10x5Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x5Khr:
                         return this.AllocateCubeMap<RgbaAstc10X5>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x5Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb10X5>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc10x6Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x6Khr:
                         return this.AllocateCubeMap<RgbaAstc10X6>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x6Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb10X6>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc10x8Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x8Khr:
                         return this.AllocateCubeMap<RgbaAstc10X8>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x8Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb10X8>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc10x10Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x10Khr:
                         return this.AllocateCubeMap<RgbaAstc10X10>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc10x10Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb10X10>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc12x10Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x10Khr:
                         return this.AllocateCubeMap<RgbaAstc12X10>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x10Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb12X10>(stream, width, height);
                     case GlInternalPixelFormat.CompressedRgbaAstc12x12Khr:
-                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x12Khr:
                         return this.AllocateCubeMap<RgbaAstc12X12>(stream, width, height);
+                    case GlInternalPixelFormat.CompressedSrgb8Alpha8Astc12x12Khr:
+                        return this.AllocateCubeMap<RgbaAstcSrgb12X12>(stream, width, height);
                 }
 
                 break;

@@ -57,7 +57,7 @@ public class Ktx2AstcHdrDecoderFlatTests
     /// error colour (magenta) for every texel.
     /// </summary>
     [Theory]
-    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Astc4x4_HdrInUnorm)]
+    [WithFile(TestTextureFormat.Ktx2, TestTextureType.Flat, TestTextureTool.ToKtx, TestImages.Ktx2.Astc.Rgba32_4x4_HdrInUnorm)]
     public void Decode_HdrBlocksInUnormContainer_EmitsErrorColor(TestTextureProvider provider)
     {
         using Texture texture = provider.GetTexture(Ktx2Decoder);

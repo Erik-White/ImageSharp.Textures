@@ -16,10 +16,7 @@ namespace SixLabors.ImageSharp.Textures.Compression.Astc;
 /// <remarks>
 /// Image data is streamed from a source of ASTC blocks to a destination <see cref="Stream"/> of pixels, one
 /// block-row band at a time, so peak memory is independent of the image height.
-/// The decoder returns raw decoded values and does not apply any gamma or color-space
-/// transform. Callers loading ASTC data from an sRGB-tagged container (e.g. a KTX file
-/// with an *_SRGB_BLOCK format) are responsible for applying sRGB-to-linear conversion
-/// downstream if they need linear values.
+/// The decoder returns raw decoded values and does not apply an sRGB-to-linear transform.
 /// </remarks>
 public static class AstcDecoder
 {
@@ -56,16 +53,24 @@ public static class AstcDecoder
     /// <param name="width">Image width in pixels.</param>
     /// <param name="height">Image height in pixels.</param>
     /// <param name="footprint">The ASTC block footprint.</param>
+    /// <param name="mode">LDR decode mode — linear (default) or sRGB endpoint expansion.</param>
     /// <exception cref="EndOfStreamException">
     /// Thrown if <paramref name="source"/> contains fewer bytes than the footprint requires.
     /// </exception>
-    public static void DecompressImage(Stream source, Stream destination, int width, int height, Footprint footprint)
+    public static void DecompressImage(Stream source, Stream destination, int width, int height, Footprint footprint, LdrDecodeMode mode = LdrDecodeMode.Linear)
     {
         Guard.NotNull(source);
         Guard.NotNull(destination);
         ValidateStreamDecodeArgs(width, height);
 
-        DecodeToStream<LdrPipeline, byte, ByteBandSerializer>(source, destination, width, height, footprint);
+        if (mode == LdrDecodeMode.Srgb)
+        {
+            DecodeToStream<LdrPipeline<SrgbMode>, byte, ByteBandSerializer>(source, destination, width, height, footprint);
+        }
+        else
+        {
+            DecodeToStream<LdrPipeline<LinearMode>, byte, ByteBandSerializer>(source, destination, width, height, footprint);
+        }
     }
 
     /// <summary>
@@ -77,19 +82,22 @@ public static class AstcDecoder
     /// <param name="width">Image width in pixels.</param>
     /// <param name="height">Image height in pixels.</param>
     /// <param name="footprint">The ASTC block footprint.</param>
+    /// <param name="mode">LDR decode mode — linear (default) or sRGB endpoint expansion.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>A task that completes when the decode has finished.</returns>
     /// <exception cref="EndOfStreamException">
     /// Thrown if <paramref name="source"/> contains fewer bytes than the footprint requires.
     /// </exception>
     public static Task DecompressImageAsync(
-        Stream source, Stream destination, int width, int height, Footprint footprint, CancellationToken cancellationToken = default)
+        Stream source, Stream destination, int width, int height, Footprint footprint, LdrDecodeMode mode = LdrDecodeMode.Linear, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(source);
         Guard.NotNull(destination);
         ValidateStreamDecodeArgs(width, height);
 
-        return DecodeToStreamAsync<LdrPipeline, byte, ByteBandSerializer>(source, destination, width, height, footprint, cancellationToken);
+        return mode == LdrDecodeMode.Srgb
+            ? DecodeToStreamAsync<LdrPipeline<SrgbMode>, byte, ByteBandSerializer>(source, destination, width, height, footprint, cancellationToken)
+            : DecodeToStreamAsync<LdrPipeline<LinearMode>, byte, ByteBandSerializer>(source, destination, width, height, footprint, cancellationToken);
     }
 
     /// <summary>
